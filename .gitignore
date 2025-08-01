@@ -57,3 +57,28 @@ logs/
 *.temp
 tmp/
 temp/
+
+# Large data files
+*.nc4
+*.hdf5
+*.tsv
+*.xml
+*.kml
+*.zip
+precipitation/
+data/raw/precipitation/
+
+# Sensitive files
+.netrc
+cookies.txt
+kaggle.json
+
+# Test files
+test_*.nc4
+test_*.hdf5
+
+# Large raw data
+data/raw/gcat_*
+data/raw/geosync_*
+data/raw/intelsat_*
+data/raw/africa_*
