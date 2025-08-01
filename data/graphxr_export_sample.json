@@ -2,194 +2,14 @@
   "metadata": {
     "title": "Ground Station Investment Intelligence",
     "description": "Network graph showing ground station infrastructure, demand regions, and investment opportunities",
-    "created": "2025-08-01T20:24:45.473248",
+    "created": "2025-08-01T21:18:43.933946",
     "node_count": 126,
     "edge_count": 222,
     "schema_version": "1.0"
   },
   "nodes": [
     {
-      "id": "f7a9dd3e-3890-469c-a44f-d64bf0de6296",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "6",
-        "name": "Tokyo Station 2",
-        "latitude": 35.361462519537874,
-        "longitude": 139.9491602334563,
-        "altitude": 261.9748748226697,
-        "status": "Online",
-        "operator_type": "semi_commercial",
-        "created_date": "2022-05-01",
-        "total_observations": 3990,
-        "investment_score": 69.907254682695,
-        "investment_priority": "medium_priority",
-        "utilization_score": 10.204081632653061,
-        "reliability_score": 74.99999999999999,
-        "weather_score": 85.77625570776256,
-        "demand_score": 100.0,
-        "competition_score": 75.0,
-        "avg_hourly_observations": 1.0204081632653061,
-        "success_rate": 0.75,
-        "utilization_rate": 4.255102040816326,
-        "is_network_bridge": true,
-        "connected_regions": 9,
-        "bridge_value_usd": 9200000.0,
-        "node_size": 6.9907254682695,
-        "node_color": "#F39C12"
-      }
-    },
-    {
-      "id": "d38ae3ee-aab9-4379-b445-cf99bb481032",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "8",
-        "name": "Singapore Main Ground Station",
-        "latitude": 1.3812034001262183,
-        "longitude": 103.75624402597253,
-        "altitude": 93.62897381052424,
-        "status": "Online",
-        "operator_type": "commercial",
-        "created_date": "2020-01-01",
-        "total_observations": 49555,
-        "investment_score": 78.81712328767122,
-        "investment_priority": "medium_priority",
-        "utilization_score": 10.0,
-        "reliability_score": 76.19999999999999,
-        "weather_score": 76.78082191780823,
-        "demand_score": 100.0,
-        "competition_score": 75.0,
-        "avg_hourly_observations": 1.0,
-        "success_rate": 0.78,
-        "utilization_rate": 4.17,
-        "is_network_bridge": true,
-        "connected_regions": 9,
-        "bridge_value_usd": 9100000.0,
-        "node_size": 7.881712328767122,
-        "node_color": "#F39C12"
-      }
-    },
-    {
-      "id": "95ac8140-25bb-454a-9242-53848901c18e",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "11",
-        "name": "Sydney Station 2",
-        "latitude": -34.37334267143255,
-        "longitude": 150.41765289323158,
-        "altitude": 142.961025569209,
-        "status": "Online",
-        "operator_type": "semi_commercial",
-        "created_date": "2021-09-01",
-        "total_observations": 4959,
-        "investment_score": 72.13939753983786,
-        "investment_priority": "medium_priority",
-        "utilization_score": 10.204081632653061,
-        "reliability_score": 83.92857142857142,
-        "weather_score": 85.77625570776256,
-        "demand_score": 100.0,
-        "competition_score": 75.0,
-        "avg_hourly_observations": 1.0204081632653061,
-        "success_rate": 0.8775510204081632,
-        "utilization_rate": 4.255102040816326,
-        "is_network_bridge": true,
-        "connected_regions": 9,
-        "bridge_value_usd": 9200000.0,
-        "node_size": 7.2139397539837855,
-        "node_color": "#F39C12"
-      }
-    },
-    {
-      "id": "13dd3610-771b-4eb4-90d4-872b689c78e7",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "13",
-        "name": "Dubai Main Ground Station",
-        "latitude": 25.137107799969403,
-        "longitude": 55.33196762888409,
-        "altitude": 11.049202253484456,
-        "status": "Online",
-        "operator_type": "semi_commercial",
-        "created_date": "2020-01-01",
-        "total_observations": 6258,
-        "investment_score": 70.90305451778055,
-        "investment_priority": "medium_priority",
-        "utilization_score": 10.101010101010102,
-        "reliability_score": 79.06565656565657,
-        "weather_score": 85.77625570776256,
-        "demand_score": 100.0,
-        "competition_score": 75.0,
-        "avg_hourly_observations": 1.0101010101010102,
-        "success_rate": 0.8080808080808081,
-        "utilization_rate": 4.212121212121212,
-        "is_network_bridge": true,
-        "connected_regions": 9,
-        "bridge_value_usd": 9200000.0,
-        "node_size": 7.090305451778055,
-        "node_color": "#F39C12"
-      }
-    },
-    {
-      "id": "e7b26e79-d641-48c9-ba90-c2b8b0d7d54a",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "17",
-        "name": "S\u00e3o Paulo Main Ground Station",
-        "latitude": -23.643876284091206,
-        "longitude": -46.554879181234604,
-        "altitude": 58.652981324651556,
-        "status": "Online",
-        "operator_type": "semi_commercial",
-        "created_date": "2020-01-01",
-        "total_observations": 1206,
-        "investment_score": 67.86012522485126,
-        "investment_priority": "medium_priority",
-        "utilization_score": 10.101010101010102,
-        "reliability_score": 81.89393939393939,
-        "weather_score": 85.77625570776256,
-        "demand_score": 100.0,
-        "competition_score": 50.0,
-        "avg_hourly_observations": 1.0101010101010102,
-        "success_rate": 0.8484848484848485,
-        "utilization_rate": 4.212121212121212,
-        "is_network_bridge": true,
-        "connected_regions": 9,
-        "bridge_value_usd": 9300000.0,
-        "node_size": 6.786012522485126,
-        "node_color": "#F39C12"
-      }
-    },
-    {
-      "id": "3589bff5-cb05-459d-8d65-c3354b3ffa1e",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "19",
-        "name": "S\u00e3o Paulo Station 3",
-        "latitude": -23.09873375468708,
-        "longitude": -46.623799834468926,
-        "altitude": 132.15319228294874,
-        "status": "Online",
-        "operator_type": "semi_commercial",
-        "created_date": "2022-04-01",
-        "total_observations": 6768,
-        "investment_score": 69.50550712605508,
-        "investment_priority": "medium_priority",
-        "utilization_score": 10.101010101010102,
-        "reliability_score": 78.87272727272727,
-        "weather_score": 76.78082191780823,
-        "demand_score": 100.0,
-        "competition_score": 75.0,
-        "avg_hourly_observations": 1.0101010101010102,
-        "success_rate": 0.8181818181818182,
-        "utilization_rate": 4.212121212121212,
-        "is_network_bridge": true,
-        "connected_regions": 9,
-        "bridge_value_usd": 9300000.0,
-        "node_size": 6.950550712605508,
-        "node_color": "#F39C12"
-      }
-    },
-    {
-      "id": "33e62a58-51f7-45e2-aa35-9737ce0b599e",
+      "id": "3144347c-a2e6-48af-9307-a7e76bd76cdb",
       "label": "GroundStation",
       "properties": {
         "station_id": "1",
@@ -219,7 +39,7 @@
       }
     },
     {
-      "id": "b22b459d-892e-4e17-9312-4c279b23e538",
+      "id": "26813cff-97a7-472f-9ad6-d4620858822e",
       "label": "GroundStation",
       "properties": {
         "station_id": "5",
@@ -249,7 +69,7 @@
       }
     },
     {
-      "id": "171d2b69-abc4-45c5-a599-037a4fe1ee69",
+      "id": "b14a1678-ffbf-409b-824f-28dc37b9441f",
       "label": "GroundStation",
       "properties": {
         "station_id": "10",
@@ -279,7 +99,7 @@
       }
     },
     {
-      "id": "9a4b7f47-5cb5-4da8-90dc-ac2848e68c32",
+      "id": "8b808984-176e-42b9-859a-d9d2cea55eb1",
       "label": "GroundStation",
       "properties": {
         "station_id": "15",
@@ -309,7 +129,7 @@
       }
     },
     {
-      "id": "6e3abb2c-7cfd-4780-be62-022c18d0a42a",
+      "id": "fe6f2bab-be8b-4811-820f-303db6c6361d",
       "label": "GroundStation",
       "properties": {
         "station_id": "18",
@@ -339,97 +159,187 @@
       }
     },
     {
-      "id": "4ed82a56-0506-4d68-add0-7812a04b95da",
+      "id": "22425266-5288-410f-9f21-4eb9d2ce1d7d",
       "label": "GroundStation",
       "properties": {
-        "station_id": "2",
-        "name": "New York Station 2",
-        "latitude": 40.595723312638334,
-        "longitude": -74.1230684784746,
-        "altitude": 38.460969962417735,
-        "status": "Online",
-        "operator_type": "community",
-        "created_date": "2022-06-01",
-        "total_observations": 869,
-        "investment_score": 75.0065898713159,
-        "investment_priority": "medium_priority",
-        "utilization_score": 10.101010101010102,
-        "reliability_score": 80.47979797979798,
-        "weather_score": 85.77625570776256,
-        "demand_score": 100.0,
-        "competition_score": 100.0,
-        "avg_hourly_observations": 1.0101010101010102,
-        "success_rate": 0.8282828282828283,
-        "utilization_rate": 4.212121212121212,
-        "is_network_bridge": true,
-        "connected_regions": 9,
-        "bridge_value_usd": 9100000.0,
-        "node_size": 7.500658987131589,
-        "node_color": "#F39C12"
-      }
-    },
-    {
-      "id": "8913ff13-9258-49d4-b4fd-7ae968192979",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "16",
-        "name": "Dubai Station 4",
-        "latitude": 25.622197709615214,
-        "longitude": 55.419080692164485,
-        "altitude": 241.38531332935514,
+        "station_id": "6",
+        "name": "Tokyo Station 2",
+        "latitude": 35.361462519537874,
+        "longitude": 139.9491602334563,
+        "altitude": 261.9748748226697,
         "status": "Online",
         "operator_type": "semi_commercial",
-        "created_date": "2021-03-01",
-        "total_observations": 3940,
-        "investment_score": 74.46082611126643,
+        "created_date": "2022-05-01",
+        "total_observations": 3990,
+        "investment_score": 69.907254682695,
         "investment_priority": "medium_priority",
         "utilization_score": 10.204081632653061,
-        "reliability_score": 78.21428571428571,
+        "reliability_score": 74.99999999999999,
         "weather_score": 85.77625570776256,
         "demand_score": 100.0,
-        "competition_score": 100.0,
+        "competition_score": 75.0,
         "avg_hourly_observations": 1.0204081632653061,
-        "success_rate": 0.7959183673469388,
+        "success_rate": 0.75,
         "utilization_rate": 4.255102040816326,
         "is_network_bridge": true,
         "connected_regions": 9,
         "bridge_value_usd": 9200000.0,
-        "node_size": 7.446082611126643,
+        "node_size": 6.9907254682695,
         "node_color": "#F39C12"
       }
     },
     {
-      "id": "199b6d99-b2b1-4679-8394-1c173ddb4d45",
+      "id": "46cac7f5-2d2f-4a3a-b5cc-071c854f62de",
       "label": "GroundStation",
       "properties": {
-        "station_id": "20",
-        "name": "S\u00e3o Paulo Station 4",
-        "latitude": -23.656580710855813,
-        "longitude": -46.84673439701986,
-        "altitude": 88.99843075446216,
+        "station_id": "8",
+        "name": "Singapore Main Ground Station",
+        "latitude": 1.3812034001262183,
+        "longitude": 103.75624402597253,
+        "altitude": 93.62897381052424,
         "status": "Online",
-        "operator_type": "semi_commercial",
-        "created_date": "2020-09-01",
-        "total_observations": 2793,
-        "investment_score": 75.01643835616439,
+        "operator_type": "commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 49555,
+        "investment_score": 78.81712328767122,
         "investment_priority": "medium_priority",
         "utilization_score": 10.0,
-        "reliability_score": 80.6,
-        "weather_score": 85.77625570776256,
+        "reliability_score": 76.19999999999999,
+        "weather_score": 76.78082191780823,
         "demand_score": 100.0,
-        "competition_score": 100.0,
+        "competition_score": 75.0,
         "avg_hourly_observations": 1.0,
-        "success_rate": 0.83,
+        "success_rate": 0.78,
         "utilization_rate": 4.17,
         "is_network_bridge": true,
         "connected_regions": 9,
-        "bridge_value_usd": 9300000.0,
-        "node_size": 7.501643835616439,
+        "bridge_value_usd": 9100000.0,
+        "node_size": 7.881712328767122,
         "node_color": "#F39C12"
       }
     },
     {
-      "id": "ddec5889-6d16-43f7-b968-8a0a4eb644b7",
+      "id": "edb9c813-b49f-4f9a-94d9-851b25744c0b",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "11",
+        "name": "Sydney Station 2",
+        "latitude": -34.37334267143255,
+        "longitude": 150.41765289323158,
+        "altitude": 142.961025569209,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-09-01",
+        "total_observations": 4959,
+        "investment_score": 72.13939753983786,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.204081632653061,
+        "reliability_score": 83.92857142857142,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0204081632653061,
+        "success_rate": 0.8775510204081632,
+        "utilization_rate": 4.255102040816326,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.2139397539837855,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "2bd87cc5-1b24-432e-be9f-5ceb92a8ed85",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "13",
+        "name": "Dubai Main Ground Station",
+        "latitude": 25.137107799969403,
+        "longitude": 55.33196762888409,
+        "altitude": 11.049202253484456,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 6258,
+        "investment_score": 70.90305451778055,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 79.06565656565657,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8080808080808081,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.090305451778055,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "e04508ee-40a8-4e77-9b82-77123f7dac19",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "17",
+        "name": "S\u00e3o Paulo Main Ground Station",
+        "latitude": -23.643876284091206,
+        "longitude": -46.554879181234604,
+        "altitude": 58.652981324651556,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 1206,
+        "investment_score": 67.86012522485126,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 81.89393939393939,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 50.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8484848484848485,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 6.786012522485126,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "958a0746-c36d-4980-9252-25aec5aeaa8a",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "19",
+        "name": "S\u00e3o Paulo Station 3",
+        "latitude": -23.09873375468708,
+        "longitude": -46.623799834468926,
+        "altitude": 132.15319228294874,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2022-04-01",
+        "total_observations": 6768,
+        "investment_score": 69.50550712605508,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 78.87272727272727,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8181818181818182,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 6.950550712605508,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "7aa4c63a-ebf3-4a0b-a179-402b97af4dba",
       "label": "GroundStation",
       "properties": {
         "station_id": "3",
@@ -459,7 +369,7 @@
       }
     },
     {
-      "id": "92ec6c6f-52a4-45b8-b5c3-e40893cfd997",
+      "id": "eeadce67-98d5-4f43-a8a8-2076880bcc63",
       "label": "GroundStation",
       "properties": {
         "station_id": "7",
@@ -489,7 +399,7 @@
       }
     },
     {
-      "id": "6a96f070-ee03-42e9-8651-623af26a3f38",
+      "id": "874abc7a-a071-4f4e-852a-e935b5433a4e",
       "label": "GroundStation",
       "properties": {
         "station_id": "9",
@@ -519,7 +429,7 @@
       }
     },
     {
-      "id": "bfd47fce-cc44-4da8-97f4-bb865e159664",
+      "id": "9581c426-f2ff-4d06-8c21-2065a6545be9",
       "label": "GroundStation",
       "properties": {
         "station_id": "12",
@@ -549,67 +459,97 @@
       }
     },
     {
-      "id": "3841aa79-2f34-4ad9-a8f7-5a5da8e8f235",
+      "id": "4bcfb7c2-eb02-455e-a62d-dad2d31fb42a",
       "label": "GroundStation",
       "properties": {
-        "station_id": "21",
-        "name": "Mumbai Main Ground Station",
-        "latitude": 18.92775757531411,
-        "longitude": 72.8548152483761,
-        "altitude": 89.13689009536958,
+        "station_id": "2",
+        "name": "New York Station 2",
+        "latitude": 40.595723312638334,
+        "longitude": -74.1230684784746,
+        "altitude": 38.460969962417735,
         "status": "Online",
-        "operator_type": "commercial",
-        "created_date": "2020-01-01",
-        "total_observations": 43941,
-        "investment_score": 69.16712328767123,
+        "operator_type": "community",
+        "created_date": "2022-06-01",
+        "total_observations": 869,
+        "investment_score": 75.0065898713159,
         "investment_priority": "medium_priority",
-        "utilization_score": 10.0,
-        "reliability_score": 77.6,
-        "weather_score": 76.78082191780823,
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 80.47979797979798,
+        "weather_score": 85.77625570776256,
         "demand_score": 100.0,
-        "competition_score": 75.0,
-        "avg_hourly_observations": 1.0,
-        "success_rate": 0.8,
-        "utilization_rate": 30.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8282828282828283,
+        "utilization_rate": 4.212121212121212,
         "is_network_bridge": true,
         "connected_regions": 9,
-        "bridge_value_usd": 9200000.0,
-        "node_size": 6.916712328767123,
+        "bridge_value_usd": 9100000.0,
+        "node_size": 7.500658987131589,
         "node_color": "#F39C12"
       }
     },
     {
-      "id": "3049a60c-17a3-4db5-ad31-5b372195063c",
+      "id": "b257835d-cb12-4208-959c-5c2f60c11beb",
       "label": "GroundStation",
       "properties": {
-        "station_id": "22",
-        "name": "Mumbai Station 2",
-        "latitude": 18.68897853462675,
-        "longitude": 72.69781092735401,
-        "altitude": 184.5859406577177,
+        "station_id": "16",
+        "name": "Dubai Station 4",
+        "latitude": 25.622197709615214,
+        "longitude": 55.419080692164485,
+        "altitude": 241.38531332935514,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-03-01",
+        "total_observations": 3940,
+        "investment_score": 74.46082611126643,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.204081632653061,
+        "reliability_score": 78.21428571428571,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0204081632653061,
+        "success_rate": 0.7959183673469388,
+        "utilization_rate": 4.255102040816326,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.446082611126643,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "a30e09d8-be86-4b25-81d9-e117d01cb53f",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "20",
+        "name": "S\u00e3o Paulo Station 4",
+        "latitude": -23.656580710855813,
+        "longitude": -46.84673439701986,
+        "altitude": 88.99843075446216,
         "status": "Online",
         "operator_type": "semi_commercial",
         "created_date": "2020-09-01",
-        "total_observations": 1406,
-        "investment_score": 69.16712328767123,
+        "total_observations": 2793,
+        "investment_score": 75.01643835616439,
         "investment_priority": "medium_priority",
         "utilization_score": 10.0,
-        "reliability_score": 77.6,
-        "weather_score": 76.78082191780823,
+        "reliability_score": 80.6,
+        "weather_score": 85.77625570776256,
         "demand_score": 100.0,
-        "competition_score": 75.0,
+        "competition_score": 100.0,
         "avg_hourly_observations": 1.0,
-        "success_rate": 0.8,
-        "utilization_rate": 30.0,
+        "success_rate": 0.83,
+        "utilization_rate": 4.17,
         "is_network_bridge": true,
         "connected_regions": 9,
-        "bridge_value_usd": 9200000.0,
-        "node_size": 6.916712328767123,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 7.501643835616439,
         "node_color": "#F39C12"
       }
     },
     {
-      "id": "b2438f85-7bd4-4a48-a890-0deff9498bfa",
+      "id": "bddfaee5-e563-4862-a2e6-4d12003ea610",
       "label": "GroundStation",
       "properties": {
         "station_id": "25",
@@ -639,7 +579,7 @@
       }
     },
     {
-      "id": "8cf175cb-1e07-4985-bda9-95f2f4225056",
+      "id": "810c7709-80d5-4764-977a-b8cbc7b39a21",
       "label": "GroundStation",
       "properties": {
         "station_id": "26",
@@ -669,7 +609,67 @@
       }
     },
     {
-      "id": "23e06a27-bc6d-4ea1-8ccc-fbc109855977",
+      "id": "7bfeefb6-a8e0-4ae0-8249-a0ccec5857e1",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "21",
+        "name": "Mumbai Main Ground Station",
+        "latitude": 18.92775757531411,
+        "longitude": 72.8548152483761,
+        "altitude": 89.13689009536958,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 43941,
+        "investment_score": 69.16712328767123,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 6.916712328767123,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "e3ac9262-8f84-4685-8fb4-f615eaad3745",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "22",
+        "name": "Mumbai Station 2",
+        "latitude": 18.68897853462675,
+        "longitude": 72.69781092735401,
+        "altitude": 184.5859406577177,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-09-01",
+        "total_observations": 1406,
+        "investment_score": 69.16712328767123,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 6.916712328767123,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "7d355e8f-5cb8-40c7-9e43-b5aca4fd9ab3",
       "label": "GroundStation",
       "properties": {
         "station_id": "24",
@@ -699,7 +699,7 @@
       }
     },
     {
-      "id": "a380a79d-c532-48f3-bd6f-fb6c5dec37d5",
+      "id": "3641d806-2e44-4ee9-bc9a-e753c48e790a",
       "label": "GroundStation",
       "properties": {
         "station_id": "27",
@@ -729,37 +729,7 @@
       }
     },
     {
-      "id": "3c70a197-cd63-4d6b-b58a-49da86516cc7",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "30",
-        "name": "Berlin Station 3",
-        "latitude": 52.07967959073512,
-        "longitude": 13.443447474292284,
-        "altitude": 419.2982228387266,
-        "status": "Online",
-        "operator_type": "community",
-        "created_date": "2021-03-01",
-        "total_observations": 759,
-        "investment_score": 48.24143835616438,
-        "investment_priority": "low_priority",
-        "utilization_score": 10.0,
-        "reliability_score": 78.49999999999999,
-        "weather_score": 85.77625570776256,
-        "demand_score": 10.0,
-        "competition_score": 75.0,
-        "avg_hourly_observations": 1.0,
-        "success_rate": 0.8,
-        "utilization_rate": 30.0,
-        "is_network_bridge": false,
-        "connected_regions": 0,
-        "bridge_value_usd": 0.0,
-        "node_size": 4.824143835616438,
-        "node_color": "#E74C3C"
-      }
-    },
-    {
-      "id": "a0628cca-4dff-4b21-a7e2-eb46747dbe53",
+      "id": "55c2e3d1-27d8-4b44-96d9-02452bdcaa99",
       "label": "GroundStation",
       "properties": {
         "station_id": "28",
@@ -789,7 +759,7 @@
       }
     },
     {
-      "id": "ee3cb595-8d70-40e1-ab31-a4efb27d7ceb",
+      "id": "2ced47cb-08e3-424e-a7d6-35c17c4892d4",
       "label": "GroundStation",
       "properties": {
         "station_id": "29",
@@ -819,157 +789,37 @@
       }
     },
     {
-      "id": "b2ea888f-2faf-4ac6-824c-efcc1aa5fe6b",
+      "id": "b3975bc9-09f7-495f-a64b-ce70b6f3bb79",
       "label": "GroundStation",
       "properties": {
-        "station_id": "31",
-        "name": "Berlin Station 4",
-        "latitude": 51.97162385071141,
-        "longitude": 13.063849218039863,
-        "altitude": 358.46327089462875,
+        "station_id": "30",
+        "name": "Berlin Station 3",
+        "latitude": 52.07967959073512,
+        "longitude": 13.443447474292284,
+        "altitude": 419.2982228387266,
         "status": "Online",
-        "operator_type": "semi_commercial",
-        "created_date": "2022-04-01",
-        "total_observations": 8780,
-        "investment_score": 51.99143835616438,
+        "operator_type": "community",
+        "created_date": "2021-03-01",
+        "total_observations": 759,
+        "investment_score": 48.24143835616438,
         "investment_priority": "low_priority",
         "utilization_score": 10.0,
         "reliability_score": 78.49999999999999,
         "weather_score": 85.77625570776256,
         "demand_score": 10.0,
-        "competition_score": 100.0,
+        "competition_score": 75.0,
         "avg_hourly_observations": 1.0,
         "success_rate": 0.8,
         "utilization_rate": 30.0,
         "is_network_bridge": false,
         "connected_regions": 0,
         "bridge_value_usd": 0.0,
-        "node_size": 5.199143835616438,
+        "node_size": 4.824143835616438,
         "node_color": "#E74C3C"
       }
     },
     {
-      "id": "779fe934-8efa-4315-94cb-545e1590d55f",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "32",
-        "name": "Azores Remote",
-        "latitude": 37.7412,
-        "longitude": -25.6756,
-        "altitude": 721.8439642922193,
-        "status": "Online",
-        "operator_type": "commercial",
-        "created_date": "2021-06-01",
-        "total_observations": 10759,
-        "investment_score": 51.99143835616438,
-        "investment_priority": "low_priority",
-        "utilization_score": 10.0,
-        "reliability_score": 78.49999999999999,
-        "weather_score": 85.77625570776256,
-        "demand_score": 10.0,
-        "competition_score": 100.0,
-        "avg_hourly_observations": 1.0,
-        "success_rate": 0.8,
-        "utilization_rate": 30.0,
-        "is_network_bridge": false,
-        "connected_regions": 0,
-        "bridge_value_usd": 0.0,
-        "node_size": 5.199143835616438,
-        "node_color": "#E74C3C"
-      }
-    },
-    {
-      "id": "dc6863ff-b3ad-468b-8d8e-32dff7c3cb2a",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "34",
-        "name": "Madagascar Remote",
-        "latitude": -18.7669,
-        "longitude": 46.8691,
-        "altitude": 223.7688497313939,
-        "status": "Online",
-        "operator_type": "commercial",
-        "created_date": "2021-06-01",
-        "total_observations": 13155,
-        "investment_score": 50.41712328767123,
-        "investment_priority": "low_priority",
-        "utilization_score": 10.0,
-        "reliability_score": 77.6,
-        "weather_score": 76.78082191780823,
-        "demand_score": 10.0,
-        "competition_score": 100.0,
-        "avg_hourly_observations": 1.0,
-        "success_rate": 0.8,
-        "utilization_rate": 30.0,
-        "is_network_bridge": false,
-        "connected_regions": 0,
-        "bridge_value_usd": 0.0,
-        "node_size": 5.041712328767123,
-        "node_color": "#E74C3C"
-      }
-    },
-    {
-      "id": "5e1f0637-639c-45ac-a559-edc165902b81",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "35",
-        "name": "Iceland Remote",
-        "latitude": 64.9631,
-        "longitude": -19.0208,
-        "altitude": 761.694507316695,
-        "status": "Online",
-        "operator_type": "commercial",
-        "created_date": "2021-06-01",
-        "total_observations": 19257,
-        "investment_score": 51.99143835616438,
-        "investment_priority": "low_priority",
-        "utilization_score": 10.0,
-        "reliability_score": 78.49999999999999,
-        "weather_score": 85.77625570776256,
-        "demand_score": 10.0,
-        "competition_score": 100.0,
-        "avg_hourly_observations": 1.0,
-        "success_rate": 0.8,
-        "utilization_rate": 30.0,
-        "is_network_bridge": false,
-        "connected_regions": 0,
-        "bridge_value_usd": 0.0,
-        "node_size": 5.199143835616438,
-        "node_color": "#E74C3C"
-      }
-    },
-    {
-      "id": "fe12ec79-57cd-4450-b946-fa732ef5e04d",
-      "label": "GroundStation",
-      "properties": {
-        "station_id": "36",
-        "name": "Hawaii Remote",
-        "latitude": 19.8968,
-        "longitude": -155.5828,
-        "altitude": 932.2242564507065,
-        "status": "Online",
-        "operator_type": "semi_commercial",
-        "created_date": "2021-06-01",
-        "total_observations": 9061,
-        "investment_score": 50.41712328767123,
-        "investment_priority": "low_priority",
-        "utilization_score": 10.0,
-        "reliability_score": 77.6,
-        "weather_score": 76.78082191780823,
-        "demand_score": 10.0,
-        "competition_score": 100.0,
-        "avg_hourly_observations": 1.0,
-        "success_rate": 0.8,
-        "utilization_rate": 30.0,
-        "is_network_bridge": false,
-        "connected_regions": 0,
-        "bridge_value_usd": 0.0,
-        "node_size": 5.041712328767123,
-        "node_color": "#E74C3C"
-      }
-    },
-    {
-      "id": "a402c7ee-693f-413b-8324-86993344e1ee",
+      "id": "b1797885-cf16-41bb-9083-6eee21660d88",
       "label": "GroundStation",
       "properties": {
         "station_id": "33",
@@ -999,7 +849,157 @@
       }
     },
     {
-      "id": "7dd29a21-64cf-4b29-8bec-1fd65af76c9d",
+      "id": "e5b8d1e5-e2ff-4c0e-a8f0-17aee39690eb",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "31",
+        "name": "Berlin Station 4",
+        "latitude": 51.97162385071141,
+        "longitude": 13.063849218039863,
+        "altitude": 358.46327089462875,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2022-04-01",
+        "total_observations": 8780,
+        "investment_score": 51.99143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.199143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "55e946f2-c38f-4e37-a47e-6fa2d2518d7e",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "32",
+        "name": "Azores Remote",
+        "latitude": 37.7412,
+        "longitude": -25.6756,
+        "altitude": 721.8439642922193,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 10759,
+        "investment_score": 51.99143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.199143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "710e99ba-9dc2-4a96-868e-ab95c49d0313",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "34",
+        "name": "Madagascar Remote",
+        "latitude": -18.7669,
+        "longitude": 46.8691,
+        "altitude": 223.7688497313939,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 13155,
+        "investment_score": 50.41712328767123,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.041712328767123,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "9c68d638-50a3-445c-abb5-2c1bfcb8b490",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "35",
+        "name": "Iceland Remote",
+        "latitude": 64.9631,
+        "longitude": -19.0208,
+        "altitude": 761.694507316695,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 19257,
+        "investment_score": 51.99143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.199143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "eb9af4d3-d68e-46a1-b258-13b015b81973",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "36",
+        "name": "Hawaii Remote",
+        "latitude": 19.8968,
+        "longitude": -155.5828,
+        "altitude": 932.2242564507065,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 9061,
+        "investment_score": 50.41712328767123,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.041712328767123,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "144e87ea-fb28-4417-9105-b38e4bb60fcb",
       "label": "DemandRegion",
       "properties": {
         "region_id": "New York_1_-1",
@@ -1018,7 +1018,7 @@
       }
     },
     {
-      "id": "ca0cb35b-1a28-4300-a00e-4058fbb81b0f",
+      "id": "d98c1f99-59b0-43f0-add7-cafb22aaad0f",
       "label": "DemandRegion",
       "properties": {
         "region_id": "New York_1_0",
@@ -1037,7 +1037,7 @@
       }
     },
     {
-      "id": "f6ccfb89-bd57-4f2f-9b58-0804db4e683d",
+      "id": "e9185d15-1658-4674-b4c8-34578328ba0f",
       "label": "DemandRegion",
       "properties": {
         "region_id": "New York_1_1",
@@ -1056,7 +1056,7 @@
       }
     },
     {
-      "id": "c8b6178b-d748-4c07-bb73-39ff7e237223",
+      "id": "8ab52106-9c18-419b-a7ff-4ece62cfdae1",
       "label": "DemandRegion",
       "properties": {
         "region_id": "London_-1_0",
@@ -1075,7 +1075,7 @@
       }
     },
     {
-      "id": "29c6b6f4-9f1f-4738-a88d-9c43929ba5ea",
+      "id": "d2e113d6-3090-4dab-983c-3914968ea225",
       "label": "DemandRegion",
       "properties": {
         "region_id": "London_0_-1",
@@ -1094,7 +1094,7 @@
       }
     },
     {
-      "id": "3bb54376-e275-4fd9-bb06-e8074780ffe5",
+      "id": "636b076f-9ba1-43d8-b2b8-0eeb5e2e9119",
       "label": "DemandRegion",
       "properties": {
         "region_id": "London_1_1",
@@ -1113,7 +1113,7 @@
       }
     },
     {
-      "id": "07fb82ac-db3e-4cd3-9ced-d48b65a41336",
+      "id": "2982cdc8-b486-4563-925b-d86579d061af",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Tokyo_-1_-1",
@@ -1132,7 +1132,7 @@
       }
     },
     {
-      "id": "5781500a-ae06-4320-9880-31e4eb4145e7",
+      "id": "d8c86bf8-ecd9-44da-a20e-f65054757075",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Tokyo_-1_0",
@@ -1151,7 +1151,7 @@
       }
     },
     {
-      "id": "201e4998-0de6-4e35-8187-fbd7edbd25c5",
+      "id": "11988dbd-9128-49d9-9bfa-eb2aa58d4d64",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Tokyo_-1_1",
@@ -1170,7 +1170,7 @@
       }
     },
     {
-      "id": "680aea73-9e30-407a-8a45-066dd9fbc27a",
+      "id": "28db00f0-b738-4829-b974-8e71177babe0",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Tokyo_0_-1",
@@ -1189,7 +1189,7 @@
       }
     },
     {
-      "id": "3fe2885b-eff7-457c-b81f-86293dcab6f8",
+      "id": "eab029c7-4327-4e28-9897-bef72012e1d4",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Tokyo_0_0",
@@ -1208,7 +1208,7 @@
       }
     },
     {
-      "id": "6930992b-da55-48ef-a813-b22b80dd22e4",
+      "id": "6e2fdfe1-7812-4c92-9a82-443dfffe8df5",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Tokyo_1_0",
@@ -1227,7 +1227,7 @@
       }
     },
     {
-      "id": "a971eba5-0a2a-4a83-9775-b399ebcec5b2",
+      "id": "e0ecad3f-24e1-430b-ab2c-c7b1ba3ed05f",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Tokyo_1_1",
@@ -1246,7 +1246,7 @@
       }
     },
     {
-      "id": "3f23a2ba-c248-44db-bdbe-23afef67edf6",
+      "id": "0d8fcd24-7d33-4adb-8ea9-7842edff696e",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Singapore_-1_-1",
@@ -1265,7 +1265,7 @@
       }
     },
     {
-      "id": "3d5178ff-ed7d-40c2-b068-dab6c40e7595",
+      "id": "66a11089-570a-43e7-8233-c2ed291a4b73",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Singapore_-1_1",
@@ -1284,7 +1284,7 @@
       }
     },
     {
-      "id": "dbad2531-d56d-4307-9bfd-aeb2934594ef",
+      "id": "80223229-e2b9-42af-af74-7d6b8550d352",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Singapore_0_0",
@@ -1303,7 +1303,7 @@
       }
     },
     {
-      "id": "a1c3b2bc-7582-4ce8-91b3-492e8b145322",
+      "id": "0ad03c05-b8f3-4b6c-bffc-0ef95d421826",
       "label": "DemandRegion",
       "properties": {
         "region_id": "Sydney_-1_-1",
@@ -1324,9 +1324,9 @@
   ],
   "edges": [
     {
-      "id": "b696c855-840a-4b99-99dc-72510a33215c",
-      "source": "33e62a58-51f7-45e2-aa35-9737ce0b599e",
-      "target": "7dd29a21-64cf-4b29-8bec-1fd65af76c9d",
+      "id": "ce452bb0-55d2-4c92-bb49-d62445da5a50",
+      "source": "3144347c-a2e6-48af-9307-a7e76bd76cdb",
+      "target": "144e87ea-fb28-4417-9105-b38e4bb60fcb",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1338,9 +1338,9 @@
       }
     },
     {
-      "id": "e749192a-93f8-4546-90f0-c825f136dc44",
-      "source": "33e62a58-51f7-45e2-aa35-9737ce0b599e",
-      "target": "ca0cb35b-1a28-4300-a00e-4058fbb81b0f",
+      "id": "2136463f-955a-4eef-8432-f2e6caea09b2",
+      "source": "3144347c-a2e6-48af-9307-a7e76bd76cdb",
+      "target": "d98c1f99-59b0-43f0-add7-cafb22aaad0f",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1352,9 +1352,9 @@
       }
     },
     {
-      "id": "9a56f925-8856-401a-a789-ab51fae51675",
-      "source": "33e62a58-51f7-45e2-aa35-9737ce0b599e",
-      "target": "f6ccfb89-bd57-4f2f-9b58-0804db4e683d",
+      "id": "5bf4fbe8-654c-447d-a416-558ee1cd3cca",
+      "source": "3144347c-a2e6-48af-9307-a7e76bd76cdb",
+      "target": "e9185d15-1658-4674-b4c8-34578328ba0f",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1366,9 +1366,9 @@
       }
     },
     {
-      "id": "1fcaab3a-47be-48a6-b9dc-dd5681eb8491",
-      "source": "4ed82a56-0506-4d68-add0-7812a04b95da",
-      "target": "7dd29a21-64cf-4b29-8bec-1fd65af76c9d",
+      "id": "387b0485-bc2b-4e5e-8415-0d3424a6d474",
+      "source": "4bcfb7c2-eb02-455e-a62d-dad2d31fb42a",
+      "target": "144e87ea-fb28-4417-9105-b38e4bb60fcb",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1380,9 +1380,9 @@
       }
     },
     {
-      "id": "075c19c6-ae48-4777-b0a6-e8f94e0cc620",
-      "source": "4ed82a56-0506-4d68-add0-7812a04b95da",
-      "target": "ca0cb35b-1a28-4300-a00e-4058fbb81b0f",
+      "id": "aa60e9ed-9a31-4738-aeac-e9e2d5155779",
+      "source": "4bcfb7c2-eb02-455e-a62d-dad2d31fb42a",
+      "target": "d98c1f99-59b0-43f0-add7-cafb22aaad0f",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1394,9 +1394,9 @@
       }
     },
     {
-      "id": "6eca593d-b1de-49d0-a32b-363f3dfb290f",
-      "source": "4ed82a56-0506-4d68-add0-7812a04b95da",
-      "target": "f6ccfb89-bd57-4f2f-9b58-0804db4e683d",
+      "id": "f10078d9-5209-49e3-b4ca-631ef1a67799",
+      "source": "4bcfb7c2-eb02-455e-a62d-dad2d31fb42a",
+      "target": "e9185d15-1658-4674-b4c8-34578328ba0f",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1408,9 +1408,9 @@
       }
     },
     {
-      "id": "99af7454-abfd-45cd-99ce-12cc1ad743d3",
-      "source": "ddec5889-6d16-43f7-b968-8a0a4eb644b7",
-      "target": "c8b6178b-d748-4c07-bb73-39ff7e237223",
+      "id": "104fa05f-330a-4576-bc5e-85ee93d464a3",
+      "source": "7aa4c63a-ebf3-4a0b-a179-402b97af4dba",
+      "target": "8ab52106-9c18-419b-a7ff-4ece62cfdae1",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1422,9 +1422,9 @@
       }
     },
     {
-      "id": "f5d6e410-7d41-44dd-b971-12898af871b6",
-      "source": "ddec5889-6d16-43f7-b968-8a0a4eb644b7",
-      "target": "29c6b6f4-9f1f-4738-a88d-9c43929ba5ea",
+      "id": "9bf0862a-88dd-4faa-b523-1406db65f748",
+      "source": "7aa4c63a-ebf3-4a0b-a179-402b97af4dba",
+      "target": "d2e113d6-3090-4dab-983c-3914968ea225",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1436,9 +1436,9 @@
       }
     },
     {
-      "id": "81721928-7875-4a2e-a68e-cf4dd02adcec",
-      "source": "ddec5889-6d16-43f7-b968-8a0a4eb644b7",
-      "target": "3bb54376-e275-4fd9-bb06-e8074780ffe5",
+      "id": "62bb8424-abf3-4e94-bce9-17e11b076164",
+      "source": "7aa4c63a-ebf3-4a0b-a179-402b97af4dba",
+      "target": "636b076f-9ba1-43d8-b2b8-0eeb5e2e9119",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1450,9 +1450,9 @@
       }
     },
     {
-      "id": "6f4a8977-531d-4d79-8a40-1d7e37237be6",
-      "source": "b22b459d-892e-4e17-9312-4c279b23e538",
-      "target": "07fb82ac-db3e-4cd3-9ced-d48b65a41336",
+      "id": "c8e0255e-207d-48f1-9d9c-bff077649ab2",
+      "source": "26813cff-97a7-472f-9ad6-d4620858822e",
+      "target": "2982cdc8-b486-4563-925b-d86579d061af",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1464,9 +1464,9 @@
       }
     },
     {
-      "id": "f31994df-cbfd-4bd1-bff3-e2d2a9a9ef67",
-      "source": "b22b459d-892e-4e17-9312-4c279b23e538",
-      "target": "5781500a-ae06-4320-9880-31e4eb4145e7",
+      "id": "3cad99a5-3331-496d-88f0-14aa2d66e0b2",
+      "source": "26813cff-97a7-472f-9ad6-d4620858822e",
+      "target": "d8c86bf8-ecd9-44da-a20e-f65054757075",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1478,9 +1478,9 @@
       }
     },
     {
-      "id": "f2886b67-fbd2-493a-8132-cce1425c1b8f",
-      "source": "b22b459d-892e-4e17-9312-4c279b23e538",
-      "target": "201e4998-0de6-4e35-8187-fbd7edbd25c5",
+      "id": "efffb8c0-1a04-45d9-906d-c8bc0521d7c5",
+      "source": "26813cff-97a7-472f-9ad6-d4620858822e",
+      "target": "11988dbd-9128-49d9-9bfa-eb2aa58d4d64",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1492,9 +1492,9 @@
       }
     },
     {
-      "id": "4891bb45-c0bd-42cc-bd86-b84c3f9aaceb",
-      "source": "b22b459d-892e-4e17-9312-4c279b23e538",
-      "target": "680aea73-9e30-407a-8a45-066dd9fbc27a",
+      "id": "2d35a373-b9c4-4595-a348-916ce3eda77f",
+      "source": "26813cff-97a7-472f-9ad6-d4620858822e",
+      "target": "28db00f0-b738-4829-b974-8e71177babe0",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1506,9 +1506,9 @@
       }
     },
     {
-      "id": "22d1b82b-fe0d-4946-a47c-abe43e6516dc",
-      "source": "b22b459d-892e-4e17-9312-4c279b23e538",
-      "target": "3fe2885b-eff7-457c-b81f-86293dcab6f8",
+      "id": "e0dfe93f-975b-4519-ba60-7d0a25e504a0",
+      "source": "26813cff-97a7-472f-9ad6-d4620858822e",
+      "target": "eab029c7-4327-4e28-9897-bef72012e1d4",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "excellent",
@@ -1520,9 +1520,9 @@
       }
     },
     {
-      "id": "5cb766f1-adee-48e3-9af3-67abbf83acd5",
-      "source": "b22b459d-892e-4e17-9312-4c279b23e538",
-      "target": "6930992b-da55-48ef-a813-b22b80dd22e4",
+      "id": "be9483e6-b21a-4099-b017-1f4ad7d1fee1",
+      "source": "26813cff-97a7-472f-9ad6-d4620858822e",
+      "target": "6e2fdfe1-7812-4c92-9a82-443dfffe8df5",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1534,9 +1534,9 @@
       }
     },
     {
-      "id": "1543261e-55d0-4fc2-82df-15608bbc689d",
-      "source": "b22b459d-892e-4e17-9312-4c279b23e538",
-      "target": "a971eba5-0a2a-4a83-9775-b399ebcec5b2",
+      "id": "09d8370d-824d-4ab2-9195-72ed929bc454",
+      "source": "26813cff-97a7-472f-9ad6-d4620858822e",
+      "target": "e0ecad3f-24e1-430b-ab2c-c7b1ba3ed05f",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1548,9 +1548,9 @@
       }
     },
     {
-      "id": "a8621c59-84fc-4067-8dcc-526c7d26b406",
-      "source": "f7a9dd3e-3890-469c-a44f-d64bf0de6296",
-      "target": "07fb82ac-db3e-4cd3-9ced-d48b65a41336",
+      "id": "46f8c3ad-a5f8-4974-94c8-a6e2ef5cbd90",
+      "source": "22425266-5288-410f-9f21-4eb9d2ce1d7d",
+      "target": "2982cdc8-b486-4563-925b-d86579d061af",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1562,9 +1562,9 @@
       }
     },
     {
-      "id": "7b27d241-a5f3-464d-aa4a-307e7c7be960",
-      "source": "f7a9dd3e-3890-469c-a44f-d64bf0de6296",
-      "target": "5781500a-ae06-4320-9880-31e4eb4145e7",
+      "id": "d2e500c7-c778-4673-bb0e-61009a1095b3",
+      "source": "22425266-5288-410f-9f21-4eb9d2ce1d7d",
+      "target": "d8c86bf8-ecd9-44da-a20e-f65054757075",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "excellent",
@@ -1576,9 +1576,9 @@
       }
     },
     {
-      "id": "6629a7d7-9ed3-493d-8fa9-2bbc1a702dd1",
-      "source": "f7a9dd3e-3890-469c-a44f-d64bf0de6296",
-      "target": "201e4998-0de6-4e35-8187-fbd7edbd25c5",
+      "id": "0270cc75-b55a-43f4-a557-33810b70a4c7",
+      "source": "22425266-5288-410f-9f21-4eb9d2ce1d7d",
+      "target": "11988dbd-9128-49d9-9bfa-eb2aa58d4d64",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1590,9 +1590,9 @@
       }
     },
     {
-      "id": "12a67546-035c-40c4-b6c6-e608d38e6d7a",
-      "source": "f7a9dd3e-3890-469c-a44f-d64bf0de6296",
-      "target": "680aea73-9e30-407a-8a45-066dd9fbc27a",
+      "id": "aa444f8f-6144-4743-a493-a025225c768e",
+      "source": "22425266-5288-410f-9f21-4eb9d2ce1d7d",
+      "target": "28db00f0-b738-4829-b974-8e71177babe0",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1604,9 +1604,9 @@
       }
     },
     {
-      "id": "cb209d7e-18ab-4edc-bfdd-92a1f01c2aca",
-      "source": "f7a9dd3e-3890-469c-a44f-d64bf0de6296",
-      "target": "3fe2885b-eff7-457c-b81f-86293dcab6f8",
+      "id": "f5f1e1a2-cd3c-4f7c-824d-41a2658a2bb6",
+      "source": "22425266-5288-410f-9f21-4eb9d2ce1d7d",
+      "target": "eab029c7-4327-4e28-9897-bef72012e1d4",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "excellent",
@@ -1618,9 +1618,9 @@
       }
     },
     {
-      "id": "c9d84ab3-9646-4325-a4eb-181fb97b6700",
-      "source": "f7a9dd3e-3890-469c-a44f-d64bf0de6296",
-      "target": "6930992b-da55-48ef-a813-b22b80dd22e4",
+      "id": "b91cac81-1145-4541-86d7-b5c0ebaab56c",
+      "source": "22425266-5288-410f-9f21-4eb9d2ce1d7d",
+      "target": "6e2fdfe1-7812-4c92-9a82-443dfffe8df5",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1632,9 +1632,9 @@
       }
     },
     {
-      "id": "4327c054-c658-45cd-ba01-2987471fa332",
-      "source": "f7a9dd3e-3890-469c-a44f-d64bf0de6296",
-      "target": "a971eba5-0a2a-4a83-9775-b399ebcec5b2",
+      "id": "73ef6cc2-b65d-40c0-b16d-584676ed906f",
+      "source": "22425266-5288-410f-9f21-4eb9d2ce1d7d",
+      "target": "e0ecad3f-24e1-430b-ab2c-c7b1ba3ed05f",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1646,9 +1646,9 @@
       }
     },
     {
-      "id": "fd9a064d-2285-4b1b-847d-9a2f44f3e6b9",
-      "source": "92ec6c6f-52a4-45b8-b5c3-e40893cfd997",
-      "target": "07fb82ac-db3e-4cd3-9ced-d48b65a41336",
+      "id": "b39a1849-36ea-4dab-91bd-37bb3cb8ec76",
+      "source": "eeadce67-98d5-4f43-a8a8-2076880bcc63",
+      "target": "2982cdc8-b486-4563-925b-d86579d061af",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1660,9 +1660,9 @@
       }
     },
     {
-      "id": "073cb37e-e69d-416c-931f-3a209daa9169",
-      "source": "92ec6c6f-52a4-45b8-b5c3-e40893cfd997",
-      "target": "5781500a-ae06-4320-9880-31e4eb4145e7",
+      "id": "27c959a0-d220-4082-bc42-493aa4f442ab",
+      "source": "eeadce67-98d5-4f43-a8a8-2076880bcc63",
+      "target": "d8c86bf8-ecd9-44da-a20e-f65054757075",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1674,9 +1674,9 @@
       }
     },
     {
-      "id": "6849830e-db88-458f-a67e-9f8656b428b7",
-      "source": "92ec6c6f-52a4-45b8-b5c3-e40893cfd997",
-      "target": "201e4998-0de6-4e35-8187-fbd7edbd25c5",
+      "id": "0f78095e-0408-45b5-99e7-3d19145dd257",
+      "source": "eeadce67-98d5-4f43-a8a8-2076880bcc63",
+      "target": "11988dbd-9128-49d9-9bfa-eb2aa58d4d64",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "excellent",
@@ -1688,9 +1688,9 @@
       }
     },
     {
-      "id": "ffdc5196-1e3f-4960-b056-22d291114d35",
-      "source": "92ec6c6f-52a4-45b8-b5c3-e40893cfd997",
-      "target": "680aea73-9e30-407a-8a45-066dd9fbc27a",
+      "id": "078691b9-43ea-4d6a-8a5c-fb6054288ad2",
+      "source": "eeadce67-98d5-4f43-a8a8-2076880bcc63",
+      "target": "28db00f0-b738-4829-b974-8e71177babe0",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1702,9 +1702,9 @@
       }
     },
     {
-      "id": "b1dea341-d7f6-413b-b4e3-3f897d9d36bb",
-      "source": "92ec6c6f-52a4-45b8-b5c3-e40893cfd997",
-      "target": "3fe2885b-eff7-457c-b81f-86293dcab6f8",
+      "id": "ac41a602-e4ed-492f-85b4-66a1f71364f4",
+      "source": "eeadce67-98d5-4f43-a8a8-2076880bcc63",
+      "target": "eab029c7-4327-4e28-9897-bef72012e1d4",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1716,9 +1716,9 @@
       }
     },
     {
-      "id": "0ae9790c-44b2-4aef-a960-907108f76389",
-      "source": "92ec6c6f-52a4-45b8-b5c3-e40893cfd997",
-      "target": "6930992b-da55-48ef-a813-b22b80dd22e4",
+      "id": "73aa51fb-9de9-4a29-845f-8b010bf8d64a",
+      "source": "eeadce67-98d5-4f43-a8a8-2076880bcc63",
+      "target": "6e2fdfe1-7812-4c92-9a82-443dfffe8df5",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1730,9 +1730,9 @@
       }
     },
     {
-      "id": "2bac12d6-9eee-47bf-a65f-a767b7fac80e",
-      "source": "92ec6c6f-52a4-45b8-b5c3-e40893cfd997",
-      "target": "a971eba5-0a2a-4a83-9775-b399ebcec5b2",
+      "id": "06409e96-0599-4a22-a149-dd20b1278fdc",
+      "source": "eeadce67-98d5-4f43-a8a8-2076880bcc63",
+      "target": "e0ecad3f-24e1-430b-ab2c-c7b1ba3ed05f",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1744,9 +1744,9 @@
       }
     },
     {
-      "id": "84317c25-670e-4e9c-a244-c13463d8f65a",
-      "source": "d38ae3ee-aab9-4379-b445-cf99bb481032",
-      "target": "3f23a2ba-c248-44db-bdbe-23afef67edf6",
+      "id": "58d10e9d-144d-4835-9d97-c56865bd9acd",
+      "source": "46cac7f5-2d2f-4a3a-b5cc-071c854f62de",
+      "target": "0d8fcd24-7d33-4adb-8ea9-7842edff696e",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1758,9 +1758,9 @@
       }
     },
     {
-      "id": "fd68b826-bbd4-4e1d-b7b5-56d36392b08d",
-      "source": "d38ae3ee-aab9-4379-b445-cf99bb481032",
-      "target": "3d5178ff-ed7d-40c2-b068-dab6c40e7595",
+      "id": "340bd7bb-6c6b-4f04-a8f9-75cf6c79e41f",
+      "source": "46cac7f5-2d2f-4a3a-b5cc-071c854f62de",
+      "target": "66a11089-570a-43e7-8233-c2ed291a4b73",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1772,9 +1772,9 @@
       }
     },
     {
-      "id": "4cc6279e-385f-49ea-8ea9-d9dd649f6f02",
-      "source": "d38ae3ee-aab9-4379-b445-cf99bb481032",
-      "target": "dbad2531-d56d-4307-9bfd-aeb2934594ef",
+      "id": "eaa4dee7-f458-4d9e-b86b-6cf239ca951b",
+      "source": "46cac7f5-2d2f-4a3a-b5cc-071c854f62de",
+      "target": "80223229-e2b9-42af-af74-7d6b8550d352",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "excellent",
@@ -1786,9 +1786,9 @@
       }
     },
     {
-      "id": "b628b8b2-9f1d-4bde-8ce2-4914c60535ec",
-      "source": "6a96f070-ee03-42e9-8651-623af26a3f38",
-      "target": "3f23a2ba-c248-44db-bdbe-23afef67edf6",
+      "id": "f46a9398-8cb0-46fe-a77f-faae2ad68eee",
+      "source": "874abc7a-a071-4f4e-852a-e935b5433a4e",
+      "target": "0d8fcd24-7d33-4adb-8ea9-7842edff696e",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1800,9 +1800,9 @@
       }
     },
     {
-      "id": "cae0d0cc-ae8a-41f3-9cfd-3b453e259a40",
-      "source": "6a96f070-ee03-42e9-8651-623af26a3f38",
-      "target": "3d5178ff-ed7d-40c2-b068-dab6c40e7595",
+      "id": "3bd44e19-6248-49a3-9683-909c0f1cae15",
+      "source": "874abc7a-a071-4f4e-852a-e935b5433a4e",
+      "target": "66a11089-570a-43e7-8233-c2ed291a4b73",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1814,9 +1814,9 @@
       }
     },
     {
-      "id": "d5b7f00e-89b3-4586-a5e0-e99a93b4cfa1",
-      "source": "6a96f070-ee03-42e9-8651-623af26a3f38",
-      "target": "dbad2531-d56d-4307-9bfd-aeb2934594ef",
+      "id": "d3704bba-a89d-44a0-8e14-231eb7519971",
+      "source": "874abc7a-a071-4f4e-852a-e935b5433a4e",
+      "target": "80223229-e2b9-42af-af74-7d6b8550d352",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "excellent",
@@ -1828,9 +1828,9 @@
       }
     },
     {
-      "id": "120e6122-9da9-4c46-8ead-b003c691a289",
-      "source": "171d2b69-abc4-45c5-a599-037a4fe1ee69",
-      "target": "a1c3b2bc-7582-4ce8-91b3-492e8b145322",
+      "id": "ccf80d79-9e21-401a-ac7a-1a466844b696",
+      "source": "b14a1678-ffbf-409b-824f-28dc37b9441f",
+      "target": "0ad03c05-b8f3-4b6c-bffc-0ef95d421826",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1842,9 +1842,9 @@
       }
     },
     {
-      "id": "e40d4d84-f71b-4edb-9b48-4bb86ec56a1f",
-      "source": "95ac8140-25bb-454a-9242-53848901c18e",
-      "target": "a1c3b2bc-7582-4ce8-91b3-492e8b145322",
+      "id": "ec9c24b0-713b-4e85-b24b-214bed97c317",
+      "source": "edb9c813-b49f-4f9a-94d9-851b25744c0b",
+      "target": "0ad03c05-b8f3-4b6c-bffc-0ef95d421826",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "excellent",
@@ -1856,9 +1856,9 @@
       }
     },
     {
-      "id": "86919918-0e0f-490c-8436-499eb23d9e11",
-      "source": "bfd47fce-cc44-4da8-97f4-bb865e159664",
-      "target": "a1c3b2bc-7582-4ce8-91b3-492e8b145322",
+      "id": "17d2b802-87dc-43b0-837c-fbe2d0215592",
+      "source": "9581c426-f2ff-4d06-8c21-2065a6545be9",
+      "target": "0ad03c05-b8f3-4b6c-bffc-0ef95d421826",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "good",
@@ -1870,9 +1870,9 @@
       }
     },
     {
-      "id": "4bb9b3fc-2077-4854-b1b6-8650ab1f3877",
-      "source": "b2438f85-7bd4-4a48-a890-0deff9498bfa",
-      "target": "c8b6178b-d748-4c07-bb73-39ff7e237223",
+      "id": "ef49de00-fabe-48d0-982e-d4c941010bd7",
+      "source": "bddfaee5-e563-4862-a2e6-4d12003ea610",
+      "target": "8ab52106-9c18-419b-a7ff-4ece62cfdae1",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "fair",
@@ -1884,9 +1884,9 @@
       }
     },
     {
-      "id": "fdc320ef-7933-4bf2-9c7c-55f2c9d269f2",
-      "source": "b2438f85-7bd4-4a48-a890-0deff9498bfa",
-      "target": "29c6b6f4-9f1f-4738-a88d-9c43929ba5ea",
+      "id": "21f3d221-e72e-4e9f-8f33-58873c4ba4c6",
+      "source": "bddfaee5-e563-4862-a2e6-4d12003ea610",
+      "target": "d2e113d6-3090-4dab-983c-3914968ea225",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "fair",
@@ -1898,9 +1898,9 @@
       }
     },
     {
-      "id": "52a7717a-a961-40a2-b457-59a2dac3c9e1",
-      "source": "b2438f85-7bd4-4a48-a890-0deff9498bfa",
-      "target": "3bb54376-e275-4fd9-bb06-e8074780ffe5",
+      "id": "ce78e8bd-caf9-4c6e-994b-4bc7c2025f85",
+      "source": "bddfaee5-e563-4862-a2e6-4d12003ea610",
+      "target": "636b076f-9ba1-43d8-b2b8-0eeb5e2e9119",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "fair",
@@ -1912,9 +1912,9 @@
       }
     },
     {
-      "id": "d5eb2aea-6ed6-4238-a4f9-e181f3a4b236",
-      "source": "8cf175cb-1e07-4985-bda9-95f2f4225056",
-      "target": "c8b6178b-d748-4c07-bb73-39ff7e237223",
+      "id": "4efc53c5-3b0d-4c12-bfc4-fe90764817f7",
+      "source": "810c7709-80d5-4764-977a-b8cbc7b39a21",
+      "target": "8ab52106-9c18-419b-a7ff-4ece62cfdae1",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "fair",
@@ -1926,9 +1926,9 @@
       }
     },
     {
-      "id": "46795d6d-e2aa-427d-82b4-af58f2b62b9e",
-      "source": "8cf175cb-1e07-4985-bda9-95f2f4225056",
-      "target": "3bb54376-e275-4fd9-bb06-e8074780ffe5",
+      "id": "c8c99ea4-1eab-4ddd-9ac7-991d0c4a0f78",
+      "source": "810c7709-80d5-4764-977a-b8cbc7b39a21",
+      "target": "636b076f-9ba1-43d8-b2b8-0eeb5e2e9119",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "fair",
@@ -1940,9 +1940,9 @@
       }
     },
     {
-      "id": "dcecc6d5-7e3a-4bf1-8b12-50740816369b",
-      "source": "a380a79d-c532-48f3-bd6f-fb6c5dec37d5",
-      "target": "c8b6178b-d748-4c07-bb73-39ff7e237223",
+      "id": "296b8516-1c35-44c2-8d47-fff6b8512775",
+      "source": "3641d806-2e44-4ee9-bc9a-e753c48e790a",
+      "target": "8ab52106-9c18-419b-a7ff-4ece62cfdae1",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "fair",
@@ -1954,9 +1954,9 @@
       }
     },
     {
-      "id": "d8679645-da8a-46aa-a79d-37bf6bb20e68",
-      "source": "a380a79d-c532-48f3-bd6f-fb6c5dec37d5",
-      "target": "29c6b6f4-9f1f-4738-a88d-9c43929ba5ea",
+      "id": "66b51bfc-d846-49e3-808c-7ee50c44e218",
+      "source": "3641d806-2e44-4ee9-bc9a-e753c48e790a",
+      "target": "d2e113d6-3090-4dab-983c-3914968ea225",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "fair",
@@ -1968,9 +1968,9 @@
       }
     },
     {
-      "id": "d6acc2ec-eed8-4a24-8754-5003bdf62455",
-      "source": "a380a79d-c532-48f3-bd6f-fb6c5dec37d5",
-      "target": "3bb54376-e275-4fd9-bb06-e8074780ffe5",
+      "id": "01c061bb-c40b-4882-950b-9127b5455d5d",
+      "source": "3641d806-2e44-4ee9-bc9a-e753c48e790a",
+      "target": "636b076f-9ba1-43d8-b2b8-0eeb5e2e9119",
       "label": "SERVES",
       "properties": {
         "coverage_quality": "fair",
@@ -1982,9 +1982,9 @@
       }
     },
     {
-      "id": "3bedaa66-bd33-4de8-b9de-972aabf33fac",
-      "source": "33e62a58-51f7-45e2-aa35-9737ce0b599e",
-      "target": "4ed82a56-0506-4d68-add0-7812a04b95da",
+      "id": "110db1d0-de59-496e-9138-235331d0479e",
+      "source": "3144347c-a2e6-48af-9307-a7e76bd76cdb",
+      "target": "4bcfb7c2-eb02-455e-a62d-dad2d31fb42a",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 21.76954522794498,
@@ -1995,9 +1995,9 @@
       }
     },
     {
-      "id": "d97b60c3-284a-4dce-afee-54051c7e1409",
-      "source": "d38ae3ee-aab9-4379-b445-cf99bb481032",
-      "target": "6a96f070-ee03-42e9-8651-623af26a3f38",
+      "id": "f3834c03-02e5-4dbb-8b56-39e0db928991",
+      "source": "46cac7f5-2d2f-4a3a-b5cc-071c854f62de",
+      "target": "874abc7a-a071-4f4e-852a-e935b5433a4e",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 36.58295138362383,
@@ -2008,9 +2008,9 @@
       }
     },
     {
-      "id": "a4d71e34-6976-49f3-ab15-1d0a5320fa70",
-      "source": "13dd3610-771b-4eb4-90d4-872b689c78e7",
-      "target": "9a4b7f47-5cb5-4da8-90dc-ac2848e68c32",
+      "id": "c14d4ad1-2542-4fbc-8c25-3bc62b79d8e5",
+      "source": "2bd87cc5-1b24-432e-be9f-5ceb92a8ed85",
+      "target": "8b808984-176e-42b9-859a-d9d2cea55eb1",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 44.18976078328377,
@@ -2021,9 +2021,9 @@
       }
     },
     {
-      "id": "274de35f-bc9d-4a04-af1e-096834d18f9b",
-      "source": "e7b26e79-d641-48c9-ba90-c2b8b0d7d54a",
-      "target": "199b6d99-b2b1-4679-8394-1c173ddb4d45",
+      "id": "0d151d5b-022e-457d-a6a4-43cc55d50308",
+      "source": "e04508ee-40a8-4e77-9b82-77123f7dac19",
+      "target": "a30e09d8-be86-4b25-81d9-e117d01cb53f",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 32.42660716720282,
@@ -2034,9 +2034,9 @@
       }
     },
     {
-      "id": "a3b1a6fe-d26c-478e-9a4e-af7b631e4e21",
-      "source": "6e3abb2c-7cfd-4780-be62-022c18d0a42a",
-      "target": "199b6d99-b2b1-4679-8394-1c173ddb4d45",
+      "id": "756a692c-b946-4b57-9977-93f22c1951ce",
+      "source": "fe6f2bab-be8b-4811-820f-303db6c6361d",
+      "target": "a30e09d8-be86-4b25-81d9-e117d01cb53f",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 30.09224451778168,
@@ -2047,9 +2047,9 @@
       }
     },
     {
-      "id": "0da7be40-6143-42d8-8c75-2305718610ba",
-      "source": "3841aa79-2f34-4ad9-a8f7-5a5da8e8f235",
-      "target": "3049a60c-17a3-4db5-ad31-5b372195063c",
+      "id": "671cbdd1-bb19-429a-a200-7f92734393d5",
+      "source": "7bfeefb6-a8e0-4ae0-8249-a0ccec5857e1",
+      "target": "e3ac9262-8f84-4685-8fb4-f615eaad3745",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 31.720721346628718,
@@ -2060,9 +2060,9 @@
       }
     },
     {
-      "id": "1594b3c5-8892-4bde-8ab9-9e4e78408f57",
-      "source": "3841aa79-2f34-4ad9-a8f7-5a5da8e8f235",
-      "target": "23e06a27-bc6d-4ea1-8ccc-fbc109855977",
+      "id": "92a39c52-bda1-4c20-a411-e9ec705b553b",
+      "source": "7bfeefb6-a8e0-4ae0-8249-a0ccec5857e1",
+      "target": "7d355e8f-5cb8-40c7-9e43-b5aca4fd9ab3",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 14.582346636626935,
@@ -2073,9 +2073,9 @@
       }
     },
     {
-      "id": "7c1462eb-8f42-4c87-98c1-3729010ae65c",
-      "source": "3049a60c-17a3-4db5-ad31-5b372195063c",
-      "target": "23e06a27-bc6d-4ea1-8ccc-fbc109855977",
+      "id": "1febba57-388e-4263-a76d-af2a6913b651",
+      "source": "e3ac9262-8f84-4685-8fb4-f615eaad3745",
+      "target": "7d355e8f-5cb8-40c7-9e43-b5aca4fd9ab3",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 21.370922498579926,
@@ -2086,9 +2086,9 @@
       }
     },
     {
-      "id": "3bf206e7-66f3-4c4c-8df8-c37e21e2ce9a",
-      "source": "b2438f85-7bd4-4a48-a890-0deff9498bfa",
-      "target": "a380a79d-c532-48f3-bd6f-fb6c5dec37d5",
+      "id": "02f37274-f7be-47e7-9f63-a27df8158e88",
+      "source": "bddfaee5-e563-4862-a2e6-4d12003ea610",
+      "target": "3641d806-2e44-4ee9-bc9a-e753c48e790a",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 17.429719012784663,
@@ -2099,9 +2099,9 @@
       }
     },
     {
-      "id": "790c0ea7-5f61-4f91-8843-20bcaae67328",
-      "source": "ee3cb595-8d70-40e1-ab31-a4efb27d7ceb",
-      "target": "3c70a197-cd63-4d6b-b58a-49da86516cc7",
+      "id": "9d7587ca-9433-4328-b9c2-f638f3a7febe",
+      "source": "2ced47cb-08e3-424e-a7d6-35c17c4892d4",
+      "target": "b3975bc9-09f7-495f-a64b-ce70b6f3bb79",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 39.08112198135377,
@@ -2112,9 +2112,9 @@
       }
     },
     {
-      "id": "a3a86bef-4e26-4659-9704-39f8e6da32e3",
-      "source": "3c70a197-cd63-4d6b-b58a-49da86516cc7",
-      "target": "b2ea888f-2faf-4ac6-824c-efcc1aa5fe6b",
+      "id": "229a3be7-ead7-45f0-a604-f7d129a7fb74",
+      "source": "b3975bc9-09f7-495f-a64b-ce70b6f3bb79",
+      "target": "e5b8d1e5-e2ff-4c0e-a8f0-17aee39690eb",
       "label": "COMPETES_WITH",
       "properties": {
         "distance_km": 43.80927985501623,
