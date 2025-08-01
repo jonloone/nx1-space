@@ -1,0 +1,16 @@
+{
+  "download_date": "2025-08-01T16:36:27.758407",
+  "data_sources": {
+    "satnogs": "https://network.satnogs.org/api/",
+    "weather": "https://www.ncei.noaa.gov/",
+    "population": "synthetic based on major cities",
+    "economic": "https://api.worldbank.org/",
+    "satellites": "https://celestrak.org/"
+  },
+  "files_created": [
+    "starlink_constellation.parquet",
+    "economic_indicators.parquet",
+    "active_satellites.parquet",
+    "population_grid.parquet"
+  ]
+}

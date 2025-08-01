@@ -1,0 +1,53 @@
+{
+  "stations": {
+    "total": 33,
+    "high_priority": 1,
+    "avg_score": 64.58,
+    "max_score": 82.39
+  },
+  "regions": {
+    "total": 90,
+    "avg_population_density": 102.99
+  },
+  "relationships": {
+    "serves": 216,
+    "competition": 32
+  },
+  "top_opportunities": [
+    {
+      "name": "Singapore Station 2",
+      "composite_score": 82.39212328767124,
+      "investment_priority": "high_priority",
+      "latitude": 1.1680145293282294,
+      "longitude": 104.00758231692035
+    },
+    {
+      "name": "Singapore Main Ground Station",
+      "composite_score": 78.81712328767122,
+      "investment_priority": "medium_priority",
+      "latitude": 1.3812034001262183,
+      "longitude": 103.75624402597253
+    },
+    {
+      "name": "London Main Ground Station",
+      "composite_score": 75.4485090632351,
+      "investment_priority": "medium_priority",
+      "latitude": 51.53070952390597,
+      "longitude": -0.11600053876565
+    },
+    {
+      "name": "S\u00e3o Paulo Station 4",
+      "composite_score": 75.01643835616439,
+      "investment_priority": "medium_priority",
+      "latitude": -23.656580710855813,
+      "longitude": -46.84673439701986
+    },
+    {
+      "name": "New York Station 2",
+      "composite_score": 75.0065898713159,
+      "investment_priority": "medium_priority",
+      "latitude": 40.595723312638334,
+      "longitude": -74.1230684784746
+    }
+  ]
+}

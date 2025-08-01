@@ -1,0 +1,59 @@
+# Large data files
+*.db
+*.sqlite
+*.sqlite3
+
+# Excel files
+*.xlsx
+*.xls
+*.xlsm
+
+# Data directories
+data/ground_stations.db
+data/raw/*.parquet
+data/processed/*.parquet
+data/enriched/*.parquet
+
+# Large CSV/JSON files over 100MB
+*.csv
+*.json
+
+# Keep specific smaller files
+!analytics_summary.json
+!download_metadata.json
+!graphxr_export_sample.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+.venv
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/

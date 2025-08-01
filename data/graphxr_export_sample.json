@@ -1,0 +1,2139 @@
+{
+  "metadata": {
+    "title": "Ground Station Investment Intelligence",
+    "description": "Network graph showing ground station infrastructure, demand regions, and investment opportunities",
+    "created": "2025-08-01T16:38:21.509655",
+    "node_count": 126,
+    "edge_count": 222,
+    "schema_version": "1.0"
+  },
+  "nodes": [
+    {
+      "id": "c89ef91b-84b4-4b15-8856-b67ace26d29e",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "1",
+        "name": "New York Main Ground Station",
+        "latitude": 40.76247141530112,
+        "longitude": -74.01982643011712,
+        "altitude": 149.07884894416696,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 45732,
+        "investment_score": 70.04143835616438,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 75.69999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.76,
+        "utilization_rate": 4.17,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9100000.0,
+        "node_size": 7.004143835616437,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "bfecd66a-a762-4770-a85c-e12075c6cc1e",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "5",
+        "name": "Tokyo Main Ground Station",
+        "latitude": 35.633395393582376,
+        "longitude": 139.57605931628808,
+        "altitude": 79.60875022580143,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 1189,
+        "investment_score": 71.2565898713159,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 80.47979797979798,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8282828282828283,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.125658987131589,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "4641b727-6567-4901-b605-13aa74caca0c",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "10",
+        "name": "Sydney Main Ground Station",
+        "latitude": -33.84693616839461,
+        "longitude": 151.29747610389487,
+        "altitude": 185.1561046543922,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 30127,
+        "investment_score": 70.39143835616439,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.1,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.78,
+        "utilization_rate": 4.17,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.039143835616438,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "06ffe298-51b0-4ccb-8f82-646aa2b1cad1",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "15",
+        "name": "Dubai Station 3",
+        "latitude": 24.756632408435348,
+        "longitude": 55.21480608974653,
+        "altitude": 191.70094357715053,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-03-01",
+        "total_observations": 2831,
+        "investment_score": 71.44143835616438,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 81.3,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.84,
+        "utilization_rate": 4.17,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.144143835616438,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "aa6fe6c0-7e69-4081-80df-2b686b4b56d7",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "18",
+        "name": "S\u00e3o Paulo Station 2",
+        "latitude": -23.62576692912989,
+        "longitude": -47.116078835947484,
+        "altitude": 108.84240914434413,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-04-01",
+        "total_observations": 5216,
+        "investment_score": 71.44143835616438,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 81.3,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.84,
+        "utilization_rate": 4.17,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 7.144143835616438,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "65a062f7-b6fe-4e14-b2e3-a3d8cbbafaf4",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "6",
+        "name": "Tokyo Station 2",
+        "latitude": 35.361462519537874,
+        "longitude": 139.9491602334563,
+        "altitude": 261.9748748226697,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2022-05-01",
+        "total_observations": 3990,
+        "investment_score": 69.907254682695,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.204081632653061,
+        "reliability_score": 74.99999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0204081632653061,
+        "success_rate": 0.75,
+        "utilization_rate": 4.255102040816326,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 6.9907254682695,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "8cb68646-ed3f-427a-8860-68dbabde9a22",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "8",
+        "name": "Singapore Main Ground Station",
+        "latitude": 1.3812034001262183,
+        "longitude": 103.75624402597253,
+        "altitude": 93.62897381052424,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 49555,
+        "investment_score": 78.81712328767122,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 76.19999999999999,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.78,
+        "utilization_rate": 4.17,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9100000.0,
+        "node_size": 7.881712328767122,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "3698e49b-88ce-402e-b30f-0ea1f000247d",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "11",
+        "name": "Sydney Station 2",
+        "latitude": -34.37334267143255,
+        "longitude": 150.41765289323158,
+        "altitude": 142.961025569209,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-09-01",
+        "total_observations": 4959,
+        "investment_score": 72.13939753983786,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.204081632653061,
+        "reliability_score": 83.92857142857142,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0204081632653061,
+        "success_rate": 0.8775510204081632,
+        "utilization_rate": 4.255102040816326,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.2139397539837855,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "e7705053-dd39-4ee5-8a14-9b25902073a5",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "13",
+        "name": "Dubai Main Ground Station",
+        "latitude": 25.137107799969403,
+        "longitude": 55.33196762888409,
+        "altitude": 11.049202253484456,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 6258,
+        "investment_score": 70.90305451778055,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 79.06565656565657,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8080808080808081,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.090305451778055,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "92076b31-0582-4531-8498-e3fd464337db",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "17",
+        "name": "S\u00e3o Paulo Main Ground Station",
+        "latitude": -23.643876284091206,
+        "longitude": -46.554879181234604,
+        "altitude": 58.652981324651556,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 1206,
+        "investment_score": 67.86012522485126,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 81.89393939393939,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 50.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8484848484848485,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 6.786012522485126,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "117eda58-01b6-4517-87f7-54a233a5bf0d",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "19",
+        "name": "S\u00e3o Paulo Station 3",
+        "latitude": -23.09873375468708,
+        "longitude": -46.623799834468926,
+        "altitude": 132.15319228294874,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2022-04-01",
+        "total_observations": 6768,
+        "investment_score": 69.50550712605508,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 78.87272727272727,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8181818181818182,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 6.950550712605508,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "d8d74969-cf29-482d-ad54-e7d1a15398df",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "3",
+        "name": "London Main Ground Station",
+        "latitude": 51.53070952390597,
+        "longitude": -0.11600053876565,
+        "altitude": 10.147965509792723,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 38819,
+        "investment_score": 75.4485090632351,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 82.24747474747474,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8535353535353535,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 7.544850906323509,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "a12bf310-fc45-4b32-b790-598ff8930418",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "7",
+        "name": "Tokyo Station 3",
+        "latitude": 35.413638574435,
+        "longitude": 140.60668563567958,
+        "altitude": 16.4998309683346,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-02-01",
+        "total_observations": 7613,
+        "investment_score": 73.94598381070983,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 76.23737373737373,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.7676767676767676,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.394598381070983,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "14d5098a-470e-4fd1-b4aa-45b32cbb23c9",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "9",
+        "name": "Singapore Station 2",
+        "latitude": 1.1680145293282294,
+        "longitude": 104.00758231692035,
+        "altitude": 201.61969771088798,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 3943,
+        "investment_score": 82.39212328767124,
+        "investment_priority": "high_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 75.49999999999999,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.77,
+        "utilization_rate": 4.17,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9100000.0,
+        "node_size": 8.239212328767124,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "9da186ef-55ec-4c88-9919-eb735b333c46",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "12",
+        "name": "Sydney Station 3",
+        "latitude": -34.6237786411083,
+        "longitude": 151.57005123117935,
+        "altitude": 155.17401779500037,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-07-01",
+        "total_observations": 2668,
+        "investment_score": 74.10368325412357,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.204081632653061,
+        "reliability_score": 76.78571428571428,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0204081632653061,
+        "success_rate": 0.7755102040816326,
+        "utilization_rate": 4.255102040816326,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.410368325412357,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "146a42c8-9227-4415-bace-a739607748a5",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "2",
+        "name": "New York Station 2",
+        "latitude": 40.595723312638334,
+        "longitude": -74.1230684784746,
+        "altitude": 38.460969962417735,
+        "status": "Online",
+        "operator_type": "community",
+        "created_date": "2022-06-01",
+        "total_observations": 869,
+        "investment_score": 75.0065898713159,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.101010101010102,
+        "reliability_score": 80.47979797979798,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0101010101010102,
+        "success_rate": 0.8282828282828283,
+        "utilization_rate": 4.212121212121212,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9100000.0,
+        "node_size": 7.500658987131589,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "15dc3404-c205-4a9d-be0e-3a69dc940efa",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "16",
+        "name": "Dubai Station 4",
+        "latitude": 25.622197709615214,
+        "longitude": 55.419080692164485,
+        "altitude": 241.38531332935514,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-03-01",
+        "total_observations": 3940,
+        "investment_score": 74.46082611126643,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.204081632653061,
+        "reliability_score": 78.21428571428571,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0204081632653061,
+        "success_rate": 0.7959183673469388,
+        "utilization_rate": 4.255102040816326,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.446082611126643,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "c17e2247-d200-4e2e-8021-551f26ebc522",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "20",
+        "name": "S\u00e3o Paulo Station 4",
+        "latitude": -23.656580710855813,
+        "longitude": -46.84673439701986,
+        "altitude": 88.99843075446216,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-09-01",
+        "total_observations": 2793,
+        "investment_score": 75.01643835616439,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 80.6,
+        "weather_score": 85.77625570776256,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.83,
+        "utilization_rate": 4.17,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 7.501643835616439,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "df3ca1ff-8cda-4c00-a60b-f6575a6b9305",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "25",
+        "name": "Paris Main Ground Station",
+        "latitude": 48.790326168662176,
+        "longitude": 2.337552719325838,
+        "altitude": 58.24392864752549,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 18675,
+        "investment_score": 50.74143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 20.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 5.074143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "1fb7073f-b86e-44a2-a53a-6ffc19e820b9",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "26",
+        "name": "Paris Station 2",
+        "latitude": 49.39996351151964,
+        "longitude": 2.854693440351316,
+        "altitude": 82.56259567716594,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2022-01-01",
+        "total_observations": 4837,
+        "investment_score": 50.74143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 20.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 5.074143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "afdb0cb6-0855-4d3f-87d7-6e8e205d0104",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "21",
+        "name": "Mumbai Main Ground Station",
+        "latitude": 18.92775757531411,
+        "longitude": 72.8548152483761,
+        "altitude": 89.13689009536958,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 43941,
+        "investment_score": 69.16712328767123,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 6.916712328767123,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "8a950ba1-b842-4758-bdc6-d1e8c715e5d2",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "22",
+        "name": "Mumbai Station 2",
+        "latitude": 18.68897853462675,
+        "longitude": 72.69781092735401,
+        "altitude": 184.5859406577177,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-09-01",
+        "total_observations": 1406,
+        "investment_score": 69.16712328767123,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 6.916712328767123,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "ac35033a-f610-4cb7-a15b-20a79cb473e4",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "24",
+        "name": "Mumbai Station 4",
+        "latitude": 18.878241774209854,
+        "longitude": 72.73313157176503,
+        "altitude": 175.4314339877777,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-08-01",
+        "total_observations": 3404,
+        "investment_score": 72.91712328767123,
+        "investment_priority": "medium_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 100.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9200000.0,
+        "node_size": 7.291712328767123,
+        "node_color": "#F39C12"
+      }
+    },
+    {
+      "id": "4667e80b-ae13-4917-b854-866c557b43de",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "27",
+        "name": "Paris Station 3",
+        "latitude": 48.635716988386996,
+        "longitude": 2.310117457409411,
+        "altitude": 179.08491153307466,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-02-01",
+        "total_observations": 5272,
+        "investment_score": 54.49143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 20.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": true,
+        "connected_regions": 9,
+        "bridge_value_usd": 9300000.0,
+        "node_size": 5.449143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "2a34cfdb-8dea-40d8-9939-9eca62b6a2ed",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "28",
+        "name": "Berlin Main Ground Station",
+        "latitude": 52.553982096418665,
+        "longitude": 13.404261985005542,
+        "altitude": 55.99050158718508,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2020-01-01",
+        "total_observations": 5931,
+        "investment_score": 44.49143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 50.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 4.449143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "70128a9b-6487-4316-a885-ea7e34779a42",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "29",
+        "name": "Berlin Station 2",
+        "latitude": 52.132331947021534,
+        "longitude": 13.791570427944624,
+        "altitude": 366.8260108198112,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 7225,
+        "investment_score": 48.24143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 4.824143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "bc29769c-dd26-4b37-8775-21f2c3b64acb",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "30",
+        "name": "Berlin Station 3",
+        "latitude": 52.07967959073512,
+        "longitude": 13.443447474292284,
+        "altitude": 419.2982228387266,
+        "status": "Online",
+        "operator_type": "community",
+        "created_date": "2021-03-01",
+        "total_observations": 759,
+        "investment_score": 48.24143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 75.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 4.824143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "7ec211e9-fdd8-4e7f-8069-e35f074c22da",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "33",
+        "name": "Alaska Remote",
+        "latitude": 64.2008,
+        "longitude": -149.4937,
+        "altitude": 565.976215474732,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 16111,
+        "investment_score": 51.99143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.199143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "95c54125-814a-4f32-a554-21a9e7dd06ef",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "31",
+        "name": "Berlin Station 4",
+        "latitude": 51.97162385071141,
+        "longitude": 13.063849218039863,
+        "altitude": 358.46327089462875,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2022-04-01",
+        "total_observations": 8780,
+        "investment_score": 51.99143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.199143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "44ba1dc1-f368-4543-acb1-9d99f62c703c",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "32",
+        "name": "Azores Remote",
+        "latitude": 37.7412,
+        "longitude": -25.6756,
+        "altitude": 721.8439642922193,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 10759,
+        "investment_score": 51.99143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.199143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "c13d991f-9f46-4e45-988c-ffdbedc8fb27",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "34",
+        "name": "Madagascar Remote",
+        "latitude": -18.7669,
+        "longitude": 46.8691,
+        "altitude": 223.7688497313939,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 13155,
+        "investment_score": 50.41712328767123,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.041712328767123,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "b31b9e0e-1e30-4f2a-9d71-3b4ad6f88999",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "35",
+        "name": "Iceland Remote",
+        "latitude": 64.9631,
+        "longitude": -19.0208,
+        "altitude": 761.694507316695,
+        "status": "Online",
+        "operator_type": "commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 19257,
+        "investment_score": 51.99143835616438,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 78.49999999999999,
+        "weather_score": 85.77625570776256,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.199143835616438,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "5ccb4eec-7c86-4915-b40e-1d11456753c9",
+      "label": "GroundStation",
+      "properties": {
+        "station_id": "36",
+        "name": "Hawaii Remote",
+        "latitude": 19.8968,
+        "longitude": -155.5828,
+        "altitude": 932.2242564507065,
+        "status": "Online",
+        "operator_type": "semi_commercial",
+        "created_date": "2021-06-01",
+        "total_observations": 9061,
+        "investment_score": 50.41712328767123,
+        "investment_priority": "low_priority",
+        "utilization_score": 10.0,
+        "reliability_score": 77.6,
+        "weather_score": 76.78082191780823,
+        "demand_score": 10.0,
+        "competition_score": 100.0,
+        "avg_hourly_observations": 1.0,
+        "success_rate": 0.8,
+        "utilization_rate": 30.0,
+        "is_network_bridge": false,
+        "connected_regions": 0,
+        "bridge_value_usd": 0.0,
+        "node_size": 5.041712328767123,
+        "node_color": "#E74C3C"
+      }
+    },
+    {
+      "id": "bed5ba3c-2427-4527-a92f-abb9467c64fc",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "New York_1_-1",
+        "name": "New York",
+        "center_lat": 41.7128,
+        "center_lon": -75.006,
+        "population_density": 74.84962439917395,
+        "connectivity_gap": 40.0,
+        "serving_stations": 2,
+        "nearest_station_km": 152.01986870778006,
+        "enterprise_demand_score": 85,
+        "maritime_traffic_score": 70,
+        "growth_potential": 58.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "960953a5-3ff0-4c94-9d4e-07dedf550fb5",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "New York_1_0",
+        "name": "New York",
+        "center_lat": 41.7128,
+        "center_lon": -74.006,
+        "population_density": 74.84962439917395,
+        "connectivity_gap": 40.0,
+        "serving_stations": 2,
+        "nearest_station_km": 105.49763681181096,
+        "enterprise_demand_score": 85,
+        "maritime_traffic_score": 70,
+        "growth_potential": 58.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "1b967aa6-6c40-4c0e-b7db-67dff12fdd66",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "New York_1_1",
+        "name": "New York",
+        "center_lat": 41.7128,
+        "center_lon": -73.006,
+        "population_density": 74.84962439917395,
+        "connectivity_gap": 40.0,
+        "serving_stations": 2,
+        "nearest_station_km": 154.2448127614762,
+        "enterprise_demand_score": 85,
+        "maritime_traffic_score": 70,
+        "growth_potential": 58.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "6363cc47-377f-4f0c-a5fb-0352b873dcf9",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "London_-1_0",
+        "name": "London",
+        "center_lat": 50.5074,
+        "center_lon": -0.1278,
+        "population_density": 81.16224332440548,
+        "connectivity_gap": 20.0,
+        "serving_stations": 4,
+        "nearest_station_km": 113.59490800434115,
+        "enterprise_demand_score": 85,
+        "maritime_traffic_score": 70,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "6525d8cb-1420-4079-90fa-632e31c493a1",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "London_0_-1",
+        "name": "London",
+        "center_lat": 51.5074,
+        "center_lon": -1.1278,
+        "population_density": 81.16224332440548,
+        "connectivity_gap": 20.0,
+        "serving_stations": 4,
+        "nearest_station_km": 112.33953961166397,
+        "enterprise_demand_score": 85,
+        "maritime_traffic_score": 70,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "35a78fc9-16a2-4d83-83d2-6f8a48abeb08",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "London_1_1",
+        "name": "London",
+        "center_lat": 52.5074,
+        "center_lon": 0.8722,
+        "population_density": 81.16224332440548,
+        "connectivity_gap": 20.0,
+        "serving_stations": 4,
+        "nearest_station_km": 154.22468746797946,
+        "enterprise_demand_score": 85,
+        "maritime_traffic_score": 70,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "53b76dee-d66a-4b7c-826d-7d2a863fed40",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Tokyo_-1_-1",
+        "name": "Tokyo",
+        "center_lat": 34.6762,
+        "center_lon": 138.6503,
+        "population_density": 121.74336498660823,
+        "connectivity_gap": 20.0,
+        "serving_stations": 3,
+        "nearest_station_km": 147.8115500163232,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "67c1be94-f21d-4fea-bf15-fbe2bf930b44",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Tokyo_-1_0",
+        "name": "Tokyo",
+        "center_lat": 34.6762,
+        "center_lon": 139.6503,
+        "population_density": 121.74336498660823,
+        "connectivity_gap": 20.0,
+        "serving_stations": 3,
+        "nearest_station_km": 82.9833327313578,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "d98e0d3e-ab17-4363-b19b-ada359ce1112",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Tokyo_-1_1",
+        "name": "Tokyo",
+        "center_lat": 34.6762,
+        "center_lon": 140.6503,
+        "population_density": 121.74336498660823,
+        "connectivity_gap": 20.0,
+        "serving_stations": 3,
+        "nearest_station_km": 81.99871828492252,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "473d2cc7-a3a9-41cd-b591-e28cef8a9736",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Tokyo_0_-1",
+        "name": "Tokyo",
+        "center_lat": 35.6762,
+        "center_lon": 138.6503,
+        "population_density": 121.74336498660823,
+        "connectivity_gap": 20.0,
+        "serving_stations": 3,
+        "nearest_station_km": 102.8690693530915,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "0e9ac805-cc07-4c7b-aab3-3b2c403c51f4",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Tokyo_0_0",
+        "name": "Tokyo",
+        "center_lat": 35.6762,
+        "center_lon": 139.6503,
+        "population_density": 121.74336498660823,
+        "connectivity_gap": 20.0,
+        "serving_stations": 3,
+        "nearest_station_km": 9.512326613397153,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "96780831-8f12-4a68-be88-91eabc30ba50",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Tokyo_1_0",
+        "name": "Tokyo",
+        "center_lat": 36.6762,
+        "center_lon": 139.6503,
+        "population_density": 121.74336498660823,
+        "connectivity_gap": 20.0,
+        "serving_stations": 3,
+        "nearest_station_km": 116.04428236213569,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "d70de445-68df-4223-9502-c4c4b4de8e2d",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Tokyo_1_1",
+        "name": "Tokyo",
+        "center_lat": 36.6762,
+        "center_lon": 140.6503,
+        "population_density": 121.74336498660823,
+        "connectivity_gap": 20.0,
+        "serving_stations": 3,
+        "nearest_station_km": 140.22791126560975,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "23c32744-060f-4344-9762-ae6fe78b73e0",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Singapore_-1_-1",
+        "name": "Singapore",
+        "center_lat": 0.3521000000000001,
+        "center_lon": 102.8198,
+        "population_density": 51.40275410545681,
+        "connectivity_gap": 40.0,
+        "serving_stations": 2,
+        "nearest_station_km": 154.44489190456167,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 58.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "3ef371c6-89f1-4c97-a5f6-d5827e389253",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Singapore_-1_1",
+        "name": "Singapore",
+        "center_lat": 0.3521000000000001,
+        "center_lon": 104.8198,
+        "population_density": 51.40275410545681,
+        "connectivity_gap": 40.0,
+        "serving_stations": 2,
+        "nearest_station_km": 127.79055883530074,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 58.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "62299365-8814-4be0-bba4-a7ed15c31de9",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Singapore_0_0",
+        "name": "Singapore",
+        "center_lat": 1.3521,
+        "center_lon": 103.8198,
+        "population_density": 51.40275410545681,
+        "connectivity_gap": 40.0,
+        "serving_stations": 2,
+        "nearest_station_km": 7.759185620043465,
+        "enterprise_demand_score": 90,
+        "maritime_traffic_score": 95,
+        "growth_potential": 58.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "ea98de84-00ac-4383-a35e-b421e23ab96d",
+      "label": "DemandRegion",
+      "properties": {
+        "region_id": "Sydney_-1_-1",
+        "name": "Sydney",
+        "center_lat": -34.8688,
+        "center_lon": 150.2093,
+        "population_density": 47.79554329103879,
+        "connectivity_gap": 20.0,
+        "serving_stations": 3,
+        "nearest_station_km": 59.66070771536431,
+        "enterprise_demand_score": 50,
+        "maritime_traffic_score": 40,
+        "growth_potential": 44.0,
+        "node_size": 5.0,
+        "node_color": "#2ECC71"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "2142bbe3-5df2-442d-88d3-9fd564c9812b",
+      "source": "c89ef91b-84b4-4b15-8856-b67ace26d29e",
+      "target": "bed5ba3c-2427-4527-a92f-abb9467c64fc",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 152.01986870778006,
+        "latency_ms": 35.20198687077801,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6959602625844399,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "95b2c360-ad3f-47e1-aabc-58d990377823",
+      "source": "c89ef91b-84b4-4b15-8856-b67ace26d29e",
+      "target": "960953a5-3ff0-4c94-9d4e-07dedf550fb5",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 105.49763681181096,
+        "latency_ms": 30.549763681181098,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7890047263763781,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "500f0e3d-d94b-4007-b7fd-2cfbcd091039",
+      "source": "c89ef91b-84b4-4b15-8856-b67ace26d29e",
+      "target": "1b967aa6-6c40-4c0e-b7db-67dff12fdd66",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 154.2448127614762,
+        "latency_ms": 35.42448127614762,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6915103744770477,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "d35e2d60-7e90-4fcd-8048-b7e1d2b55695",
+      "source": "146a42c8-9227-4415-bace-a739607748a5",
+      "target": "bed5ba3c-2427-4527-a92f-abb9467c64fc",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 158.05045169592591,
+        "latency_ms": 35.80504516959259,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6838990966081482,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "a6f29b07-b8a1-4dde-abb1-0c4fd7f8cdbf",
+      "source": "146a42c8-9227-4415-bace-a739607748a5",
+      "target": "960953a5-3ff0-4c94-9d4e-07dedf550fb5",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 124.6745632751811,
+        "latency_ms": 32.46745632751811,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7506508734496378,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "3a8086ea-64bb-4f11-ba96-37adb4f8fa7d",
+      "source": "146a42c8-9227-4415-bace-a739607748a5",
+      "target": "1b967aa6-6c40-4c0e-b7db-67dff12fdd66",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 175.35549085907763,
+        "latency_ms": 37.53554908590776,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6492890182818447,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "d196b0b9-5a7f-4d4a-ba40-4391a9ba8e04",
+      "source": "d8d74969-cf29-482d-ad54-e7d1a15398df",
+      "target": "6363cc47-377f-4f0c-a5fb-0352b873dcf9",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 113.59490800434115,
+        "latency_ms": 31.359490800434116,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7728101839913177,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "c9a77496-0e5d-4cb1-866e-051191758ee1",
+      "source": "d8d74969-cf29-482d-ad54-e7d1a15398df",
+      "target": "6525d8cb-1420-4079-90fa-632e31c493a1",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 112.33953961166397,
+        "latency_ms": 31.2339539611664,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.775320920776672,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "2e169a4d-372c-4ce4-8505-8a1c90efae3e",
+      "source": "d8d74969-cf29-482d-ad54-e7d1a15398df",
+      "target": "35a78fc9-16a2-4d83-83d2-6f8a48abeb08",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 154.22468746797946,
+        "latency_ms": 35.422468746797946,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6915506250640411,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "49114dfe-5148-4fdc-b062-24a9602a41d3",
+      "source": "bfecd66a-a762-4770-a85c-e12075c6cc1e",
+      "target": "53b76dee-d66a-4b7c-826d-7d2a863fed40",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 147.8115500163232,
+        "latency_ms": 34.78115500163232,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7043768999673536,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "ddb0f7b7-2e05-4cdd-8ea7-9a4f084c5678",
+      "source": "bfecd66a-a762-4770-a85c-e12075c6cc1e",
+      "target": "67c1be94-f21d-4fea-bf15-fbe2bf930b44",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 106.5677870946789,
+        "latency_ms": 30.656778709467893,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7868644258106422,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "637f67da-2a8e-41b5-8327-09ea8873635a",
+      "source": "bfecd66a-a762-4770-a85c-e12075c6cc1e",
+      "target": "d98e0d3e-ab17-4363-b19b-ada359ce1112",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 159.709524369355,
+        "latency_ms": 35.9709524369355,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.68058095126129,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "5aba16eb-c9be-4cae-b101-aa195651ea69",
+      "source": "bfecd66a-a762-4770-a85c-e12075c6cc1e",
+      "target": "473d2cc7-a3a9-41cd-b591-e28cef8a9736",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 102.8690693530915,
+        "latency_ms": 30.28690693530915,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.794261861293817,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "3eeb1e56-497c-40b6-82ae-b5f0d461aff9",
+      "source": "bfecd66a-a762-4770-a85c-e12075c6cc1e",
+      "target": "0e9ac805-cc07-4c7b-aab3-3b2c403c51f4",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "excellent",
+        "distance_km": 9.512326613397153,
+        "latency_ms": 20.951232661339716,
+        "capacity_gbps": 10.0,
+        "edge_weight": 0.9809753467732056,
+        "edge_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "37fa8cef-742c-4c49-9dbe-a813f8d0ab77",
+      "source": "bfecd66a-a762-4770-a85c-e12075c6cc1e",
+      "target": "96780831-8f12-4a68-be88-91eabc30ba50",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 116.04428236213569,
+        "latency_ms": 31.604428236213572,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7679114352757286,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "01ecce73-91bf-4b9d-8a42-721a39ccb918",
+      "source": "bfecd66a-a762-4770-a85c-e12075c6cc1e",
+      "target": "d70de445-68df-4223-9502-c4c4b4de8e2d",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 166.1827740681081,
+        "latency_ms": 36.61827740681081,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6676344518637838,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "6c05923f-f83d-47d4-a659-5a7a451f6628",
+      "source": "65a062f7-b6fe-4e14-b2e3-a3d8cbbafaf4",
+      "target": "53b76dee-d66a-4b7c-826d-7d2a863fed40",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 163.00842734053236,
+        "latency_ms": 36.300842734053234,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6739831453189353,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "52c31aa4-094f-4947-97ea-33b02c9c59b1",
+      "source": "65a062f7-b6fe-4e14-b2e3-a3d8cbbafaf4",
+      "target": "67c1be94-f21d-4fea-bf15-fbe2bf930b44",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "excellent",
+        "distance_km": 82.9833327313578,
+        "latency_ms": 28.298333273135782,
+        "capacity_gbps": 10.0,
+        "edge_weight": 0.8340333345372843,
+        "edge_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "3002548b-5971-4693-824d-92c79d0f127c",
+      "source": "65a062f7-b6fe-4e14-b2e3-a3d8cbbafaf4",
+      "target": "d98e0d3e-ab17-4363-b19b-ada359ce1112",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 108.82426033919484,
+        "latency_ms": 30.882426033919486,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7823514793216103,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "e72a45fa-fe55-4b11-8da5-240f4211e558",
+      "source": "65a062f7-b6fe-4e14-b2e3-a3d8cbbafaf4",
+      "target": "473d2cc7-a3a9-41cd-b591-e28cef8a9736",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 148.34590785586698,
+        "latency_ms": 34.8345907855867,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.703308184288266,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "7b0da445-ca83-4197-bf12-72d45fe95273",
+      "source": "65a062f7-b6fe-4e14-b2e3-a3d8cbbafaf4",
+      "target": "0e9ac805-cc07-4c7b-aab3-3b2c403c51f4",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "excellent",
+        "distance_km": 48.176700849591136,
+        "latency_ms": 24.817670084959115,
+        "capacity_gbps": 10.0,
+        "edge_weight": 0.9036465983008177,
+        "edge_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "07e7a3ee-a8b7-4fdb-851b-afa62fd5ea3f",
+      "source": "65a062f7-b6fe-4e14-b2e3-a3d8cbbafaf4",
+      "target": "96780831-8f12-4a68-be88-91eabc30ba50",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 149.65879692921078,
+        "latency_ms": 34.96587969292108,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7006824061415784,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "95140ce3-4c69-4173-96c4-15b433217a63",
+      "source": "65a062f7-b6fe-4e14-b2e3-a3d8cbbafaf4",
+      "target": "d70de445-68df-4223-9502-c4c4b4de8e2d",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 165.39117759260427,
+        "latency_ms": 36.53911775926043,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6692176448147915,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "de41f864-b052-4cc6-a05f-831e37346284",
+      "source": "a12bf310-fc45-4b32-b790-598ff8930418",
+      "target": "53b76dee-d66a-4b7c-826d-7d2a863fed40",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 232.07390949696014,
+        "latency_ms": 43.20739094969602,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.5358521810060797,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "a2d5e2c4-5ff2-40e0-bde3-d39562f44c97",
+      "source": "a12bf310-fc45-4b32-b790-598ff8930418",
+      "target": "67c1be94-f21d-4fea-bf15-fbe2bf930b44",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 134.05239511022052,
+        "latency_ms": 33.40523951102205,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.731895209779559,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "35647688-b8f7-48b8-b974-6af848a2be34",
+      "source": "a12bf310-fc45-4b32-b790-598ff8930418",
+      "target": "d98e0d3e-ab17-4363-b19b-ada359ce1112",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "excellent",
+        "distance_km": 81.99871828492252,
+        "latency_ms": 28.199871828492252,
+        "capacity_gbps": 10.0,
+        "edge_weight": 0.836002563430155,
+        "edge_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "508185ae-cb18-4ede-94d8-f1a6f7164365",
+      "source": "a12bf310-fc45-4b32-b790-598ff8930418",
+      "target": "473d2cc7-a3a9-41cd-b591-e28cef8a9736",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 219.10576924849804,
+        "latency_ms": 41.910576924849806,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.561788461503004,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "9e1148f0-17eb-4e10-9f61-cd944e01df5f",
+      "source": "a12bf310-fc45-4b32-b790-598ff8930418",
+      "target": "0e9ac805-cc07-4c7b-aab3-3b2c403c51f4",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 110.0867080239912,
+        "latency_ms": 31.008670802399124,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7798265839520175,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "404eaec1-3e80-4858-9c7d-0f32166c4d10",
+      "source": "a12bf310-fc45-4b32-b790-598ff8930418",
+      "target": "96780831-8f12-4a68-be88-91eabc30ba50",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 175.81274678569898,
+        "latency_ms": 37.5812746785699,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6483745064286021,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "1226cd47-271e-46c1-9352-895b5205609f",
+      "source": "a12bf310-fc45-4b32-b790-598ff8930418",
+      "target": "d70de445-68df-4223-9502-c4c4b4de8e2d",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 140.22791126560975,
+        "latency_ms": 34.022791126560975,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7195441774687805,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "04fc680e-32a0-411e-9048-d4168c3369e7",
+      "source": "8cb68646-ed3f-427a-8860-68dbabde9a22",
+      "target": "23c32744-060f-4344-9762-ae6fe78b73e0",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 154.44489190456167,
+        "latency_ms": 35.44448919045617,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6911102161908766,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "77a96dde-bc95-4170-b2b2-90dfc2d3d44d",
+      "source": "8cb68646-ed3f-427a-8860-68dbabde9a22",
+      "target": "3ef371c6-89f1-4c97-a5f6-d5827e389253",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 164.27269176397328,
+        "latency_ms": 36.42726917639733,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6714546164720534,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "a8bfe8f7-6fc8-4f98-86ea-de80a650e7bd",
+      "source": "8cb68646-ed3f-427a-8860-68dbabde9a22",
+      "target": "62299365-8814-4be0-bba4-a7ed15c31de9",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "excellent",
+        "distance_km": 7.759185620043465,
+        "latency_ms": 20.775918562004346,
+        "capacity_gbps": 10.0,
+        "edge_weight": 0.9844816287599131,
+        "edge_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "931351af-3583-4c6e-8610-36b303eadf98",
+      "source": "14d5098a-470e-4fd1-b4aa-45b32cbb23c9",
+      "target": "23c32744-060f-4344-9762-ae6fe78b73e0",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 159.95340144723679,
+        "latency_ms": 35.99534014472368,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6800931971055264,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "cd7bffa0-ffd2-44f9-a154-78128af1f7a7",
+      "source": "14d5098a-470e-4fd1-b4aa-45b32cbb23c9",
+      "target": "3ef371c6-89f1-4c97-a5f6-d5827e389253",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 127.79055883530074,
+        "latency_ms": 32.77905588353008,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.7444188823293985,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "94815cda-1e3d-42fa-81e1-013da818f131",
+      "source": "14d5098a-470e-4fd1-b4aa-45b32cbb23c9",
+      "target": "62299365-8814-4be0-bba4-a7ed15c31de9",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "excellent",
+        "distance_km": 29.188918261618603,
+        "latency_ms": 22.91889182616186,
+        "capacity_gbps": 10.0,
+        "edge_weight": 0.9416221634767628,
+        "edge_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "b47fec0d-8070-4fc7-b558-33a4e25484fa",
+      "source": "4641b727-6567-4901-b605-13aa74caca0c",
+      "target": "ea98de84-00ac-4383-a35e-b421e23ab96d",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 165.6963788065196,
+        "latency_ms": 36.56963788065196,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6686072423869609,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "58f73e87-2f96-4a2d-acf3-cf9f78405607",
+      "source": "3698e49b-88ce-402e-b30f-0ea1f000247d",
+      "target": "ea98de84-00ac-4383-a35e-b421e23ab96d",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "excellent",
+        "distance_km": 59.66070771536431,
+        "latency_ms": 25.96607077153643,
+        "capacity_gbps": 10.0,
+        "edge_weight": 0.8806785845692714,
+        "edge_color": "#2ECC71"
+      }
+    },
+    {
+      "id": "d27d6b5c-59bd-4e25-9b09-5f126fe08c8c",
+      "source": "9da186ef-55ec-4c88-9919-eb735b333c46",
+      "target": "ea98de84-00ac-4383-a35e-b421e23ab96d",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "good",
+        "distance_km": 153.47247842672041,
+        "latency_ms": 35.34724784267204,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.6930550431465592,
+        "edge_color": "#3498DB"
+      }
+    },
+    {
+      "id": "18df3750-d53d-47f9-9cd4-fc5ed0ecf968",
+      "source": "df3ca1ff-8cda-4c00-a60b-f6575a6b9305",
+      "target": "6363cc47-377f-4f0c-a5fb-0352b873dcf9",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "fair",
+        "distance_km": 333.4863164889185,
+        "latency_ms": 53.348631648891846,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.33302736702216307,
+        "edge_color": "#F39C12"
+      }
+    },
+    {
+      "id": "3ca716a7-7747-46f3-9fd5-0476e7645918",
+      "source": "df3ca1ff-8cda-4c00-a60b-f6575a6b9305",
+      "target": "6525d8cb-1420-4079-90fa-632e31c493a1",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "fair",
+        "distance_km": 488.7928787807787,
+        "latency_ms": 68.87928787807788,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.02241424243844259,
+        "edge_color": "#F39C12"
+      }
+    },
+    {
+      "id": "9b511a04-1cdf-4063-97dc-cef8009e7c48",
+      "source": "df3ca1ff-8cda-4c00-a60b-f6575a6b9305",
+      "target": "35a78fc9-16a2-4d83-83d2-6f8a48abeb08",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "fair",
+        "distance_km": 443.4987804711226,
+        "latency_ms": 64.34987804711227,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.11300243905775487,
+        "edge_color": "#F39C12"
+      }
+    },
+    {
+      "id": "af0cf725-7063-490d-b2d8-be0f3d956ea8",
+      "source": "1fb7073f-b86e-44a2-a53a-6ffc19e820b9",
+      "target": "6363cc47-377f-4f0c-a5fb-0352b873dcf9",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "fair",
+        "distance_km": 353.1419721854879,
+        "latency_ms": 55.31419721854879,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.29371605562902425,
+        "edge_color": "#F39C12"
+      }
+    },
+    {
+      "id": "8148a416-c5ad-4321-81e3-b642e107b549",
+      "source": "1fb7073f-b86e-44a2-a53a-6ffc19e820b9",
+      "target": "35a78fc9-16a2-4d83-83d2-6f8a48abeb08",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "fair",
+        "distance_km": 409.14367777125045,
+        "latency_ms": 60.91436777712505,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.18171264445749913,
+        "edge_color": "#F39C12"
+      }
+    },
+    {
+      "id": "d0525d22-c063-4021-8648-c632c7130683",
+      "source": "4667e80b-ae13-4917-b854-866c557b43de",
+      "target": "6363cc47-377f-4f0c-a5fb-0352b873dcf9",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "fair",
+        "distance_km": 341.16277194923424,
+        "latency_ms": 54.11627719492343,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.31767445610153155,
+        "edge_color": "#F39C12"
+      }
+    },
+    {
+      "id": "28dd44a9-1a54-420e-9451-2aa72978a4f2",
+      "source": "4667e80b-ae13-4917-b854-866c557b43de",
+      "target": "6525d8cb-1420-4079-90fa-632e31c493a1",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "fair",
+        "distance_km": 497.22350278495037,
+        "latency_ms": 69.72235027849504,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.005552994430099267,
+        "edge_color": "#F39C12"
+      }
+    },
+    {
+      "id": "3566607f-3017-4ea0-b314-15307c963fc0",
+      "source": "4667e80b-ae13-4917-b854-866c557b43de",
+      "target": "35a78fc9-16a2-4d83-83d2-6f8a48abeb08",
+      "label": "SERVES",
+      "properties": {
+        "coverage_quality": "fair",
+        "distance_km": 458.4385460701768,
+        "latency_ms": 65.84385460701768,
+        "capacity_gbps": 5.0,
+        "edge_weight": 0.08312290785964638,
+        "edge_color": "#F39C12"
+      }
+    },
+    {
+      "id": "11b483d6-bc6b-4284-a77a-a48a7bacc2f6",
+      "source": "c89ef91b-84b4-4b15-8856-b67ace26d29e",
+      "target": "146a42c8-9227-4415-bace-a739607748a5",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 21.76954522794498,
+        "competition_intensity": "high",
+        "market_overlap_pct": 78.23045477205503,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "7a014bb0-2143-4487-9bb9-1eacfcb3afd8",
+      "source": "8cb68646-ed3f-427a-8860-68dbabde9a22",
+      "target": "14d5098a-470e-4fd1-b4aa-45b32cbb23c9",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 36.58295138362383,
+        "competition_intensity": "high",
+        "market_overlap_pct": 63.41704861637617,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "87ea5cbd-fc96-4e65-a8c9-ecf4ba926ed7",
+      "source": "e7705053-dd39-4ee5-8a14-9b25902073a5",
+      "target": "06ffe298-51b0-4ccb-8f82-646aa2b1cad1",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 44.18976078328377,
+        "competition_intensity": "high",
+        "market_overlap_pct": 55.81023921671623,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "20b8a6b3-0b91-4b29-a15f-2ba3d5035799",
+      "source": "92076b31-0582-4531-8498-e3fd464337db",
+      "target": "c17e2247-d200-4e2e-8021-551f26ebc522",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 32.42660716720282,
+        "competition_intensity": "high",
+        "market_overlap_pct": 67.57339283279718,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "06a7c2c7-0492-4fac-965b-ea3544cdb1c9",
+      "source": "aa6fe6c0-7e69-4081-80df-2b686b4b56d7",
+      "target": "c17e2247-d200-4e2e-8021-551f26ebc522",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 30.09224451778168,
+        "competition_intensity": "high",
+        "market_overlap_pct": 69.90775548221832,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "191fd60c-ece4-4b0e-9d08-f0ad91d2d107",
+      "source": "afdb0cb6-0855-4d3f-87d7-6e8e205d0104",
+      "target": "8a950ba1-b842-4758-bdc6-d1e8c715e5d2",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 31.720721346628718,
+        "competition_intensity": "high",
+        "market_overlap_pct": 68.27927865337128,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "a67f571b-7175-4587-9266-9d020ebfec7d",
+      "source": "afdb0cb6-0855-4d3f-87d7-6e8e205d0104",
+      "target": "ac35033a-f610-4cb7-a15b-20a79cb473e4",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 14.582346636626935,
+        "competition_intensity": "high",
+        "market_overlap_pct": 85.41765336337306,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "e7e3c651-63bf-44a0-8ace-2a1207b079ff",
+      "source": "8a950ba1-b842-4758-bdc6-d1e8c715e5d2",
+      "target": "ac35033a-f610-4cb7-a15b-20a79cb473e4",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 21.370922498579926,
+        "competition_intensity": "high",
+        "market_overlap_pct": 78.62907750142007,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "1b40bfcf-50fe-4650-a68d-cadf60757da8",
+      "source": "df3ca1ff-8cda-4c00-a60b-f6575a6b9305",
+      "target": "4667e80b-ae13-4917-b854-866c557b43de",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 17.429719012784663,
+        "competition_intensity": "high",
+        "market_overlap_pct": 82.57028098721534,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "143aa60c-51ca-440f-a1a9-057d1b588ab2",
+      "source": "70128a9b-6487-4316-a885-ea7e34779a42",
+      "target": "bc29769c-dd26-4b37-8775-21f2c3b64acb",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 39.08112198135377,
+        "competition_intensity": "high",
+        "market_overlap_pct": 60.91887801864623,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    },
+    {
+      "id": "727e87cc-72d9-4e67-ae96-eccdd07a0d4b",
+      "source": "bc29769c-dd26-4b37-8775-21f2c3b64acb",
+      "target": "95c54125-814a-4f32-a554-21a9e7dd06ef",
+      "label": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 43.80927985501623,
+        "competition_intensity": "high",
+        "market_overlap_pct": 56.19072014498377,
+        "edge_color": "#FFA500",
+        "edge_style": "dashed"
+      }
+    }
+  ],
+  "layout": {
+    "type": "geo",
+    "lat_property": "latitude",
+    "lon_property": "longitude"
+  },
+  "display": {
+    "node_size_property": "node_size",
+    "node_color_property": "node_color",
+    "edge_weight_property": "edge_weight",
+    "edge_color_property": "edge_color"
+  }
+}
