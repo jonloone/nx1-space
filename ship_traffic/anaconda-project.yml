@@ -1,0 +1,38 @@
+name: ship_traffic
+description: Visualizing AIS location tracking data for marine vessels near the USA
+channels:
+- defaults
+packages: &id001
+- python=3.9
+- bokeh
+- colorcet
+- dask
+- datashader
+- holoviews
+- notebook
+- numba
+- numexpr
+- pandas
+- panel
+- python
+- spatialpandas
+- xarray
+- pyarrow
+dependencies: *id001
+commands:
+  dashboard:
+    unix: panel serve --rest-session-info --session-history -1 ship_traffic.ipynb
+    supports_http_options: true
+  notebook:
+    notebook: ship_traffic.ipynb
+downloads:
+  DATA:
+    url: http://s3.amazonaws.com/datashader-data/ship_traffic.zip
+    description: "US AIS records from 1/2020 \n"
+    filename: data/AIS_2020_01_broadcast.parq
+    unzip: true
+platforms:
+- linux-64
+- osx-64
+- win-64
+- osx-arm64
