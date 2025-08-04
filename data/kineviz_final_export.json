@@ -1,0 +1,2075 @@
+{
+  "nodes": [
+    {
+      "id": "COMM_001",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Riverside, CA Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 33.9533,
+        "longitude": -117.3962,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 76.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_002",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Mountainside, MD Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 38.7849,
+        "longitude": -77.2405,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 73.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_003",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Fuchsstadt, Germany Teleport",
+        "operator": "Intelsat",
+        "country": "Germany",
+        "latitude": 50.1072,
+        "longitude": 9.9459,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 78.0,
+        "location_score": 65.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 90.0,
+        "investment_score": 70.2,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_004",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Perth, Australia Teleport",
+        "operator": "Intelsat",
+        "country": "Australia",
+        "latitude": -31.9505,
+        "longitude": 115.8605,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 65.0,
+        "location_score": 50.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 82.0,
+        "investment_score": 66.8,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_005",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Kumsan, South Korea Teleport",
+        "operator": "Intelsat",
+        "country": "South Korea",
+        "latitude": 36.1408,
+        "longitude": 127.4872,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 72.0,
+        "location_score": 50.0,
+        "competition_score": 75.0,
+        "infrastructure_score": 90.0,
+        "investment_score": 68.5,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_006",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Clarksburg, MD Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 39.2362,
+        "longitude": -77.2692,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 73.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_007",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Fillmore, CA Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 34.3989,
+        "longitude": -118.9181,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 76.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_008",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Ellenwood, GA Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 33.6151,
+        "longitude": -84.2899,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 75.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 79.0,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_009",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Lake Zurich, IL Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 42.1975,
+        "longitude": -88.0834,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 81.2,
+        "recommendation": "excellent",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_010",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Sandy, UT Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 40.5649,
+        "longitude": -111.8389,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 81.2,
+        "recommendation": "excellent",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_011",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Wahiawa, HI Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 21.5039,
+        "longitude": -158.0011,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 80.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 84.2,
+        "recommendation": "excellent",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_012",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Brewster, WA Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 48.0929,
+        "longitude": -119.7811,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 75.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 79.0,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_013",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Vernon Valley, NJ Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "latitude": 41.254,
+        "longitude": -74.4821,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 76.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_014",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Goonhilly, UK Teleport",
+        "operator": "Intelsat",
+        "country": "United Kingdom",
+        "latitude": 50.0477,
+        "longitude": -5.1808,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 75.0,
+        "location_score": 65.0,
+        "competition_score": 75.0,
+        "infrastructure_score": 88.0,
+        "investment_score": 74.0,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_015",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Aussaguel, France Teleport",
+        "operator": "Intelsat",
+        "country": "France",
+        "latitude": 43.5963,
+        "longitude": 1.4136,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 68.0,
+        "location_score": 50.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 68.5,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_016",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Raisting, Germany Teleport",
+        "operator": "Intelsat",
+        "country": "Germany",
+        "latitude": 47.9019,
+        "longitude": 11.1108,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 78.0,
+        "location_score": 65.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 90.0,
+        "investment_score": 70.2,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_017",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Lario, Italy Teleport",
+        "operator": "Intelsat",
+        "country": "Italy",
+        "latitude": 45.8205,
+        "longitude": 9.2573,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 50.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 53.0,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_018",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Usingen, Germany Teleport",
+        "operator": "Intelsat",
+        "country": "Germany",
+        "latitude": 50.3358,
+        "longitude": 8.5436,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 78.0,
+        "location_score": 65.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 90.0,
+        "investment_score": 70.2,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_019",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Yamaguchi, Japan Teleport",
+        "operator": "Intelsat",
+        "country": "Japan",
+        "latitude": 34.1858,
+        "longitude": 131.4706,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 70.0,
+        "location_score": 50.0,
+        "competition_score": 75.0,
+        "infrastructure_score": 92.0,
+        "investment_score": 68.0,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_020",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Beijing, China Teleport",
+        "operator": "Intelsat",
+        "country": "China",
+        "latitude": 39.9042,
+        "longitude": 116.4074,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 82.0,
+        "location_score": 50.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 70.0,
+        "investment_score": 71.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_021",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Betzdorf, Luxembourg Teleport",
+        "operator": "SES",
+        "country": "Luxembourg",
+        "latitude": 49.6755,
+        "longitude": 6.2663,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 60.0,
+        "location_score": 50.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 88.0,
+        "investment_score": 58.2,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_022",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Manassas, VA Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "latitude": 38.7509,
+        "longitude": -77.4753,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 73.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_023",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Stockholm, Sweden Teleport",
+        "operator": "SES",
+        "country": "Sweden",
+        "latitude": 59.3293,
+        "longitude": 18.0686,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 50.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 57.5,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_024",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Redu, Belgium Teleport",
+        "operator": "SES",
+        "country": "Belgium",
+        "latitude": 50.0014,
+        "longitude": 5.1456,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 50.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 50.0,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_025",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Princeton, NJ Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "latitude": 40.3573,
+        "longitude": -74.6672,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 76.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_026",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Rambouillet, France Teleport",
+        "operator": "SES",
+        "country": "France",
+        "latitude": 48.6436,
+        "longitude": 1.8347,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 68.0,
+        "location_score": 50.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 64.0,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_027",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Madrid, Spain Teleport",
+        "operator": "SES",
+        "country": "Spain",
+        "latitude": 40.4168,
+        "longitude": -3.7038,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 50.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 57.5,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_028",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Fucino, Italy Teleport",
+        "operator": "SES",
+        "country": "Italy",
+        "latitude": 42.0117,
+        "longitude": 13.5975,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 50.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 57.5,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_029",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Munich, Germany Teleport",
+        "operator": "SES",
+        "country": "Germany",
+        "latitude": 48.1351,
+        "longitude": 11.582,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 78.0,
+        "location_score": 65.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 90.0,
+        "investment_score": 70.2,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_030",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Woodbine, MD Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "latitude": 39.3751,
+        "longitude": -77.0747,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 73.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_031",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Castle Rock, CO Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "latitude": 39.3722,
+        "longitude": -104.856,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 81.2,
+        "recommendation": "excellent",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_032",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Four Oaks, NC Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "latitude": 35.4454,
+        "longitude": -78.4831,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 76.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_033",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Cologne, Germany Teleport",
+        "operator": "SES",
+        "country": "Germany",
+        "latitude": 50.9375,
+        "longitude": 6.9603,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 78.0,
+        "location_score": 65.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 90.0,
+        "investment_score": 70.2,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_034",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Pembury, UK Teleport",
+        "operator": "SES",
+        "country": "United Kingdom",
+        "latitude": 51.1558,
+        "longitude": 0.3403,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 75.0,
+        "location_score": 65.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 88.0,
+        "investment_score": 71.7,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_035",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Singapore Teleport",
+        "operator": "SES",
+        "country": "Singapore",
+        "latitude": 1.3521,
+        "longitude": 103.8198,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "lightning_days_per_year": 179,
+        "weather_data_source": "NASA LIS",
+        "market_score": 88.0,
+        "location_score": 85.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 95.0,
+        "investment_score": 88.5,
+        "recommendation": "excellent",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "VERIFIED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_036",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Leuk, Switzerland Teleport",
+        "operator": "SkyEdge",
+        "country": "Switzerland",
+        "latitude": 46.3186,
+        "longitude": 7.6456,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 50.0,
+        "competition_score": 40.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 50.0,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_037",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Tulum, Mexico Teleport",
+        "operator": "Axesat",
+        "country": "Mexico",
+        "latitude": 20.2114,
+        "longitude": -87.4289,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 60.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 60.5,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_038",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Rio de Janeiro, Brazil Teleport",
+        "operator": "Embratel Star One",
+        "country": "Brazil",
+        "latitude": -22.9068,
+        "longitude": -43.1729,
+        "antenna_size_m": 6.3,
+        "g_t_db": 32.3,
+        "eirp_dbw": 41.4,
+        "frequency_bands": "Ku-band",
+        "services": "",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 75.0,
+        "location_score": 60.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 65.0,
+        "investment_score": 71.2,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_039",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Buenos Aires, Argentina Teleport",
+        "operator": "Arsat",
+        "country": "Argentina",
+        "latitude": -34.6118,
+        "longitude": -58.396,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 50.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 57.5,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_040",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Johannesburg, South Africa Teleport",
+        "operator": "Sentech",
+        "country": "South Africa",
+        "latitude": -26.2041,
+        "longitude": 28.0473,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 60.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 60.5,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_041",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Lagos, Nigeria Teleport",
+        "operator": "NigComSat",
+        "country": "Nigeria",
+        "latitude": 6.5244,
+        "longitude": 3.3792,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 150,
+        "weather_data_source": "NASA LIS",
+        "market_score": 50.0,
+        "location_score": 60.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 60.5,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "VERIFIED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_042",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Cairo, Egypt Teleport",
+        "operator": "Nilesat",
+        "country": "Egypt",
+        "latitude": 30.0444,
+        "longitude": 31.2357,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 50.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 57.5,
+        "recommendation": "poor",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_043",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Dubai, UAE Teleport",
+        "operator": "Al Yah Satellite",
+        "country": "United Arab Emirates",
+        "latitude": 25.2048,
+        "longitude": 55.2708,
+        "antenna_size_m": 6.3,
+        "g_t_db": 32.3,
+        "eirp_dbw": 41.4,
+        "frequency_bands": "Ku-band",
+        "services": "",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 50.0,
+        "location_score": 60.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 60.5,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_044",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Mumbai, India Teleport",
+        "operator": "ISRO",
+        "country": "India",
+        "latitude": 19.076,
+        "longitude": 72.8777,
+        "antenna_size_m": 6.3,
+        "g_t_db": 32.3,
+        "eirp_dbw": 41.4,
+        "frequency_bands": "Ku-band",
+        "services": "",
+        "lightning_days_per_year": 85,
+        "weather_data_source": "NASA LIS",
+        "market_score": 50.0,
+        "location_score": 60.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 60.5,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "VERIFIED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_045",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Bangkok, Thailand Teleport",
+        "operator": "Thaicom",
+        "country": "Thailand",
+        "latitude": 13.7563,
+        "longitude": 100.5018,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 95,
+        "weather_data_source": "NASA LIS",
+        "market_score": 50.0,
+        "location_score": 60.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 60.0,
+        "investment_score": 60.5,
+        "recommendation": "moderate",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "VERIFIED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_046",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Sparks, NV Teleport",
+        "operator": "Viasat",
+        "country": "United States",
+        "latitude": 39.5349,
+        "longitude": -119.7527,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 90.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 81.2,
+        "recommendation": "excellent",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_047",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Duluth, GA Teleport",
+        "operator": "Viasat",
+        "country": "United States",
+        "latitude": 34.0029,
+        "longitude": -84.1557,
+        "antenna_size_m": 6.3,
+        "g_t_db": 32.3,
+        "eirp_dbw": 41.4,
+        "frequency_bands": "Ku-band",
+        "services": "",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 75.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 79.0,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_048",
+      "label": "GroundStation",
+      "properties": {
+        "name": "San Diego, CA Teleport",
+        "operator": "Viasat",
+        "country": "United States",
+        "latitude": 32.7157,
+        "longitude": -117.1611,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 76.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_049",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Redmond, WA Teleport",
+        "operator": "SpaceX",
+        "country": "United States",
+        "latitude": 47.674,
+        "longitude": -122.1215,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 75.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 79.0,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "COMM_050",
+      "label": "GroundStation",
+      "properties": {
+        "name": "Hawthorne, CA Teleport",
+        "operator": "SpaceX",
+        "country": "United States",
+        "latitude": 33.9207,
+        "longitude": -118.3287,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "lightning_days_per_year": 50,
+        "weather_data_source": "Estimated",
+        "market_score": 85.0,
+        "location_score": 70.0,
+        "competition_score": 60.0,
+        "infrastructure_score": 85.0,
+        "investment_score": 76.8,
+        "recommendation": "good",
+        "location_data": "REAL - Operator public data",
+        "technical_data": "REAL - Physics calculations",
+        "weather_data": "ESTIMATED",
+        "investment_data": "ILLUSTRATIVE - Methodology demo"
+      }
+    },
+    {
+      "id": "OP_INTELSAT",
+      "label": "Operator",
+      "properties": {
+        "name": "Intelsat",
+        "station_count": 20,
+        "type": "Satellite Operator",
+        "market_position": "Global"
+      }
+    },
+    {
+      "id": "OP_SES",
+      "label": "Operator",
+      "properties": {
+        "name": "SES",
+        "station_count": 15,
+        "type": "Satellite Operator",
+        "market_position": "Global"
+      }
+    },
+    {
+      "id": "OP_VIASAT",
+      "label": "Operator",
+      "properties": {
+        "name": "Viasat",
+        "station_count": 3,
+        "type": "Satellite Operator",
+        "market_position": "Regional"
+      }
+    },
+    {
+      "id": "OP_SPACEX",
+      "label": "Operator",
+      "properties": {
+        "name": "SpaceX",
+        "station_count": 2,
+        "type": "Satellite Operator",
+        "market_position": "Regional"
+      }
+    },
+    {
+      "id": "OP_SKYEDGE",
+      "label": "Operator",
+      "properties": {
+        "name": "SkyEdge",
+        "station_count": 1,
+        "type": "Satellite Operator",
+        "market_position": "Regional"
+      }
+    },
+    {
+      "id": "OP_AXESAT",
+      "label": "Operator",
+      "properties": {
+        "name": "Axesat",
+        "station_count": 1,
+        "type": "Satellite Operator",
+        "market_position": "Regional"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "E1",
+      "source": "COMM_001",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E2",
+      "source": "COMM_002",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E3",
+      "source": "COMM_003",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E4",
+      "source": "COMM_004",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E5",
+      "source": "COMM_005",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E6",
+      "source": "COMM_006",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E7",
+      "source": "COMM_007",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E8",
+      "source": "COMM_008",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E9",
+      "source": "COMM_009",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E10",
+      "source": "COMM_010",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E11",
+      "source": "COMM_011",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E12",
+      "source": "COMM_012",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E13",
+      "source": "COMM_013",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E14",
+      "source": "COMM_014",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E15",
+      "source": "COMM_015",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E16",
+      "source": "COMM_016",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E17",
+      "source": "COMM_017",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E18",
+      "source": "COMM_018",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E19",
+      "source": "COMM_019",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E20",
+      "source": "COMM_020",
+      "target": "OP_INTELSAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E21",
+      "source": "COMM_021",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E22",
+      "source": "COMM_022",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E23",
+      "source": "COMM_023",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E24",
+      "source": "COMM_024",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E25",
+      "source": "COMM_025",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E26",
+      "source": "COMM_026",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E27",
+      "source": "COMM_027",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E28",
+      "source": "COMM_028",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E29",
+      "source": "COMM_029",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E30",
+      "source": "COMM_030",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E31",
+      "source": "COMM_031",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E32",
+      "source": "COMM_032",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E33",
+      "source": "COMM_033",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E34",
+      "source": "COMM_034",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E35",
+      "source": "COMM_035",
+      "target": "OP_SES",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E36",
+      "source": "COMM_036",
+      "target": "OP_SKYEDGE",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E37",
+      "source": "COMM_037",
+      "target": "OP_AXESAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E38",
+      "source": "COMM_046",
+      "target": "OP_VIASAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E39",
+      "source": "COMM_047",
+      "target": "OP_VIASAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E40",
+      "source": "COMM_048",
+      "target": "OP_VIASAT",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E41",
+      "source": "COMM_049",
+      "target": "OP_SPACEX",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E42",
+      "source": "COMM_050",
+      "target": "OP_SPACEX",
+      "type": "OPERATED_BY",
+      "properties": {
+        "relationship": "ownership"
+      }
+    },
+    {
+      "id": "E43",
+      "source": "COMM_001",
+      "target": "COMM_048",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 139.0
+      }
+    },
+    {
+      "id": "E44",
+      "source": "COMM_001",
+      "target": "COMM_050",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 86.3
+      }
+    },
+    {
+      "id": "E45",
+      "source": "COMM_002",
+      "target": "COMM_022",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 20.8
+      }
+    },
+    {
+      "id": "E46",
+      "source": "COMM_002",
+      "target": "COMM_025",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 281.7
+      }
+    },
+    {
+      "id": "E47",
+      "source": "COMM_002",
+      "target": "COMM_030",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 67.1
+      }
+    },
+    {
+      "id": "E48",
+      "source": "COMM_003",
+      "target": "COMM_021",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 268.7
+      }
+    },
+    {
+      "id": "E49",
+      "source": "COMM_003",
+      "target": "COMM_029",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 249.7
+      }
+    },
+    {
+      "id": "E50",
+      "source": "COMM_003",
+      "target": "COMM_033",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 231.0
+      }
+    },
+    {
+      "id": "E51",
+      "source": "COMM_006",
+      "target": "COMM_022",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 56.8
+      }
+    },
+    {
+      "id": "E52",
+      "source": "COMM_006",
+      "target": "COMM_025",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 255.2
+      }
+    },
+    {
+      "id": "E53",
+      "source": "COMM_006",
+      "target": "COMM_030",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 22.8
+      }
+    },
+    {
+      "id": "E54",
+      "source": "COMM_007",
+      "target": "COMM_048",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 247.9
+      }
+    },
+    {
+      "id": "E55",
+      "source": "COMM_007",
+      "target": "COMM_050",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 75.9
+      }
+    },
+    {
+      "id": "E56",
+      "source": "COMM_008",
+      "target": "COMM_047",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 44.8
+      }
+    },
+    {
+      "id": "E57",
+      "source": "COMM_012",
+      "target": "COMM_049",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 181.1
+      }
+    },
+    {
+      "id": "E58",
+      "source": "COMM_013",
+      "target": "COMM_025",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 100.8
+      }
+    },
+    {
+      "id": "E59",
+      "source": "COMM_016",
+      "target": "COMM_029",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 43.7
+      }
+    },
+    {
+      "id": "E60",
+      "source": "COMM_017",
+      "target": "COMM_036",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 136.4
+      }
+    },
+    {
+      "id": "E61",
+      "source": "COMM_018",
+      "target": "COMM_021",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 179.0
+      }
+    },
+    {
+      "id": "E62",
+      "source": "COMM_018",
+      "target": "COMM_024",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 245.6
+      }
+    },
+    {
+      "id": "E63",
+      "source": "COMM_018",
+      "target": "COMM_033",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 130.5
+      }
+    },
+    {
+      "id": "E64",
+      "source": "COMM_048",
+      "target": "COMM_050",
+      "type": "COMPETES_WITH",
+      "properties": {
+        "distance_km": 172.3
+      }
+    }
+  ],
+  "metadata": {
+    "created": "2025-08-04T14:34:46.967512",
+    "title": "Commercial Ground Station Investment Intelligence",
+    "description": "Real Intelsat/SES locations with investment opportunity analysis",
+    "data_attribution": {
+      "locations": "Real commercial teleport locations (public documentation)",
+      "technical_specs": "Physics-based calculations from antenna parameters",
+      "weather_data": "NASA Lightning Imaging Sensor (where available)",
+      "investment_scores": "Illustrative methodology demonstration"
+    },
+    "visualization_guide": {
+      "layout": "Geographic (latitude/longitude coordinates)",
+      "node_sizing": "investment_score (higher score = larger node)",
+      "node_coloring": "recommendation (excellent=green, good=yellow, moderate=orange, poor=red)",
+      "edge_coloring": "type (OPERATED_BY=blue, LOCATED_IN=gray, COMPETES_WITH=red)",
+      "filters": [
+        "operator",
+        "recommendation",
+        "country",
+        "region"
+      ]
+    },
+    "statistics": {
+      "total_nodes": 56,
+      "ground_stations": 50,
+      "operators": 6,
+      "regions": 0,
+      "total_edges": 64,
+      "ownership_edges": 42,
+      "location_edges": 0,
+      "competition_edges": 22
+    }
+  }
+}
