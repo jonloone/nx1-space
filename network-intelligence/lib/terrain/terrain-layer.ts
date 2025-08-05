@@ -59,6 +59,15 @@ export function createTerrainSuitabilityLayer(stations: any[], enabled: boolean)
 
 // Calculate terrain statistics
 export function calculateTerrainStats(stations: any[]) {
+  // Handle empty array case
+  if (!stations || stations.length === 0) {
+    return {
+      avgElevation: 0,
+      highRiskAreas: 0,
+      optimalSites: 0
+    };
+  }
+
   // Mock calculation for demonstration
   const elevations = stations.map(() => Math.random() * 2000 + 500);
   const avgElevation = Math.round(elevations.reduce((a, b) => a + b) / elevations.length);

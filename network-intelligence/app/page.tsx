@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-const GlobeView = dynamic(() => import("@/components/globe-view").then(mod => mod.GlobeView), { ssr: false });
+const IsometricMapView = dynamic(() => import("@/components/isometric-map-view").then(mod => mod.IsometricMapView), { ssr: false });
 import { NetworkGraph } from "@/components/network-graph";
 import { BIControls } from "@/components/bi-controls";
 import { StationDetails } from "@/components/station-details";
-import { StarfieldBackground } from "@/components/starfield-background";
 
 interface LayerControls {
   showStations: boolean;
@@ -22,7 +21,7 @@ interface LayerControls {
 }
 
 export default function NetworkIntelligencePlatform() {
-  const [viewMode, setViewMode] = useState<'globe' | 'network'>('globe');
+  const [viewMode, setViewMode] = useState<'map' | 'network'>('map');
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [showControls, setShowControls] = useState(true);
@@ -36,13 +35,12 @@ export default function NetworkIntelligencePlatform() {
 
   return (
     <div className="h-screen w-screen bg-background relative">
-      <StarfieldBackground />
       
       {/* Fullscreen Main View */}
       <div className="absolute inset-0 z-10">
-        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'globe' | 'network')} className="h-full">
-          <TabsContent value="globe" className="h-full m-0">
-            <GlobeView 
+        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'map' | 'network')} className="h-full">
+          <TabsContent value="map" className="h-full m-0">
+            <IsometricMapView 
               onSelectAsset={setSelectedAsset} 
               layers={layers}
             />
@@ -57,9 +55,9 @@ export default function NetworkIntelligencePlatform() {
       {/* View Mode Toggle - Top Left */}
       {showControls && (
         <div className="absolute top-4 left-4 z-30 transition-all duration-300 ease-in-out">
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'globe' | 'network')}>
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'map' | 'network')}>
             <TabsList className="bg-black/80 backdrop-blur-md border border-white/10">
-              <TabsTrigger value="globe" className="data-[state=active]:bg-white/20">Globe View</TabsTrigger>
+              <TabsTrigger value="map" className="data-[state=active]:bg-white/20">Map View</TabsTrigger>
               <TabsTrigger value="network" className="data-[state=active]:bg-white/20">Network Graph</TabsTrigger>
             </TabsList>
           </Tabs>
