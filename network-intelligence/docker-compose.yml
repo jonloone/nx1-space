@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  network-intelligence:
+    build: .
+    container_name: network-intelligence-platform
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data:ro
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
