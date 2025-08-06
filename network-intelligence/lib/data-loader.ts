@@ -23,7 +23,7 @@ export async function loadGroundStationAnalytics(): Promise<GroundStationAnalyti
 /**
  * Provides comprehensive fallback analytics data
  */
-function getFallbackAnalyticsData(): GroundStationAnalytics[] {
+export function getFallbackAnalyticsData(): GroundStationAnalytics[] {
   return [
     {
       station_id: 'GS001',

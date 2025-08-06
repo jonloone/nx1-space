@@ -156,14 +156,7 @@ export function IsometricMapView({
         pickable: true,
         onClick: ({ object }: any) => {
           onSelectAsset(object);
-          // Create terrain portal for detailed view
-          if (viewMode === ViewMode.REGIONAL && terrainPortal) {
-            const portalId = terrainPortal.createPortal(
-              object.coordinates[1], 
-              object.coordinates[0]
-            );
-            setActivePortalId(portalId);
-          }
+          // Note: Terrain portals are handled in REGIONAL/ISOMETRIC modes
         },
         radiusUnits: 'meters',
         radiusMinPixels: viewMode === ViewMode.GLOBAL ? 8 : 12,
@@ -286,7 +279,7 @@ export function IsometricMapView({
         data: coverageData,
         getPolygon: (d: any) => d.polygon[0],
         getFillColor: (d: any) => d.color,
-        getLineColor: (d: any) => [...d.satellite.color, 80],
+        getLineColor: (d: any) => [...d.satellite.color, 80] as [number, number, number, number],
         lineWidthMinPixels: 1,
         filled: true,
         stroked: true,
