@@ -9,6 +9,8 @@ import { latLngToCell, cellToLatLng, cellToBoundary, cellArea } from 'h3-js';
 import { isLandSimple, getLandCoverageForBounds, isCoastalArea } from '../land-water-detection';
 import { ALL_COMPETITOR_STATIONS, CompetitorStation } from '../data/competitorStations';
 import type { GroundStationAnalytics } from '../types/ground-station';
+import { enhancedH3Scorer, type EnhancedH3Score } from '../scoring/enhanced-h3-scorer';
+import { maritimeDataService } from './maritimeDataService';
 
 export interface H3HexagonOpportunity {
   // H3 Properties
@@ -777,6 +779,146 @@ export class H3GridService {
     return allOpportunities
       .sort((a, b) => b.overallScore - a.overallScore)
       .slice(0, count);
+  }
+  
+  /**
+   * Generate enhanced opportunities with maritime integration
+   */
+  generateEnhancedOpportunities(options: {
+    resolutions?: number[];
+    maxOpportunities?: number;
+    includeMaritimeOnly?: boolean;
+    globalAnalysis?: boolean;
+  } = {}): {
+    topOpportunities: H3HexagonOpportunity[];
+    maritimeOpportunities: H3HexagonOpportunity[];
+    hybridOpportunities: H3HexagonOpportunity[];
+    enhancedScores: Map<string, EnhancedH3Score>;
+  } {
+    const {
+      resolutions = [5, 6],
+      maxOpportunities = 500,
+      includeMaritimeOnly = false,
+      globalAnalysis = true
+    } = options;
+    
+    // Get maritime H3 cells
+    const maritimeH3Cells = maritimeDataService.generateMaritimeH3Cells(5, 1000);
+    
+    // Generate traditional land-based opportunities
+    const landOpportunities = this.generateGroundStationOpportunities({
+      resolutions,
+      maxOpportunities: maxOpportunities * 2, // Generate more to filter later
+      globalAnalysis
+    });
+    
+    // Create a map for enhanced scoring
+    const enhancedScores = new Map<string, EnhancedH3Score>();
+    
+    // Score land opportunities with enhanced scorer
+    landOpportunities.topOpportunities.forEach(opp => {
+      const enhanced = enhancedH3Scorer.scoreHexagon(opp.h3Index, opp);
+      enhancedScores.set(opp.h3Index, enhanced);
+    });
+    
+    // Score maritime-only cells
+    maritimeH3Cells.forEach(cell => {
+      if (!enhancedScores.has(cell.h3Index)) {
+        const enhanced = enhancedH3Scorer.scoreHexagon(cell.h3Index);
+        enhancedScores.set(cell.h3Index, enhanced);
+      }
+    });
+    
+    // Convert enhanced scores back to H3HexagonOpportunity format
+    const allOpportunities: H3HexagonOpportunity[] = [];
+    const maritimeOpportunities: H3HexagonOpportunity[] = [];
+    const hybridOpportunities: H3HexagonOpportunity[] = [];
+    
+    enhancedScores.forEach((enhanced, h3Index) => {
+      // Create opportunity object with enhanced data
+      const opportunity: H3HexagonOpportunity = {
+        hexagon: h3Index,
+        h3Index: h3Index,
+        resolution: 5, // Default resolution
+        centerLat: enhanced.coordinates[1],
+        centerLon: enhanced.coordinates[0],
+        coordinates: enhanced.coordinates,
+        boundary: cellToBoundary(h3Index),
+        areaKm2: cellArea(h3Index, 'km2'),
+        
+        // Use enhanced scores
+        landCoverage: enhanced.components.landCoverage || 0,
+        isCoastal: enhanced.components.coastalAdvantage > 0,
+        terrainSuitability: enhanced.components.infrastructureQuality || 50,
+        
+        // Scores
+        overallScore: enhanced.overallScore,
+        score: enhanced.overallScore, // Alias
+        marketScore: enhanced.components.economicActivity || 50,
+        competitionScore: 100 - enhanced.components.terrestrialCompetition || 50,
+        weatherScore: 100 - (enhanced.riskFactors.includes('Weather-related risks') ? 30 : 0),
+        coverageScore: enhanced.components.multiModalAccess || 50,
+        accessibilityScore: enhanced.components.portAccessibility || 50,
+        
+        // Competition
+        nearestCompetitor: {
+          station: null,
+          distanceKm: enhanced.competitors.overall.length > 0 ? 50 : 500
+        },
+        competitorCount5km: 0,
+        competitorCount25km: enhanced.competitors.overall.length,
+        competitorCount100km: enhanced.competitors.overall.length * 2,
+        
+        // Context
+        country: null,
+        region: enhanced.coordinates[1] > 23.5 ? 'Northern' : 
+                enhanced.coordinates[1] < -23.5 ? 'Southern' : 'Equatorial',
+        populationDensityCategory: enhanced.primaryMarket.includes('Urban') ? 'urban' :
+                                   enhanced.primaryMarket.includes('Rural') ? 'rural' : 'suburban',
+        
+        // Investment metrics
+        estimatedInvestment: 5000000, // $5M default
+        projectedAnnualRevenue: enhanced.projectedRevenue.total,
+        revenue: enhanced.projectedRevenue.total, // Alias
+        estimatedROI: (enhanced.projectedRevenue.total / 5000000) * 100,
+        paybackYears: 5000000 / enhanced.projectedRevenue.total,
+        
+        // Risk
+        riskLevel: enhanced.riskLevel,
+        riskFactors: enhanced.riskFactors,
+        
+        // Additional
+        specialFactors: [
+          enhanced.opportunityType,
+          enhanced.primaryMarket,
+          ...enhanced.competitors.overall.slice(0, 2)
+        ],
+        buildingComplexity: enhanced.components.infrastructureQuality > 70 ? 'low' :
+                           enhanced.components.infrastructureQuality > 40 ? 'medium' : 'high',
+        regulatoryComplexity: 'medium'
+      };
+      
+      allOpportunities.push(opportunity);
+      
+      // Categorize by type
+      if (enhanced.opportunityType === 'MARITIME') {
+        maritimeOpportunities.push(opportunity);
+      } else if (enhanced.opportunityType === 'HYBRID') {
+        hybridOpportunities.push(opportunity);
+      }
+    });
+    
+    // Sort and limit
+    allOpportunities.sort((a, b) => b.overallScore - a.overallScore);
+    maritimeOpportunities.sort((a, b) => b.overallScore - a.overallScore);
+    hybridOpportunities.sort((a, b) => b.overallScore - a.overallScore);
+    
+    return {
+      topOpportunities: allOpportunities.slice(0, maxOpportunities),
+      maritimeOpportunities: maritimeOpportunities.slice(0, Math.floor(maxOpportunities / 3)),
+      hybridOpportunities: hybridOpportunities.slice(0, Math.floor(maxOpportunities / 3)),
+      enhancedScores
+    };
   }
   
   /**
