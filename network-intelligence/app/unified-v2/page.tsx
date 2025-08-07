@@ -180,11 +180,14 @@ const UnifiedMapV2: React.FC = () => {
     }
   }
   
-  // Filter stations based on selected operators
+  // Filter stations based on selected operators and view context
   const visibleStations = useMemo(() => {
+    // Only show competitor stations when opportunities filter is selected
+    const shouldShowCompetitors = viewContext.filter === 'opportunities'
+    
     const allStationData: StationData[] = [
       ...sesStations,
-      ...competitorStations.map(cs => ({
+      ...(shouldShowCompetitors ? competitorStations.map(cs => ({
         ...cs,
         operator: cs.operator,
         utilization: 50 + Math.random() * 40,
@@ -193,11 +196,17 @@ const UnifiedMapV2: React.FC = () => {
         margin: -10 + Math.random() * 30,
         status: 'operational' as const,
         opportunityScore: Math.random()
-      }))
+      })) : [])
     ]
     
-    return allStationData.filter(s => selectedOperators.includes(s.operator))
-  }, [sesStations, competitorStations, selectedOperators])
+    // Apply operator filter
+    if (shouldShowCompetitors) {
+      return allStationData.filter(s => selectedOperators.includes(s.operator))
+    } else {
+      // Only show SES stations when not in opportunities view
+      return allStationData.filter(s => s.operator === 'SES')
+    }
+  }, [sesStations, competitorStations, selectedOperators, viewContext.filter])
   
   // Create layers based on current view and filter
   const layers = useMemo(() => {
@@ -385,13 +394,15 @@ const UnifiedMapV2: React.FC = () => {
       {/* Floating Insights */}
       <FloatingInsights />
       
-      {/* Competitor Filter - positioned top right */}
-      <div className="absolute top-4 right-4 z-20 w-64">
-        <CompetitorFilter
-          selectedOperators={selectedOperators}
-          onOperatorChange={setSelectedOperators}
-        />
-      </div>
+      {/* Competitor Filter - only show when opportunities filter is selected */}
+      {viewContext.filter === 'opportunities' && (
+        <div className="absolute top-4 right-4 z-20 w-64">
+          <CompetitorFilter
+            selectedOperators={selectedOperators}
+            onOperatorChange={setSelectedOperators}
+          />
+        </div>
+      )}
       
       {/* Contextual Panels */}
       <ContextualPanels />
