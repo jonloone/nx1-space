@@ -131,7 +131,14 @@ export const createH3OpportunityLayer = ({
     data: layerData,
     
     // H3 hexagon properties
-    getHexagon: (d: H3HexagonOpportunity) => d.h3Index,
+    // CRITICAL: Must use 'hexagon' property name for H3HexagonLayer
+    getHexagon: (d: H3HexagonOpportunity) => {
+      const hexValue = d.hexagon || d.h3Index
+      if (!hexValue) {
+        console.error('Missing hexagon/h3Index property in:', d)
+      }
+      return hexValue
+    },
     getFillColor: getHexagonColor,
     getLineColor: [255, 255, 255, 80],
     getLineWidth: 2,

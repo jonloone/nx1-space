@@ -12,10 +12,12 @@ import type { GroundStationAnalytics } from '../types/ground-station';
 
 export interface H3HexagonOpportunity {
   // H3 Properties
-  h3Index: string;
+  hexagon: string;  // CRITICAL: Primary property for H3HexagonLayer
+  h3Index: string;  // Keep for backward compatibility
   resolution: number;
   centerLat: number;
   centerLon: number;
+  coordinates: [number, number];  // [lon, lat] for deck.gl compatibility
   boundary: Array<[number, number]>;
   areaKm2: number;
   
@@ -26,6 +28,7 @@ export interface H3HexagonOpportunity {
   
   // Opportunity Scores (0-100)
   overallScore: number;
+  score: number;  // Alias for overallScore for compatibility
   marketScore: number;
   competitionScore: number;
   weatherScore: number;
@@ -49,6 +52,7 @@ export interface H3HexagonOpportunity {
   // Investment Metrics
   estimatedInvestment: number;
   projectedAnnualRevenue: number;
+  revenue: number;  // Alias for projectedAnnualRevenue
   estimatedROI: number;
   paybackYears: number;
   
@@ -221,16 +225,19 @@ export class H3GridService {
     );
     
     return {
-      h3Index,
+      hexagon: h3Index,  // CRITICAL: Primary property for H3HexagonLayer
+      h3Index,          // Keep for backward compatibility
       resolution,
       centerLat,
       centerLon,
+      coordinates: [centerLon, centerLat],  // [lon, lat] for deck.gl
       boundary,
       areaKm2,
       landCoverage,
       isCoastal,
       terrainSuitability,
       overallScore,
+      score: overallScore,  // Alias for compatibility
       marketScore,
       competitionScore,
       weatherScore,
@@ -245,6 +252,7 @@ export class H3GridService {
       populationDensityCategory: populationCategory,
       estimatedInvestment: investmentAnalysis.investment,
       projectedAnnualRevenue: investmentAnalysis.revenue,
+      revenue: investmentAnalysis.revenue,  // Alias for compatibility
       estimatedROI: investmentAnalysis.roi,
       paybackYears: investmentAnalysis.payback,
       riskLevel: riskAssessment.level,
