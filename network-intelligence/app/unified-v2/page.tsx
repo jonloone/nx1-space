@@ -310,19 +310,19 @@ const UnifiedMapV2: React.FC = () => {
       //   new TextLayer({
       //     id: 'station-labels',
       //     data: ALL_STATIONS,
-          getPosition: (d: Station) => d.coordinates,
-          getText: (d: Station) => d.name,
-          getSize: 12,
-          getColor: [255, 255, 255, 200],
-          getAngle: 0,
-          getTextAnchor: 'start',
-          getAlignmentBaseline: 'center',
-          getPixelOffset: [15, 0],
-          pickable: false,
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: 500,
-        })
-      )
+      //     getPosition: (d: Station) => d.coordinates,
+      //     getText: (d: Station) => d.name,
+      //     getSize: 12,
+      //     getColor: [255, 255, 255, 200],
+      //     getAngle: 0,
+      //     getTextAnchor: 'start',
+      //     getAlignmentBaseline: 'center',
+      //     getPixelOffset: [15, 0],
+      //     pickable: false,
+      //     fontFamily: 'Arial, sans-serif',
+      //     fontWeight: 500,
+      //   })
+      // )
     }
     
     // Satellite view layers
