@@ -48,8 +48,8 @@ const ContextualPanels: React.FC = () => {
       })
     }
     
-    // View-specific context panels
-    if (viewContext.view === 'stations' && !selectedStation) {
+    // View-specific context panels - but not when opportunities filter is active (operator filter shows instead)
+    if (viewContext.view === 'stations' && !selectedStation && viewContext.filter !== 'opportunities') {
       panels.push({
         id: 'station-insights',
         component: <StationInsights filter={viewContext.filter} />,
