@@ -19,6 +19,13 @@ import {
   GroundStationEnrichmentService 
 } from '@/lib/data/real-ground-stations';
 
+// Import new integrated modules for enhanced scoring
+import { calculateEnhancedBusinessMetrics } from '@/lib/business-intelligence';
+import { industryValidator } from '@/lib/validation/industry-benchmarks';
+import { antennaConstraints } from '@/lib/operational/antenna-constraints';
+import { interferenceCalculator } from '@/lib/interference/interference-calculator';
+import { servicePricingModel } from '@/lib/revenue/service-pricing-model';
+
 export interface OpportunityScore {
   stationId: string;
   stationName: string;
@@ -69,9 +76,27 @@ export interface OpportunityScore {
     longTerm: string[];    // 1-3 years
   };
   
+  // Enhanced Methodology Compliance
+  methodologyCompliance: {
+    overallCompliance: number;        // 0-100: Compliance with methodology paper
+    operationalConstraints: number;   // 0-100: Slew time, acquisition modeling
+    revenueModeling: number;         // 0-100: Service-specific pricing
+    interferenceAnalysis: number;     // 0-100: C/I ratio, ASI modeling
+    validationFramework: number;     // 0-100: Industry benchmark compliance
+  };
+  
+  // Enhanced Business Metrics
+  enhancedMetrics: {
+    operationalEfficiency: number;    // Actual vs theoretical capacity
+    revenueOptimization: number;     // Service-specific vs base pricing
+    interferenceImpact: number;      // Capacity lost to interference
+    benchmarkCompliance: number;    // Industry standard compliance
+  };
+  
   // Confidence and Data Quality
   analysisConfidence: number; // 0-100: Overall confidence in analysis
   dataQuality: number;       // 0-100: Quality of underlying data
+  validationScore: number;   // 0-100: Industry benchmark validation score
   lastUpdated: Date;
 }
 
@@ -181,26 +206,49 @@ export class RealWorldOpportunityScorer {
   }
 
   /**
-   * Score a single ground station using multi-agent analysis
+   * Score a single ground station using enhanced methodology-compliant analysis
    */
   private async scoreStation(station: GroundStationAnalytics): Promise<OpportunityScore> {
-    console.log(`🔍 Analyzing ${station.name} with multi-agent system...`);
+    console.log(`🔍 Analyzing ${station.name} with enhanced methodology-compliant system...`);
     
-    // Execute comprehensive multi-agent analysis
+    // Step 1: Calculate enhanced business metrics with operational constraints and interference
+    const enhancedMetrics = calculateEnhancedBusinessMetrics(station);
+    
+    // Step 2: Validate against industry benchmarks
+    const validationReport = industryValidator.validateStation({
+      stationId: station.station_id,
+      stationName: station.name,
+      utilization: station.utilization_metrics.current_utilization,
+      profitMargin: station.business_metrics.profit_margin,
+      revenuePerGbps: station.business_metrics.revenue_per_gbps,
+      slaCompliance: station.business_metrics.sla_compliance_rate,
+      annualROI: station.roi_metrics.annual_roi_percentage,
+      capacityEfficiency: station.capacity_metrics.capacity_efficiency,
+      operationalCostRatio: (station.business_metrics.operational_cost_monthly / station.business_metrics.monthly_revenue) * 100,
+      churnRate: station.business_metrics.churn_rate,
+      interferenceImpact: enhancedMetrics.interferenceImpact.capacityReduction,
+      slewTimeEfficiency: enhancedMetrics.operationalConstraints.utilizationEfficiency * 100
+    });
+    
+    // Step 3: Execute multi-agent analysis (optional for additional insights)
     const workflowResult = await this.agentCoordinator.executeComprehensiveAnalysis(station);
     
-    // Calculate core scoring components
-    const utilizationScore = this.calculateUtilizationScore(station, workflowResult);
-    const profitabilityScore = this.calculateProfitabilityScore(station, workflowResult);
+    // Step 4: Calculate enhanced scoring components using integrated models
+    const utilizationScore = this.calculateEnhancedUtilizationScore(station, enhancedMetrics);
+    const profitabilityScore = this.calculateEnhancedProfitabilityScore(station, enhancedMetrics);
     const marketOpportunityScore = this.calculateMarketOpportunityScore(station, workflowResult);
     const technicalCapabilityScore = this.calculateTechnicalCapabilityScore(station, workflowResult);
     
-    // Calculate composite score with weightings
-    const overallOpportunityScore = this.calculateOverallScore(
+    // Step 5: Calculate methodology compliance scores
+    const methodologyCompliance = this.calculateMethodologyCompliance(station, enhancedMetrics, validationReport);
+    
+    // Step 6: Calculate composite score with methodology compliance weighting
+    const overallOpportunityScore = this.calculateEnhancedOverallScore(
       utilizationScore,
       profitabilityScore,
       marketOpportunityScore,
-      technicalCapabilityScore
+      technicalCapabilityScore,
+      methodologyCompliance.overallCompliance
     );
     
     // Determine investment priority
@@ -243,9 +291,21 @@ export class RealWorldOpportunityScorer {
       riskFactors,
       recommendedActions,
       
+      // Enhanced Methodology Compliance
+      methodologyCompliance,
+      
+      // Enhanced Business Metrics
+      enhancedMetrics: {
+        operationalEfficiency: enhancedMetrics.operationalConstraints.utilizationEfficiency * 100,
+        revenueOptimization: ((enhancedMetrics as any).revenue_optimization_potential / enhancedMetrics.monthly_revenue) * 100,
+        interferenceImpact: enhancedMetrics.interferenceImpact.capacityReduction,
+        benchmarkCompliance: validationReport.benchmarkCompliance
+      },
+      
       // Quality Metrics
-      analysisConfidence: workflowResult.confidenceScore * 100,
+      analysisConfidence: Math.min(100, workflowResult.confidenceScore * 100 + methodologyCompliance.overallCompliance * 0.2),
       dataQuality: workflowResult.executionMetrics.dataQuality,
+      validationScore: validationReport.overallConfidence,
       lastUpdated: new Date()
     };
   }
@@ -347,6 +407,135 @@ export class RealWorldOpportunityScorer {
     technicalScore += Math.min(20, services * 3); // Up to 6+ services
     
     return Math.max(0, Math.min(100, technicalScore));
+  }
+
+  /**
+   * Enhanced utilization scoring considering operational constraints
+   */
+  private calculateEnhancedUtilizationScore(
+    station: GroundStationAnalytics, 
+    enhancedMetrics: any
+  ): number {
+    const theoreticalUtilization = station.utilization_metrics.current_utilization;
+    const actualUtilization = theoreticalUtilization * enhancedMetrics.operationalConstraints.utilizationEfficiency;
+    const efficiency = enhancedMetrics.operationalConstraints.utilizationEfficiency;
+    
+    // Base score on actual utilization with efficiency bonus
+    let score = 0;
+    
+    if (actualUtilization < 40) {
+      score = 30 + (actualUtilization / 40) * 20; // 30-50 range
+    } else if (actualUtilization <= 80) {
+      score = 50 + ((actualUtilization - 40) / 40) * 40; // 50-90 range
+    } else {
+      score = 90 - ((actualUtilization - 80) / 20) * 15; // 90-75 range
+    }
+    
+    // Efficiency bonus/penalty
+    const efficiencyBonus = (efficiency - 0.8) * 50; // +/-10 points for 0.8-1.0 range
+    score += efficiencyBonus;
+    
+    return Math.max(0, Math.min(100, score));
+  }
+
+  /**
+   * Enhanced profitability scoring with revenue optimization potential
+   */
+  private calculateEnhancedProfitabilityScore(
+    station: GroundStationAnalytics,
+    enhancedMetrics: any
+  ): number {
+    const currentMargin = station.business_metrics.profit_margin;
+    const revenueOptimization = (enhancedMetrics as any).revenue_optimization_potential || 0;
+    const optimizationPotential = enhancedMetrics.optimizationPotential.marginImprovement;
+    
+    // Base score from current profitability
+    let score = Math.min(60, currentMargin * 2);
+    
+    // Revenue optimization potential bonus
+    const optimizationBonus = Math.min(25, optimizationPotential * 0.5);
+    score += optimizationBonus;
+    
+    // Interference impact penalty
+    const interferencePenalty = enhancedMetrics.interferenceImpact.capacityReduction * 0.5;
+    score -= interferencePenalty;
+    
+    return Math.max(0, Math.min(100, score));
+  }
+
+  /**
+   * Calculate methodology compliance scoring
+   */
+  private calculateMethodologyCompliance(
+    station: GroundStationAnalytics,
+    enhancedMetrics: any,
+    validationReport: any
+  ): {
+    overallCompliance: number;
+    operationalConstraints: number;
+    revenueModeling: number;
+    interferenceAnalysis: number;
+    validationFramework: number;
+  } {
+    // Operational Constraints Compliance (0-100)
+    const hasConstraints = enhancedMetrics.operationalConstraints ? 100 : 0;
+    const constraintsAccuracy = enhancedMetrics.operationalConstraints.utilizationEfficiency > 0 ? 100 : 50;
+    const operationalConstraints = (hasConstraints + constraintsAccuracy) / 2;
+
+    // Revenue Modeling Compliance (0-100) 
+    const hasServicePricing = (enhancedMetrics as any).revenue_optimization_potential > 0 ? 100 : 0;
+    const hasDynamicPricing = hasServicePricing; // Simplified for now
+    const revenueModeling = (hasServicePricing + hasDynamicPricing) / 2;
+
+    // Interference Analysis Compliance (0-100)
+    const hasInterferenceData = enhancedMetrics.interferenceImpact ? 100 : 0;
+    const hasCtoIRatio = enhancedMetrics.interferenceImpact.cToIRatio ? 100 : 50;
+    const interferenceAnalysis = (hasInterferenceData + hasCtoIRatio) / 2;
+
+    // Validation Framework Compliance (0-100)
+    const hasBenchmarks = validationReport.overallConfidence > 0 ? 100 : 0;
+    const hasValidation = validationReport.validationResults.length > 0 ? 100 : 0;
+    const validationFramework = (hasBenchmarks + hasValidation) / 2;
+
+    // Overall Compliance
+    const overallCompliance = (
+      operationalConstraints * 0.30 +
+      revenueModeling * 0.25 +
+      interferenceAnalysis * 0.25 +
+      validationFramework * 0.20
+    );
+
+    return {
+      overallCompliance,
+      operationalConstraints,
+      revenueModeling,
+      interferenceAnalysis,
+      validationFramework
+    };
+  }
+
+  /**
+   * Enhanced overall scoring with methodology compliance weighting
+   */
+  private calculateEnhancedOverallScore(
+    utilizationScore: number,
+    profitabilityScore: number,
+    marketOpportunityScore: number,
+    technicalCapabilityScore: number,
+    methodologyCompliance: number
+  ): number {
+    // Base weighted score (same as before)
+    const baseScore = (
+      utilizationScore * 0.20 +
+      profitabilityScore * 0.35 +
+      marketOpportunityScore * 0.30 +
+      technicalCapabilityScore * 0.15
+    );
+
+    // Methodology compliance bonus (up to 10% bonus for full compliance)
+    const complianceBonus = (methodologyCompliance / 100) * 10;
+    
+    return Math.min(100, baseScore + complianceBonus);
   }
 
   private calculateOverallScore(

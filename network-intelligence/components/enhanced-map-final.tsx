@@ -41,6 +41,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { SES_PRECOMPUTED_SCORES, INTELSAT_PRECOMPUTED_SCORES, PrecomputedStationScore } from '@/lib/data/precomputed-opportunity-scores';
+import { ALL_COMPETITOR_STATIONS, CompetitorStation } from '@/lib/data/competitorStations';
 import { isLandSimple, isCoastalArea, getLandCoverageForBounds } from '@/lib/land-water-detection';
 
 // MapLibre style with proper terrain support
@@ -164,7 +165,7 @@ export function EnhancedMapFinal() {
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('opportunities');
   const [viewMode, setViewMode] = useState<ViewMode>('isometric');
-  const [selectedStation, setSelectedStation] = useState<PrecomputedStationScore | null>(null);
+  const [selectedStation, setSelectedStation] = useState<PrecomputedStationScore | CompetitorStation | null>(null);
   const [selectedGridCell, setSelectedGridCell] = useState<any>(null);
   
   // UI state
@@ -175,6 +176,7 @@ export function EnhancedMapFinal() {
   // Filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOperators, setSelectedOperators] = useState<string[]>(['SES', 'Intelsat']);
+  const [showCompetitors, setShowCompetitors] = useState(false);
   const [satelliteViewEnabled, setSatelliteViewEnabled] = useState(false);
   
   // Settings state
@@ -187,6 +189,11 @@ export function EnhancedMapFinal() {
   // Combine all scores
   const allScores = useMemo(() => {
     return [...SES_PRECOMPUTED_SCORES, ...INTELSAT_PRECOMPUTED_SCORES];
+  }, []);
+  
+  // Get competitor stations data
+  const competitorStations = useMemo(() => {
+    return ALL_COMPETITOR_STATIONS;
   }, []);
   
   // Generate opportunity grid
@@ -212,6 +219,24 @@ export function EnhancedMapFinal() {
     
     return filtered;
   }, [allScores, searchTerm, selectedOperators]);
+  
+  // Filter competitor stations
+  const filteredCompetitors = useMemo(() => {
+    if (!showCompetitors) return [];
+    
+    let filtered = competitorStations;
+    
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(s => 
+        s.name.toLowerCase().includes(term) ||
+        s.country.toLowerCase().includes(term) ||
+        s.operator.toLowerCase().includes(term)
+      );
+    }
+    
+    return filtered;
+  }, [competitorStations, showCompetitors, searchTerm]);
   
   // Auto-select view mode based on analysis mode
   useEffect(() => {
@@ -346,6 +371,29 @@ export function EnhancedMapFinal() {
     }
   }, [analysisMode]);
   
+  // Get competitor station color
+  const getCompetitorColor = useCallback((station: CompetitorStation) => {
+    const threatIntensity = {
+      'Critical': 255,
+      'High': 200,
+      'Medium': 150,
+      'Low': 100
+    }[station.marketPosition.threatLevel];
+    
+    switch (station.operator) {
+      case 'AWS Ground Station':
+        return [255, threatIntensity, 0, 220]; // Orange
+      case 'SpaceX Starlink':
+        return [threatIntensity, 255, threatIntensity, 220]; // Green
+      case 'Telesat':
+        return [0, threatIntensity, 255, 220]; // Blue
+      case 'KSAT':
+        return [255, 0, threatIntensity, 220]; // Red/Pink
+      default:
+        return [threatIntensity, threatIntensity, threatIntensity, 220]; // Gray
+    }
+  }, []);
+  
   // Get station height for 3D columns
   const getStationHeight = useCallback((station: PrecomputedStationScore) => {
     const multiplier = viewMode === 'isometric' ? 8000 : 5000;
@@ -363,6 +411,19 @@ export function EnhancedMapFinal() {
         return multiplier * 0.5;
     }
   }, [analysisMode, viewMode]);
+  
+  // Get competitor station size
+  const getCompetitorSize = useCallback((station: CompetitorStation) => {
+    const baseSize = Math.sqrt(station.capabilities.estimatedCapacityGbps) * 1000;
+    const threatMultiplier = {
+      'Critical': 1.5,
+      'High': 1.2,
+      'Medium': 1.0,
+      'Low': 0.8
+    }[station.marketPosition.threatLevel];
+    
+    return baseSize * threatMultiplier;
+  }, []);
   
   // Get station label
   const getStationLabel = useCallback((station: PrecomputedStationScore) => {
@@ -512,6 +573,27 @@ export function EnhancedMapFinal() {
       })
     );
     
+    // Competitor stations
+    if (showCompetitors && filteredCompetitors.length > 0) {
+      baseLayers.push(
+        new ScatterplotLayer({
+          id: 'competitor-stations',
+          data: filteredCompetitors,
+          getPosition: (d: CompetitorStation) => [...d.coordinates].reverse(),
+          getRadius: getCompetitorSize,
+          getFillColor: getCompetitorColor,
+          getLineColor: [255, 255, 255, 180],
+          lineWidthMinPixels: 2,
+          stroked: true,
+          filled: true,
+          pickable: true,
+          radiusMinPixels: 4,
+          radiusMaxPixels: 40,
+          onClick: (info: any) => setSelectedStation(info.object)
+        })
+      );
+    }
+    
     // Station status icons
     if (viewMode !== 'globe' && qualityMode === 'quality') {
       baseLayers.push(
@@ -538,13 +620,22 @@ export function EnhancedMapFinal() {
     }
     
     // Station labels
+    const labeledStations = filteredStations.filter(s => stationsWithLabels.has(s.stationId));
+    const labeledCompetitors = showCompetitors ? filteredCompetitors.slice(0, 10) : []; // Limit competitor labels
+    
     baseLayers.push(
       new TextLayer({
         id: 'station-labels',
-        data: filteredStations.filter(s => stationsWithLabels.has(s.stationId)),
-        getPosition: (d: PrecomputedStationScore) => [...d.coordinates].reverse(),
-        getText: getStationLabel,
-        getSize: 14,
+        data: [...labeledStations, ...labeledCompetitors],
+        getPosition: (d: any) => [...d.coordinates].reverse(),
+        getText: (d: any) => {
+          if ('monthlyRevenue' in d) {
+            return getStationLabel(d);
+          } else {
+            return `${d.name} (${d.operator})`;
+          }
+        },
+        getSize: 12,
         getColor: [255, 255, 255, 255],
         getAngle: 0,
         getTextAnchor: 'middle',
@@ -574,7 +665,11 @@ export function EnhancedMapFinal() {
     getStationColor,
     getStationHeight,
     getStationLabel,
-    opportunityGrid
+    getCompetitorColor,
+    getCompetitorSize,
+    opportunityGrid,
+    filteredCompetitors,
+    showCompetitors
   ]);
   
   // Handle view state change

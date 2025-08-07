@@ -1,0 +1,1716 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "name": "Commercial Ground Stations",
+    "description": "Investment analysis of commercial satellite ground stations",
+    "generated": "2025-08-04T17:40:08.947539",
+    "total_stations": 50,
+    "data_attribution": {
+      "locations": "Real commercial teleport locations (Intelsat, SES, etc.)",
+      "scores": "BI-level investment analysis methodology (illustrative)",
+      "weather": "NASA LIS verified where available"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_001",
+        "name": "Riverside, CA Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Equatorial",
+        "investment_score": 76.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 60.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium-high",
+        "marker_size": 20.36,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.3962,
+          33.9533
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_002",
+        "name": "Mountainside, MD Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 73.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 40.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.759999999999998,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2405,
+          38.7849
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_003",
+        "name": "Fuchsstadt, Germany Teleport",
+        "operator": "Intelsat",
+        "country": "Germany",
+        "region": "Northern",
+        "investment_score": 70.2,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 78.0,
+        "strategic_location": 65.0,
+        "competition": 40.0,
+        "infrastructure": 90.0,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.04,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.9459,
+          50.1072
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_004",
+        "name": "Perth, Australia Teleport",
+        "operator": "Intelsat",
+        "country": "Australia",
+        "region": "Equatorial",
+        "investment_score": 66.8,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 65.0,
+        "strategic_location": 50.0,
+        "competition": 90.0,
+        "infrastructure": 82.0,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "low",
+        "marker_size": 18.36,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          115.8605,
+          -31.9505
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_005",
+        "name": "Kumsan, South Korea Teleport",
+        "operator": "Intelsat",
+        "country": "South Korea",
+        "region": "Northern",
+        "investment_score": 68.5,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 72.0,
+        "strategic_location": 50.0,
+        "competition": 75.0,
+        "infrastructure": 90.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 18.700000000000003,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          127.4872,
+          36.1408
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_006",
+        "name": "Clarksburg, MD Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 73.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 40.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.759999999999998,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2692,
+          39.2362
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_007",
+        "name": "Fillmore, CA Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Equatorial",
+        "investment_score": 76.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 60.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium-high",
+        "marker_size": 20.36,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.9181,
+          34.3989
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_008",
+        "name": "Ellenwood, GA Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Equatorial",
+        "investment_score": 79.0,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 75.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium-high",
+        "marker_size": 20.8,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.2899,
+          33.6151
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_009",
+        "name": "Lake Zurich, IL Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 81.2,
+        "investment_recommendation": "excellent",
+        "investment_rationale": "Strong market opportunity with strategic advantages",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 90.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 21.240000000000002,
+        "marker_color": "#00ff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -88.0834,
+          42.1975
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_010",
+        "name": "Sandy, UT Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 81.2,
+        "investment_recommendation": "excellent",
+        "investment_rationale": "Strong market opportunity with strategic advantages",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 90.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 21.240000000000002,
+        "marker_color": "#00ff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.8389,
+          40.5649
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_011",
+        "name": "Wahiawa, HI Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Equatorial",
+        "investment_score": 84.2,
+        "investment_recommendation": "excellent",
+        "investment_rationale": "Strong market opportunity with strategic advantages",
+        "market_opportunity": 85.0,
+        "strategic_location": 80.0,
+        "competition": 90.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium-high",
+        "marker_size": 21.840000000000003,
+        "marker_color": "#00ff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -158.0011,
+          21.5039
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_012",
+        "name": "Brewster, WA Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 79.0,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 75.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 20.8,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.7811,
+          48.0929
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_013",
+        "name": "Vernon Valley, NJ Teleport",
+        "operator": "Intelsat",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 76.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 60.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 20.36,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.4821,
+          41.254
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_014",
+        "name": "Goonhilly, UK Teleport",
+        "operator": "Intelsat",
+        "country": "United Kingdom",
+        "region": "Northern",
+        "investment_score": 74.0,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 75.0,
+        "strategic_location": 65.0,
+        "competition": 75.0,
+        "infrastructure": 88.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.8,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -5.1808,
+          50.0477
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_015",
+        "name": "Aussaguel, France Teleport",
+        "operator": "Intelsat",
+        "country": "France",
+        "region": "Northern",
+        "investment_score": 68.5,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 68.0,
+        "strategic_location": 50.0,
+        "competition": 90.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 18.700000000000003,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.4136,
+          43.5963
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_016",
+        "name": "Raisting, Germany Teleport",
+        "operator": "Intelsat",
+        "country": "Germany",
+        "region": "Northern",
+        "investment_score": 70.2,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 78.0,
+        "strategic_location": 65.0,
+        "competition": 40.0,
+        "infrastructure": 90.0,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.04,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.1108,
+          47.9019
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_017",
+        "name": "Lario, Italy Teleport",
+        "operator": "Intelsat",
+        "country": "Italy",
+        "region": "Northern",
+        "investment_score": 53.0,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 50.0,
+        "strategic_location": 50.0,
+        "competition": 60.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 15.600000000000001,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.2573,
+          45.8205
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_018",
+        "name": "Usingen, Germany Teleport",
+        "operator": "Intelsat",
+        "country": "Germany",
+        "region": "Northern",
+        "investment_score": 70.2,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 78.0,
+        "strategic_location": 65.0,
+        "competition": 40.0,
+        "infrastructure": 90.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.04,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.5436,
+          50.3358
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_019",
+        "name": "Yamaguchi, Japan Teleport",
+        "operator": "Intelsat",
+        "country": "Japan",
+        "region": "Equatorial",
+        "investment_score": 68.0,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 70.0,
+        "strategic_location": 50.0,
+        "competition": 75.0,
+        "infrastructure": 92.0,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium-high",
+        "marker_size": 18.6,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          131.4706,
+          34.1858
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_020",
+        "name": "Beijing, China Teleport",
+        "operator": "Intelsat",
+        "country": "China",
+        "region": "Northern",
+        "investment_score": 71.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 82.0,
+        "strategic_location": 50.0,
+        "competition": 90.0,
+        "infrastructure": 70.0,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.36,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.4074,
+          39.9042
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_021",
+        "name": "Betzdorf, Luxembourg Teleport",
+        "operator": "SES",
+        "country": "Luxembourg",
+        "region": "Northern",
+        "investment_score": 58.2,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 60.0,
+        "strategic_location": 50.0,
+        "competition": 40.0,
+        "infrastructure": 88.0,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 16.64,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.2663,
+          49.6755
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_022",
+        "name": "Manassas, VA Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 73.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 40.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.759999999999998,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4753,
+          38.7509
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_023",
+        "name": "Stockholm, Sweden Teleport",
+        "operator": "SES",
+        "country": "Sweden",
+        "region": "Northern",
+        "investment_score": 57.5,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 50.0,
+        "strategic_location": 50.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 16.5,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.0686,
+          59.3293
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_024",
+        "name": "Redu, Belgium Teleport",
+        "operator": "SES",
+        "country": "Belgium",
+        "region": "Northern",
+        "investment_score": 50.0,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 50.0,
+        "strategic_location": 50.0,
+        "competition": 40.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 15.0,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.1456,
+          50.0014
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_025",
+        "name": "Princeton, NJ Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 76.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 60.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 20.36,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.6672,
+          40.3573
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_026",
+        "name": "Rambouillet, France Teleport",
+        "operator": "SES",
+        "country": "France",
+        "region": "Northern",
+        "investment_score": 64.0,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 68.0,
+        "strategic_location": 50.0,
+        "competition": 60.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 17.8,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          1.8347,
+          48.6436
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_027",
+        "name": "Madrid, Spain Teleport",
+        "operator": "SES",
+        "country": "Spain",
+        "region": "Northern",
+        "investment_score": 57.5,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 50.0,
+        "strategic_location": 50.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 16.5,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.7038,
+          40.4168
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_028",
+        "name": "Fucino, Italy Teleport",
+        "operator": "SES",
+        "country": "Italy",
+        "region": "Northern",
+        "investment_score": 57.5,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 50.0,
+        "strategic_location": 50.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 16.5,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.5975,
+          42.0117
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_029",
+        "name": "Munich, Germany Teleport",
+        "operator": "SES",
+        "country": "Germany",
+        "region": "Northern",
+        "investment_score": 70.2,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 78.0,
+        "strategic_location": 65.0,
+        "competition": 40.0,
+        "infrastructure": 90.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.04,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.582,
+          48.1351
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_030",
+        "name": "Woodbine, MD Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 73.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 40.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.759999999999998,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0747,
+          39.3751
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_031",
+        "name": "Castle Rock, CO Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 81.2,
+        "investment_recommendation": "excellent",
+        "investment_rationale": "Strong market opportunity with strategic advantages",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 90.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 21.240000000000002,
+        "marker_color": "#00ff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.856,
+          39.3722
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_032",
+        "name": "Four Oaks, NC Teleport",
+        "operator": "SES",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 76.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 60.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 15.0,
+        "g_t_db": 40.9,
+        "eirp_dbw": 54.9,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 20.36,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4831,
+          35.4454
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_033",
+        "name": "Cologne, Germany Teleport",
+        "operator": "SES",
+        "country": "Germany",
+        "region": "Northern",
+        "investment_score": 70.2,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 78.0,
+        "strategic_location": 65.0,
+        "competition": 40.0,
+        "infrastructure": 90.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.04,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.9603,
+          50.9375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_034",
+        "name": "Pembury, UK Teleport",
+        "operator": "SES",
+        "country": "United Kingdom",
+        "region": "Northern",
+        "investment_score": 71.7,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 75.0,
+        "strategic_location": 65.0,
+        "competition": 60.0,
+        "infrastructure": 88.0,
+        "antenna_size_m": 13.0,
+        "g_t_db": 39.7,
+        "eirp_dbw": 53.7,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "medium",
+        "marker_size": 19.340000000000003,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.3403,
+          51.1558
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_035",
+        "name": "Singapore Teleport",
+        "operator": "SES",
+        "country": "Singapore",
+        "region": "Equatorial",
+        "investment_score": 88.5,
+        "investment_recommendation": "excellent",
+        "investment_rationale": "Strong market opportunity with strategic advantages",
+        "market_opportunity": 88.0,
+        "strategic_location": 85.0,
+        "competition": 90.0,
+        "infrastructure": 95.0,
+        "antenna_size_m": 18.0,
+        "g_t_db": 42.5,
+        "eirp_dbw": 56.5,
+        "frequency_bands": "C-band, Ku-band, Ka-band",
+        "services": "Broadcasting, DTH, Enterprise VSAT, Gateway, Enterprise VSAT, Government, HTS, Mobility, Aeronautical, Multi-band, Teleport Services",
+        "weather_risk": "high",
+        "marker_size": 22.7,
+        "marker_color": "#00ff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.8198,
+          1.3521
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_036",
+        "name": "Leuk, Switzerland Teleport",
+        "operator": "SkyEdge",
+        "country": "Switzerland",
+        "region": "Northern",
+        "investment_score": 50.0,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 50.0,
+        "strategic_location": 50.0,
+        "competition": 40.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium",
+        "marker_size": 15.0,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          7.6456,
+          46.3186
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_037",
+        "name": "Tulum, Mexico Teleport",
+        "operator": "Axesat",
+        "country": "Mexico",
+        "region": "Equatorial",
+        "investment_score": 60.5,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 50.0,
+        "strategic_location": 60.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium-high",
+        "marker_size": 17.1,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.4289,
+          20.2114
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_038",
+        "name": "Rio de Janeiro, Brazil Teleport",
+        "operator": "Embratel Star One",
+        "country": "Brazil",
+        "region": "Equatorial",
+        "investment_score": 71.2,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 75.0,
+        "strategic_location": 60.0,
+        "competition": 90.0,
+        "infrastructure": 65.0,
+        "antenna_size_m": 6.3,
+        "g_t_db": 32.3,
+        "eirp_dbw": 41.4,
+        "frequency_bands": "Ku-band",
+        "services": "",
+        "weather_risk": "high",
+        "marker_size": 19.240000000000002,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -43.1729,
+          -22.9068
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_039",
+        "name": "Buenos Aires, Argentina Teleport",
+        "operator": "Arsat",
+        "country": "Argentina",
+        "region": "Equatorial",
+        "investment_score": 57.5,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 50.0,
+        "strategic_location": 50.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium-high",
+        "marker_size": 16.5,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -58.396,
+          -34.6118
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_040",
+        "name": "Johannesburg, South Africa Teleport",
+        "operator": "Sentech",
+        "country": "South Africa",
+        "region": "Equatorial",
+        "investment_score": 60.5,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 50.0,
+        "strategic_location": 60.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium-high",
+        "marker_size": 17.1,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          28.0473,
+          -26.2041
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_041",
+        "name": "Lagos, Nigeria Teleport",
+        "operator": "NigComSat",
+        "country": "Nigeria",
+        "region": "Equatorial",
+        "investment_score": 60.5,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 50.0,
+        "strategic_location": 60.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium-high",
+        "marker_size": 17.1,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.3792,
+          6.5244
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_042",
+        "name": "Cairo, Egypt Teleport",
+        "operator": "Nilesat",
+        "country": "Egypt",
+        "region": "Equatorial",
+        "investment_score": 57.5,
+        "investment_recommendation": "poor",
+        "investment_rationale": "Limited opportunity under current conditions",
+        "market_opportunity": 50.0,
+        "strategic_location": 50.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "low",
+        "marker_size": 16.5,
+        "marker_color": "#ff0000",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          31.2357,
+          30.0444
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_043",
+        "name": "Dubai, UAE Teleport",
+        "operator": "Al Yah Satellite",
+        "country": "United Arab Emirates",
+        "region": "Equatorial",
+        "investment_score": 60.5,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 50.0,
+        "strategic_location": 60.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 6.3,
+        "g_t_db": 32.3,
+        "eirp_dbw": 41.4,
+        "frequency_bands": "Ku-band",
+        "services": "",
+        "weather_risk": "medium-high",
+        "marker_size": 17.1,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          55.2708,
+          25.2048
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_044",
+        "name": "Mumbai, India Teleport",
+        "operator": "ISRO",
+        "country": "India",
+        "region": "Equatorial",
+        "investment_score": 60.5,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 50.0,
+        "strategic_location": 60.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 6.3,
+        "g_t_db": 32.3,
+        "eirp_dbw": 41.4,
+        "frequency_bands": "Ku-band",
+        "services": "",
+        "weather_risk": "high",
+        "marker_size": 17.1,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          72.8777,
+          19.076
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_045",
+        "name": "Bangkok, Thailand Teleport",
+        "operator": "Thaicom",
+        "country": "Thailand",
+        "region": "Equatorial",
+        "investment_score": 60.5,
+        "investment_recommendation": "moderate",
+        "investment_rationale": "Mixed factors, requires careful evaluation",
+        "market_opportunity": 50.0,
+        "strategic_location": 60.0,
+        "competition": 90.0,
+        "infrastructure": 60.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "high",
+        "marker_size": 17.1,
+        "marker_color": "#ffa500",
+        "confidence_level": "medium",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100.5018,
+          13.7563
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_046",
+        "name": "Sparks, NV Teleport",
+        "operator": "Viasat",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 81.2,
+        "investment_recommendation": "excellent",
+        "investment_rationale": "Strong market opportunity with strategic advantages",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 90.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium",
+        "marker_size": 21.240000000000002,
+        "marker_color": "#00ff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.7527,
+          39.5349
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_047",
+        "name": "Duluth, GA Teleport",
+        "operator": "Viasat",
+        "country": "United States",
+        "region": "Equatorial",
+        "investment_score": 79.0,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 75.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 6.3,
+        "g_t_db": 32.3,
+        "eirp_dbw": 41.4,
+        "frequency_bands": "Ku-band",
+        "services": "",
+        "weather_risk": "medium-high",
+        "marker_size": 20.8,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.1557,
+          34.0029
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_048",
+        "name": "San Diego, CA Teleport",
+        "operator": "Viasat",
+        "country": "United States",
+        "region": "Equatorial",
+        "investment_score": 76.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 60.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 11.3,
+        "g_t_db": 37.4,
+        "eirp_dbw": 49.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium-high",
+        "marker_size": 20.36,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.1611,
+          32.7157
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_049",
+        "name": "Redmond, WA Teleport",
+        "operator": "SpaceX",
+        "country": "United States",
+        "region": "Northern",
+        "investment_score": 79.0,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 75.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium",
+        "marker_size": 20.8,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.1215,
+          47.674
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "COMM_050",
+        "name": "Hawthorne, CA Teleport",
+        "operator": "SpaceX",
+        "country": "United States",
+        "region": "Equatorial",
+        "investment_score": 76.8,
+        "investment_recommendation": "good",
+        "investment_rationale": "Good fundamentals, worth detailed analysis",
+        "market_opportunity": 85.0,
+        "strategic_location": 70.0,
+        "competition": 60.0,
+        "infrastructure": 85.0,
+        "antenna_size_m": 9.0,
+        "g_t_db": 35.4,
+        "eirp_dbw": 47.5,
+        "frequency_bands": "C-band, Ku-band",
+        "services": "Enterprise VSAT, Government, Multi-band",
+        "weather_risk": "medium-high",
+        "marker_size": 20.36,
+        "marker_color": "#ffff00",
+        "confidence_level": "high",
+        "data_quality": "Real location, illustrative scoring"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.3287,
+          33.9207
+        ]
+      }
+    }
+  ]
+}

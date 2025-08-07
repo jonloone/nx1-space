@@ -1,0 +1,432 @@
+'use client';
+
+import React, { useState, useMemo } from 'react';
+import { X, Filter, Search, SlidersHorizontal, MapPin, Building2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { PrecomputedStationScore } from '@/lib/data/precomputed-opportunity-scores';
+import { ViewStateManager } from '@/lib/map/view-state-manager';
+import type { ViewState as MapViewState } from 'react-map-gl/maplibre';
+
+interface LeftPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
+  stationData: PrecomputedStationScore[];
+  onStationSelect: (station: PrecomputedStationScore) => void;
+  onFilterChange: (filters: FilterState) => void;
+  viewStateManager: ViewStateManager;
+  onViewStateChange: (viewState: MapViewState) => void;
+}
+
+export interface FilterState {
+  searchQuery: string;
+  operators: string[];
+  countries: string[];
+  stationTypes: string[];
+  priorities: string[];
+  utilizationRange: [number, number];
+  profitMarginRange: [number, number];
+  overallScoreRange: [number, number];
+  sortBy: 'name' | 'score' | 'utilization' | 'revenue' | 'roi';
+  sortOrder: 'asc' | 'desc';
+}
+
+export function LeftPanel({
+  isOpen,
+  onClose,
+  stationData,
+  onStationSelect,
+  onFilterChange,
+  viewStateManager,
+  onViewStateChange
+}: LeftPanelProps) {
+  const [filters, setFilters] = useState<FilterState>({
+    searchQuery: '',
+    operators: [],
+    countries: [],
+    stationTypes: [],
+    priorities: [],
+    utilizationRange: [0, 100],
+    profitMarginRange: [0, 50],
+    overallScoreRange: [0, 100],
+    sortBy: 'score',
+    sortOrder: 'desc'
+  });
+
+  // Extract unique values for filter options
+  const filterOptions = useMemo(() => {
+    const operators = Array.from(new Set(stationData.map(s => s.operator))).sort();
+    const countries = Array.from(new Set(stationData.map(s => s.country))).sort();
+    const types = Array.from(new Set(stationData.map(s => s.type))).sort();
+    const priorities = Array.from(new Set(stationData.map(s => s.priority))).sort();
+    
+    return { operators, countries, types, priorities };
+  }, [stationData]);
+
+  // Filter and sort stations based on current filters
+  const filteredStations = useMemo(() => {
+    let filtered = stationData.filter(station => {
+      // Search query
+      if (filters.searchQuery) {
+        const query = filters.searchQuery.toLowerCase();
+        const matchesName = station.name.toLowerCase().includes(query);
+        const matchesCountry = station.country.toLowerCase().includes(query);
+        const matchesOperator = station.operator.toLowerCase().includes(query);
+        if (!matchesName && !matchesCountry && !matchesOperator) return false;
+      }
+
+      // Operator filter
+      if (filters.operators.length > 0 && !filters.operators.includes(station.operator)) {
+        return false;
+      }
+
+      // Country filter
+      if (filters.countries.length > 0 && !filters.countries.includes(station.country)) {
+        return false;
+      }
+
+      // Station type filter
+      if (filters.stationTypes.length > 0 && !filters.stationTypes.includes(station.type)) {
+        return false;
+      }
+
+      // Priority filter
+      if (filters.priorities.length > 0 && !filters.priorities.includes(station.priority)) {
+        return false;
+      }
+
+      // Utilization range
+      if (station.actualUtilization < filters.utilizationRange[0] || 
+          station.actualUtilization > filters.utilizationRange[1]) {
+        return false;
+      }
+
+      // Profit margin range
+      if (station.profitMargin < filters.profitMarginRange[0] || 
+          station.profitMargin > filters.profitMarginRange[1]) {
+        return false;
+      }
+
+      // Overall score range
+      if (station.overallScore < filters.overallScoreRange[0] || 
+          station.overallScore > filters.overallScoreRange[1]) {
+        return false;
+      }
+
+      return true;
+    });
+
+    // Sort filtered results
+    filtered.sort((a, b) => {
+      let aValue: any, bValue: any;
+      
+      switch (filters.sortBy) {
+        case 'name':
+          aValue = a.name;
+          bValue = b.name;
+          break;
+        case 'score':
+          aValue = a.overallScore;
+          bValue = b.overallScore;
+          break;
+        case 'utilization':
+          aValue = a.actualUtilization;
+          bValue = b.actualUtilization;
+          break;
+        case 'revenue':
+          aValue = a.monthlyRevenue;
+          bValue = b.monthlyRevenue;
+          break;
+        case 'roi':
+          aValue = a.annualROI;
+          bValue = b.annualROI;
+          break;
+        default:
+          return 0;
+      }
+
+      if (typeof aValue === 'string') {
+        return filters.sortOrder === 'asc' 
+          ? aValue.localeCompare(bValue) 
+          : bValue.localeCompare(aValue);
+      } else {
+        return filters.sortOrder === 'asc' 
+          ? aValue - bValue 
+          : bValue - aValue;
+      }
+    });
+
+    return filtered;
+  }, [stationData, filters]);
+
+  // Update filters and notify parent
+  const updateFilter = (key: keyof FilterState, value: any) => {
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    const defaultFilters: FilterState = {
+      searchQuery: '',
+      operators: [],
+      countries: [],
+      stationTypes: [],
+      priorities: [],
+      utilizationRange: [0, 100],
+      profitMarginRange: [0, 50],
+      overallScoreRange: [0, 100],
+      sortBy: 'score',
+      sortOrder: 'desc'
+    };
+    setFilters(defaultFilters);
+    onFilterChange(defaultFilters);
+  };
+
+  // Focus on filtered stations
+  const focusOnFiltered = () => {
+    if (filteredStations.length > 0) {
+      const stations = filteredStations.map(s => ({ coordinates: s.coordinates }));
+      const newViewState = viewStateManager.fitBounds(stations);
+      onViewStateChange(newViewState);
+    }
+  };
+
+  // Get priority color
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'critical': return 'bg-pink-600';
+      case 'high': return 'bg-orange-500';
+      case 'medium': return 'bg-green-500';
+      case 'low': return 'bg-gray-500';
+      default: return 'bg-gray-400';
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="absolute left-0 top-0 bottom-0 w-80 bg-gray-900/95 backdrop-blur-sm border-r border-gray-700 z-40 overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="flex items-center space-x-2">
+          <Filter size={20} className="text-blue-400" />
+          <h2 className="text-lg font-semibold text-white">Analysis Filters</h2>
+        </div>
+        <Button variant="ghost" size="sm" onClick={onClose}>
+          <X size={16} />
+        </Button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        {/* Search */}
+        <div className="space-y-2">
+          <Label className="text-sm text-gray-300">Search Stations</Label>
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-3 text-gray-400" />
+            <Input
+              placeholder="Search by name, country, or operator..."
+              value={filters.searchQuery}
+              onChange={(e) => updateFilter('searchQuery', e.target.value)}
+              className="pl-10 bg-gray-800 border-gray-600 text-white"
+            />
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="bg-gray-800 border-gray-600">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm text-white">Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={focusOnFiltered}
+              className="w-full justify-start"
+            >
+              <MapPin size={14} className="mr-2" />
+              Focus on Filtered ({filteredStations.length})
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={clearFilters}
+              className="w-full justify-start"
+            >
+              <SlidersHorizontal size={14} className="mr-2" />
+              Clear All Filters
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Operator Filter */}
+        <div className="space-y-2">
+          <Label className="text-sm text-gray-300">Operators</Label>
+          <div className="space-y-2">
+            {filterOptions.operators.map(operator => (
+              <div key={operator} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`operator-${operator}`}
+                  checked={filters.operators.includes(operator)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      updateFilter('operators', [...filters.operators, operator]);
+                    } else {
+                      updateFilter('operators', filters.operators.filter(o => o !== operator));
+                    }
+                  }}
+                />
+                <Label htmlFor={`operator-${operator}`} className="text-sm text-gray-300">
+                  {operator}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Priority Filter */}
+        <div className="space-y-2">
+          <Label className="text-sm text-gray-300">Priority Levels</Label>
+          <div className="space-y-2">
+            {filterOptions.priorities.map(priority => (
+              <div key={priority} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`priority-${priority}`}
+                  checked={filters.priorities.includes(priority)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      updateFilter('priorities', [...filters.priorities, priority]);
+                    } else {
+                      updateFilter('priorities', filters.priorities.filter(p => p !== priority));
+                    }
+                  }}
+                />
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full ${getPriorityColor(priority)}`} />
+                  <Label htmlFor={`priority-${priority}`} className="text-sm text-gray-300 capitalize">
+                    {priority}
+                  </Label>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Utilization Range */}
+        <div className="space-y-3">
+          <Label className="text-sm text-gray-300">
+            Utilization Range: {filters.utilizationRange[0]}% - {filters.utilizationRange[1]}%
+          </Label>
+          <Slider
+            value={filters.utilizationRange}
+            onValueChange={(value) => updateFilter('utilizationRange', value)}
+            max={100}
+            step={1}
+            className="w-full"
+          />
+        </div>
+
+        {/* Overall Score Range */}
+        <div className="space-y-3">
+          <Label className="text-sm text-gray-300">
+            Overall Score: {filters.overallScoreRange[0]} - {filters.overallScoreRange[1]}
+          </Label>
+          <Slider
+            value={filters.overallScoreRange}
+            onValueChange={(value) => updateFilter('overallScoreRange', value)}
+            max={100}
+            step={1}
+            className="w-full"
+          />
+        </div>
+
+        {/* Sort Options */}
+        <div className="space-y-2">
+          <Label className="text-sm text-gray-300">Sort By</Label>
+          <div className="flex space-x-2">
+            <Select value={filters.sortBy} onValueChange={(value) => updateFilter('sortBy', value)}>
+              <SelectTrigger className="flex-1 bg-gray-800 border-gray-600">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="score">Overall Score</SelectItem>
+                <SelectItem value="utilization">Utilization</SelectItem>
+                <SelectItem value="revenue">Revenue</SelectItem>
+                <SelectItem value="roi">ROI</SelectItem>
+                <SelectItem value="name">Name</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filters.sortOrder} onValueChange={(value) => updateFilter('sortOrder', value)}>
+              <SelectTrigger className="w-20 bg-gray-800 border-gray-600">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">↓</SelectItem>
+                <SelectItem value="asc">↑</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <Separator className="bg-gray-600" />
+
+        {/* Filtered Results */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm text-gray-300">Filtered Stations</Label>
+            <Badge variant="secondary" className="bg-blue-600 text-white">
+              {filteredStations.length}
+            </Badge>
+          </div>
+          
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {filteredStations.map(station => (
+              <Card 
+                key={station.stationId}
+                className="bg-gray-800 border-gray-600 hover:bg-gray-750 cursor-pointer transition-colors"
+                onClick={() => onStationSelect(station)}
+              >
+                <CardContent className="p-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-2 h-2 rounded-full ${getPriorityColor(station.priority)}`} />
+                        <h4 className="text-sm font-medium text-white">{station.name}</h4>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">{station.country} • {station.operator}</p>
+                      <div className="flex items-center space-x-3 mt-2 text-xs">
+                        <span className="text-gray-300">
+                          Score: <span className="text-blue-400">{station.overallScore}</span>
+                        </span>
+                        <span className="text-gray-300">
+                          Util: <span className="text-green-400">{station.actualUtilization}%</span>
+                        </span>
+                      </div>
+                    </div>
+                    <Building2 size={14} className="text-gray-500 mt-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            
+            {filteredStations.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                <Search size={24} className="mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No stations match your filters</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

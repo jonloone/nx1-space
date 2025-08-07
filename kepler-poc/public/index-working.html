@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ground Station Intelligence - Kepler.gl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://d1a3f4spazzrp4.cloudfront.net/kepler.gl/uber-fonts/4.0.0/superfine.css">
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: ff-clan-web-pro, 'Helvetica Neue', Helvetica, sans-serif;
+        }
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <!-- React -->
+    <script crossorigin src="https://unpkg.com/react@16.8.4/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16.8.4/umd/react-dom.production.min.js"></script>
+    
+    <!-- Redux -->
+    <script crossorigin src="https://unpkg.com/redux@4.0.5/dist/redux.js"></script>
+    <script crossorigin src="https://unpkg.com/react-redux@7.1.3/dist/react-redux.min.js"></script>
+    
+    <!-- Kepler.gl and dependencies -->
+    <script src="https://unpkg.com/styled-components@4.1.3/dist/styled-components.min.js"></script>
+    <script src="https://unpkg.com/kepler.gl@2.5.5/umd/keplergl.min.js"></script>
+
+    <script>
+        // Wait for all scripts to load
+        window.addEventListener('load', function() {
+            console.log('Starting Kepler.gl app...');
+            
+            const { Provider, connect } = ReactRedux;
+            const { createStore, combineReducers, applyMiddleware, compose } = Redux;
+            const h = React.createElement;
+
+            // Redux setup with middleware
+            const customizedKeplerGlReducer = KeplerGl.keplerGlReducer.initialState({
+                uiState: {
+                    currentModal: null,
+                    activeSidePanel: null
+                }
+            });
+
+            const reducers = combineReducers({
+                keplerGl: customizedKeplerGlReducer
+            });
+
+            const middlewares = [KeplerGl.enhanceReduxMiddleware];
+            const enhancers = [applyMiddleware(...middlewares)];
+            
+            const store = createStore(reducers, {}, compose(...enhancers));
+
+            // Map component
+            class Map extends React.Component {
+                componentDidMount() {
+                    console.log('Map component mounted, loading data...');
+                    this.loadData();
+                }
+
+                loadData = () => {
+                    fetch('/data/kepler_ground_stations.json')
+                        .then(res => {
+                            console.log('Fetch response:', res.status);
+                            if (!res.ok) {
+                                throw new Error(`HTTP error! status: ${res.status}`);
+                            }
+                            return res.json();
+                        })
+                        .then(rawData => {
+                            console.log('Raw data loaded:', rawData);
+                            
+                            // Create properly formatted dataset
+                            const keplerData = {
+                                datasets: [{
+                                    info: {
+                                        label: 'Commercial Ground Stations',
+                                        id: 'ground-stations'
+                                    },
+                                    data: {
+                                        fields: [
+                                            {name: 'station_id', type: 'string'},
+                                            {name: 'name', type: 'string'},
+                                            {name: 'latitude', type: 'real'},
+                                            {name: 'longitude', type: 'real'},
+                                            {name: 'operator', type: 'string'},
+                                            {name: 'country', type: 'string'},
+                                            {name: 'overall_investment_score', type: 'real'},
+                                            {name: 'investment_recommendation', type: 'string'},
+                                            {name: 'primary_antenna_size_m', type: 'real'},
+                                            {name: 'estimated_g_t_db', type: 'real'},
+                                            {name: 'estimated_eirp_dbw', type: 'real'},
+                                            {name: 'frequency_bands', type: 'string'}
+                                        ],
+                                        rows: rawData.data.allData.map(station => [
+                                            station.station_id,
+                                            station.name,
+                                            station.latitude,
+                                            station.longitude,
+                                            station.operator,
+                                            station.country,
+                                            station.overall_investment_score,
+                                            station.investment_recommendation,
+                                            station.primary_antenna_size_m,
+                                            station.estimated_g_t_db,
+                                            station.estimated_eirp_dbw,
+                                            station.frequency_bands
+                                        ])
+                                    }
+                                }],
+                                options: {
+                                    centerMap: true,
+                                    readOnly: false
+                                },
+                                config: {
+                                    version: 'v1',
+                                    config: {
+                                        visState: {
+                                            filters: [],
+                                            layers: [{
+                                                id: 'point-1',
+                                                type: 'point',
+                                                config: {
+                                                    dataId: 'ground-stations',
+                                                    label: 'Ground Stations',
+                                                    color: [255, 203, 5],
+                                                    columns: {
+                                                        lat: 'latitude',
+                                                        lng: 'longitude',
+                                                        altitude: null
+                                                    },
+                                                    isVisible: true,
+                                                    visConfig: {
+                                                        radius: 30,
+                                                        fixedRadius: false,
+                                                        opacity: 0.8,
+                                                        outline: true,
+                                                        thickness: 2,
+                                                        strokeColor: null,
+                                                        colorRange: {
+                                                            name: 'Global Warming',
+                                                            type: 'sequential',
+                                                            category: 'Uber',
+                                                            colors: [
+                                                                '#5A1846',
+                                                                '#900C3F',
+                                                                '#C70039',
+                                                                '#E3611C',
+                                                                '#F1920E',
+                                                                '#FFC300'
+                                                            ]
+                                                        },
+                                                        strokeColorRange: {
+                                                            name: 'Global Warming',
+                                                            type: 'sequential',
+                                                            category: 'Uber',
+                                                            colors: [
+                                                                '#5A1846',
+                                                                '#900C3F',
+                                                                '#C70039',
+                                                                '#E3611C',
+                                                                '#F1920E',
+                                                                '#FFC300'
+                                                            ]
+                                                        },
+                                                        radiusRange: [0, 50],
+                                                        filled: true
+                                                    },
+                                                    colorField: {
+                                                        name: 'overall_investment_score',
+                                                        type: 'real'
+                                                    },
+                                                    colorScale: 'quantile',
+                                                    sizeField: {
+                                                        name: 'overall_investment_score',
+                                                        type: 'real'
+                                                    },
+                                                    sizeScale: 'linear'
+                                                }
+                                            }],
+                                            interactionConfig: {
+                                                tooltip: {
+                                                    fieldsToShow: {
+                                                        'ground-stations': [
+                                                            'name',
+                                                            'operator',
+                                                            'country',
+                                                            'overall_investment_score',
+                                                            'investment_recommendation'
+                                                        ]
+                                                    },
+                                                    enabled: true
+                                                }
+                                            }
+                                        },
+                                        mapState: {
+                                            bearing: 0,
+                                            dragRotate: false,
+                                            latitude: 20,
+                                            longitude: 0,
+                                            pitch: 0,
+                                            zoom: 2
+                                        },
+                                        mapStyle: {
+                                            styleType: 'dark'
+                                        }
+                                    }
+                                }
+                            };
+                            
+                            console.log('Dispatching data to Kepler.gl...');
+                            
+                            // Dispatch using proper action
+                            this.props.dispatch(
+                                KeplerGl.addDataToMap(keplerData)
+                            );
+                            
+                            console.log('Data dispatched successfully');
+                        })
+                        .catch(err => {
+                            console.error('Error loading data:', err);
+                            alert('Error loading ground station data: ' + err.message);
+                        });
+                }
+
+                render() {
+                    return h(KeplerGl.default, {
+                        id: 'ground-stations',
+                        mapboxApiAccessToken: 'pk.eyJ1IjoidWJlcmRhdGEiLCJhIjoiY2p5aHB5bzEzMDI3MjNucWx4dmhvbW5wYyJ9.ZjLMWjog4imdrZhtheCOtA',
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                        theme: "dark"
+                    });
+                }
+            }
+
+            // Connect component
+            const ConnectedMap = connect(state => state)(Map);
+
+            // App component
+            const App = () => {
+                return h(Provider, { store: store },
+                    h('div', { style: { position: 'absolute', width: '100%', height: '100%' } },
+                        h(ConnectedMap)
+                    )
+                );
+            };
+
+            // Render
+            ReactDOM.render(h(App), document.getElementById('app'));
+            console.log('App rendered');
+        });
+    </script>
+</body>
+</html>

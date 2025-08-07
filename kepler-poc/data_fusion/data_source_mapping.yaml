@@ -1,0 +1,299 @@
+# Data Source Mapping Configuration
+# Maps existing real data files to 30+ analysis factors for multi-factor heatmap
+
+data_sources:
+  # Infrastructure Factors
+  ground_stations:
+    file: "/mnt/blockstorage/nx1-space/data/raw/commercial_ground_stations.parquet"
+    format: "parquet"
+    coordinates: ["latitude", "longitude"]
+    factors:
+      - ground_station_density
+      - ground_station_capacity
+      - ground_station_cost_per_location
+    spatial_type: "point"
+    
+  internet_exchanges:
+    file: "/mnt/blockstorage/nx1-space/data/raw/peeringdb_exchanges.parquet"
+    format: "parquet"
+    coordinates: ["city"]  # Need geocoding
+    factors:
+      - internet_exchange_presence
+      - internet_backbone_density
+    spatial_type: "point"
+    geocoding_required: true
+    
+  submarine_cables:
+    file: "/mnt/blockstorage/nx1-space/data/raw/cable-geo.json"
+    format: "json"
+    coordinates: ["coordinates"]
+    factors:
+      - submarine_cable_proximity
+      - international_connectivity
+    spatial_type: "linestring"
+    
+  cable_landing_points:
+    file: "/mnt/blockstorage/nx1-space/data/raw/cable_landing_points.parquet"
+    format: "parquet"
+    coordinates: ["latitude", "longitude"]
+    factors:
+      - cable_landing_density
+      - international_gateway_capacity
+    spatial_type: "point"
+    
+  datacenters:
+    file: "/mnt/blockstorage/nx1-space/data/raw/cloud_datacenter_locations.parquet"
+    format: "parquet"
+    coordinates: ["latitude", "longitude"]
+    factors:
+      - datacenter_density
+      - cloud_availability
+      - computing_infrastructure
+    spatial_type: "point"
+    
+  fiber_connectivity:
+    file: "/mnt/blockstorage/nx1-space/data/raw/fiber_connectivity_index.parquet"
+    format: "parquet"
+    coordinates: ["latitude", "longitude"]
+    factors:
+      - fiber_density
+      - terrestrial_connectivity
+    spatial_type: "point"
+
+  # Economic Factors
+  economic_indicators:
+    file: "/mnt/blockstorage/nx1-space/data/raw/economic_indicators.parquet"
+    format: "parquet"
+    coordinates: ["country_code"]  # Need country boundary mapping
+    factors:
+      - gdp_per_capita
+      - economic_growth_rate
+      - business_environment_score
+    spatial_type: "polygon"
+    geocoding_required: true
+    
+  world_bank_data:
+    file: "/mnt/blockstorage/nx1-space/data/raw/world_bank_indicators.parquet"
+    format: "parquet"
+    coordinates: ["country_code"]
+    factors:
+      - inflation_rate
+      - unemployment_rate
+      - trade_openness
+    spatial_type: "polygon"
+    geocoding_required: true
+    
+  bandwidth_pricing:
+    file: "/mnt/blockstorage/nx1-space/data/raw/bandwidth_pricing.parquet"
+    format: "parquet"
+    coordinates: ["country", "region"]
+    factors:
+      - bandwidth_cost_per_mbps
+      - connectivity_cost_index
+    spatial_type: "region"
+    geocoding_required: true
+    
+  lease_rates:
+    file: "/mnt/blockstorage/nx1-space/data/raw/ground_station_lease_rates.parquet"
+    format: "parquet"
+    coordinates: ["country", "region"]
+    factors:
+      - land_lease_cost
+      - facility_operating_cost
+    spatial_type: "region"
+    geocoding_required: true
+
+  # Environmental/Weather Factors
+  precipitation:
+    file: "/mnt/blockstorage/nx1-space/data/raw/precipitation/*.nc4"
+    format: "netcdf4"
+    coordinates: ["lon", "lat", "time"]
+    factors:
+      - precipitation_intensity
+      - rain_fade_risk
+      - seasonal_weather_variation
+    spatial_type: "grid"
+    temporal: true
+    
+  rain_fade_analysis:
+    file: "/mnt/blockstorage/nx1-space/data/raw/itu_rain_fade_analysis.parquet"
+    format: "parquet"
+    coordinates: ["latitude", "longitude"]
+    factors:
+      - rain_fade_probability
+      - signal_degradation_risk
+    spatial_type: "point"
+    
+  weather_patterns:
+    file: "/mnt/blockstorage/nx1-space/data/raw/weather_patterns_gpm_real.parquet"
+    format: "parquet"
+    coordinates: ["latitude", "longitude"]
+    factors:
+      - extreme_weather_frequency
+      - climate_stability
+    spatial_type: "point"
+
+  # Risk Factors
+  seismic_risk:
+    file: "/mnt/blockstorage/nx1-space/data/raw/seismic_risk_zones.parquet"
+    format: "parquet"
+    coordinates: ["latitude", "longitude"]
+    factors:
+      - earthquake_risk
+      - geological_stability
+    spatial_type: "polygon"
+    
+  disaster_risk:
+    file: "/mnt/blockstorage/nx1-space/data/raw/kaggle/Significant Earthquake Dataset 1900-2023.csv"
+    format: "csv"
+    coordinates: ["Longitude", "Latitude"]
+    factors:
+      - historical_disaster_frequency
+      - natural_disaster_risk
+    spatial_type: "point"
+    
+  flood_risk:
+    file: "/mnt/blockstorage/nx1-space/data/raw/kaggle/flood.csv"
+    format: "csv"
+    coordinates: ["longitude", "latitude"]
+    factors:
+      - flood_risk_level
+      - water_damage_probability
+    spatial_type: "point"
+    
+  political_stability:
+    file: "/mnt/blockstorage/nx1-space/data/raw/political_stability_index.parquet"
+    format: "parquet"
+    coordinates: ["country_code"]
+    factors:
+      - political_stability_score
+      - regulatory_environment
+      - government_effectiveness
+    spatial_type: "polygon"
+    geocoding_required: true
+
+  # Population and Demographics
+  population_grid:
+    file: "/mnt/blockstorage/nx1-space/data/raw/population_grid.parquet"
+    format: "parquet"
+    coordinates: ["center_lat", "center_lon"]
+    factors:
+      - population_density
+      - urban_concentration
+      - market_size_potential
+    spatial_type: "grid"
+    
+  # Satellite-specific Factors
+  active_satellites:
+    file: "/mnt/blockstorage/nx1-space/data/raw/active_satellites.parquet"
+    format: "parquet"
+    coordinates: ["longitude", "latitude"]  # If available
+    factors:
+      - satellite_coverage_density
+      - orbital_congestion
+    spatial_type: "point"
+    
+  starlink_constellation:
+    file: "/mnt/blockstorage/nx1-space/data/raw/starlink_constellation.parquet"
+    format: "parquet"
+    coordinates: ["longitude", "latitude"]
+    factors:
+      - leo_constellation_coverage
+      - competitive_satellite_presence
+    spatial_type: "point"
+    
+  # Regulatory Factors
+  itu_spectrum:
+    file: "/mnt/blockstorage/nx1-space/data/raw/itu_spectrum_allocations.parquet"
+    format: "parquet"
+    coordinates: ["country", "region"]
+    factors:
+      - spectrum_availability
+      - regulatory_compliance_complexity
+    spatial_type: "region"
+    geocoding_required: true
+    
+  itu_interference:
+    file: "/mnt/blockstorage/nx1-space/data/raw/itu_interference_zones.parquet"
+    format: "parquet"
+    coordinates: ["latitude", "longitude"]
+    factors:
+      - interference_risk
+      - spectrum_congestion
+    spatial_type: "polygon"
+    
+  earth_station_regulations:
+    file: "/mnt/blockstorage/nx1-space/data/raw/itu_earth_station_regulations.parquet"
+    format: "parquet"
+    coordinates: ["country", "region"]
+    factors:
+      - licensing_complexity
+      - regulatory_barrier_score
+    spatial_type: "region"
+    geocoding_required: true
+
+  # Energy and Power
+  renewable_energy:
+    file: "/mnt/blockstorage/nx1-space/data/raw/irena_renewable_energy.csv"
+    format: "csv"
+    coordinates: ["Country"]  # Need geocoding
+    factors:
+      - renewable_energy_availability
+      - power_cost_index
+      - grid_reliability
+    spatial_type: "polygon"
+    geocoding_required: true
+    
+  power_reliability:
+    file: "/mnt/blockstorage/nx1-space/data/raw/power_reliability_scores.parquet"
+    format: "parquet"
+    coordinates: ["country", "region"]
+    factors:
+      - power_grid_reliability
+      - electrical_infrastructure_quality
+    spatial_type: "region"
+    geocoding_required: true
+
+# Factor definitions for multi-factor analysis
+analysis_factors:
+  # Infrastructure (Weight: 35%)
+  ground_station_density: {weight: 0.08, type: "infrastructure", normalize: "log"}
+  internet_exchange_presence: {weight: 0.06, type: "infrastructure", normalize: "linear"}
+  submarine_cable_proximity: {weight: 0.07, type: "infrastructure", normalize: "inverse_distance"}
+  datacenter_density: {weight: 0.05, type: "infrastructure", normalize: "log"}
+  fiber_density: {weight: 0.09, type: "infrastructure", normalize: "linear"}
+  
+  # Economic (Weight: 25%)
+  gdp_per_capita: {weight: 0.08, type: "economic", normalize: "log"}
+  bandwidth_cost_per_mbps: {weight: 0.07, type: "economic", normalize: "inverse"}
+  land_lease_cost: {weight: 0.05, type: "economic", normalize: "inverse"}
+  business_environment_score: {weight: 0.05, type: "economic", normalize: "linear"}
+  
+  # Risk (Weight: 20%)
+  rain_fade_risk: {weight: 0.06, type: "risk", normalize: "inverse"}
+  earthquake_risk: {weight: 0.04, type: "risk", normalize: "inverse"}
+  political_stability_score: {weight: 0.06, type: "risk", normalize: "linear"}
+  natural_disaster_risk: {weight: 0.04, type: "risk", normalize: "inverse"}
+  
+  # Market (Weight: 15%)
+  population_density: {weight: 0.06, type: "market", normalize: "log"}
+  market_size_potential: {weight: 0.05, type: "market", normalize: "linear"}
+  urban_concentration: {weight: 0.04, type: "market", normalize: "linear"}
+  
+  # Regulatory (Weight: 5%)
+  spectrum_availability: {weight: 0.03, type: "regulatory", normalize: "linear"}
+  licensing_complexity: {weight: 0.02, type: "regulatory", normalize: "inverse"}
+
+# H3 Resolution Configuration
+spatial_config:
+  h3_resolution: 6  # ~36 km^2 hexagons, good for regional analysis
+  buffer_distance_km: 50  # For proximity calculations
+  interpolation_method: "inverse_distance_weighted"
+  max_interpolation_distance_km: 200
+  
+# Processing Configuration
+processing_config:
+  chunk_size: 10000  # Records per processing chunk
+  parallel_workers: 4  # Number of parallel processing threads
+  cache_duration_hours: 24  # How long to cache processed data
+  quality_threshold: 0.7  # Minimum data quality score to include

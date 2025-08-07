@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ground Station Coverage Analysis Platform</title>
+    
+    <!-- MapLibre GL JS v3+ for globe projection -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    
+    <!-- deck.gl latest -->
+    <script src="https://unpkg.com/deck.gl@9.1.14/dist.min.js"></script>
+    
+    <!-- Turf.js for spatial analysis -->
+    <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Analysis Panel */
+        .analysis-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 380px;
+            max-height: calc(100vh - 40px);
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+            border-radius: 12px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(48, 54, 61, 0.8);
+            position: sticky;
+            top: 0;
+            background: rgba(13, 17, 23, 0.98);
+            z-index: 10;
+        }
+        
+        .panel-header h1 {
+            font-size: 20px;
+            color: #58a6ff;
+            margin: 0 0 8px 0;
+        }
+        
+        .panel-header p {
+            font-size: 13px;
+            color: #8b949e;
+            margin: 0;
+        }
+        
+        .panel-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(48, 54, 61, 0.8);
+        }
+        
+        .panel-section h2 {
+            font-size: 16px;
+            color: #c9d1d9;
+            margin: 0 0 16px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .metric-card {
+            background: rgba(48, 54, 61, 0.3);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(48, 54, 61, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            background: rgba(48, 54, 61, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #58a6ff;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Opportunity List */
+        .opportunity-list {
+            margin-top: 16px;
+        }
+        
+        .opportunity-item {
+            background: rgba(48, 54, 61, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(48, 54, 61, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .opportunity-item:hover {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: #58a6ff;
+        }
+        
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .opportunity-location {
+            font-weight: 600;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+        
+        .opportunity-score {
+            background: #58a6ff;
+            color: #0d1117;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .opportunity-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+            color: #8b949e;
+        }
+        
+        /* Layer Controls */
+        .layer-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .layer-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+        
+        .layer-toggle:hover .layer-label {
+            color: #c9d1d9;
+        }
+        
+        .layer-label {
+            font-size: 14px;
+            color: #8b949e;
+            transition: color 0.2s;
+        }
+        
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: rgba(48, 54, 61, 0.8);
+            border-radius: 12px;
+            position: relative;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #58a6ff;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #c9d1d9;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+        
+        /* Projection Toggle */
+        .projection-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .projection-btn {
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+            color: #c9d1d9;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .projection-btn:hover {
+            background: rgba(88, 166, 255, 0.2);
+            border-color: #58a6ff;
+        }
+        
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(88, 166, 255, 0.3);
+            border-top-color: #58a6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #c9d1d9;
+            font-size: 16px;
+        }
+        
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+            border-radius: 8px;
+            padding: 16px;
+            z-index: 1000;
+        }
+        
+        .legend-title {
+            font-size: 12px;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        .legend-scale {
+            width: 200px;
+            height: 20px;
+            background: linear-gradient(to right, 
+                rgba(0, 0, 0, 0),
+                rgba(0, 0, 255, 0.5),
+                rgba(0, 255, 0, 0.5),
+                rgba(255, 255, 0, 0.5),
+                rgba(255, 0, 0, 1)
+            );
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #8b949e;
+        }
+        
+        /* Filters */
+        .filter-group {
+            margin-top: 16px;
+        }
+        
+        .filter-item {
+            margin-bottom: 12px;
+        }
+        
+        .filter-label {
+            display: block;
+            font-size: 12px;
+            color: #8b949e;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-range {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(48, 54, 61, 0.8);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .filter-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #58a6ff;
+            cursor: pointer;
+        }
+        
+        .filter-value {
+            text-align: right;
+            font-size: 12px;
+            color: #c9d1d9;
+            margin-top: 4px;
+        }
+        
+        /* MapLibre overrides */
+        .maplibregl-ctrl-group {
+            background: rgba(13, 17, 23, 0.9);
+            border: 1px solid rgba(48, 54, 61, 0.8);
+        }
+        
+        .maplibregl-ctrl button {
+            background-color: transparent;
+            color: #c9d1d9;
+        }
+        
+        .maplibregl-ctrl button:hover {
+            background-color: rgba(48, 54, 61, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Analyzing global coverage...</div>
+        </div>
+    </div>
+    
+    <!-- Analysis Panel -->
+    <div class="analysis-panel">
+        <div class="panel-header">
+            <h1>🛰️ Coverage Analysis Platform</h1>
+            <p>Identifying optimal ground station locations</p>
+        </div>
+        
+        <div class="panel-section">
+            <h2>Global Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-value" id="global-coverage">0%</span>
+                    <span class="metric-label">Global Coverage</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value" id="coverage-gaps">0</span>
+                    <span class="metric-label">Coverage Gaps</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value" id="active-stations">0</span>
+                    <span class="metric-label">Active Stations</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value" id="geo-satellites">0</span>
+                    <span class="metric-label">GEO Satellites</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <h2>Top Investment Opportunities</h2>
+            <div class="opportunity-list" id="opportunity-list">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <h2>Visualization Layers</h2>
+            <div class="layer-controls">
+                <div class="layer-toggle" onclick="toggleLayer('coverage')">
+                    <span class="layer-label">Coverage Heatmap</span>
+                    <div class="toggle-switch active" id="toggle-coverage"></div>
+                </div>
+                <div class="layer-toggle" onclick="toggleLayer('opportunities')">
+                    <span class="layer-label">Opportunity Zones</span>
+                    <div class="toggle-switch active" id="toggle-opportunities"></div>
+                </div>
+                <div class="layer-toggle" onclick="toggleLayer('stations')">
+                    <span class="layer-label">Ground Stations</span>
+                    <div class="toggle-switch active" id="toggle-stations"></div>
+                </div>
+                <div class="layer-toggle" onclick="toggleLayer('satellites')">
+                    <span class="layer-label">GEO Satellites</span>
+                    <div class="toggle-switch" id="toggle-satellites"></div>
+                </div>
+                <div class="layer-toggle" onclick="toggleLayer('footprints')">
+                    <span class="layer-label">Satellite Footprints</span>
+                    <div class="toggle-switch" id="toggle-footprints"></div>
+                </div>
+                <div class="layer-toggle" onclick="toggleLayer('shipping')">
+                    <span class="layer-label">Shipping Lanes</span>
+                    <div class="toggle-switch" id="toggle-shipping"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <h2>Analysis Filters</h2>
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label class="filter-label">Minimum Population Density</label>
+                    <input type="range" class="filter-range" id="pop-density-filter" 
+                           min="0" max="1000" value="100" onchange="updateFilters()">
+                    <div class="filter-value"><span id="pop-density-value">100</span> /km²</div>
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label">Coverage Threshold</label>
+                    <input type="range" class="filter-range" id="coverage-filter" 
+                           min="0" max="100" value="30" onchange="updateFilters()">
+                    <div class="filter-value"><span id="coverage-value">30</span>%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Projection Toggle -->
+    <div class="projection-toggle">
+        <button class="projection-btn" onclick="toggleProjection()">
+            📍 <span id="projection-label">Globe View</span>
+        </button>
+    </div>
+    
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-title">Opportunity Score</div>
+        <div class="legend-scale"></div>
+        <div class="legend-labels">
+            <span>Low</span>
+            <span>Medium</span>
+            <span>High</span>
+            <span>Critical</span>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let map;
+        let deckOverlay;
+        let groundStations = [];
+        let satellites = [];
+        let satelliteFootprints = [];
+        let analysisGrid = [];
+        let currentProjection = 'globe';
+        
+        // Layer visibility
+        const layerVisibility = {
+            coverage: true,
+            opportunities: true,
+            stations: true,
+            satellites: false,
+            footprints: false,
+            shipping: false
+        };
+        
+        // Color schemes
+        const COLORS = {
+            excellent: [0, 255, 0],
+            good: [255, 255, 0],
+            moderate: [255, 165, 0],
+            poor: [255, 0, 0],
+            ses: [0, 170, 255],
+            intelsat: [255, 119, 0]
+        };
+        
+        // Initialize map with globe projection
+        async function initializeMap() {
+            // Check MapLibre version
+            console.log('MapLibre GL version:', maplibregl.version);
+            
+            map = new maplibregl.Map({
+                container: 'map',
+                style: {
+                    version: 8,
+                    name: 'Dark Globe',
+                    projection: { type: 'globe' }, // Enable globe projection
+                    fog: {
+                        color: 'rgb(20, 20, 40)',
+                        'high-color': 'rgb(0, 0, 20)',
+                        'horizon-blend': 0.02,
+                        'space-color': 'rgb(0, 0, 0)',
+                        'star-intensity': 0.6
+                    },
+                    sources: {
+                        'natural-earth': {
+                            type: 'raster',
+                            tiles: ['https://naturalearth.springercarto.com/tiles/natural_earth_2/{z}/{x}/{y}.png'],
+                            tileSize: 256,
+                            attribution: '© Natural Earth'
+                        }
+                    },
+                    layers: [
+                        {
+                            id: 'natural-earth-layer',
+                            type: 'raster',
+                            source: 'natural-earth',
+                            minzoom: 0,
+                            maxzoom: 22
+                        }
+                    ]
+                },
+                center: [0, 20],
+                zoom: 1.5,
+                pitch: 0,
+                bearing: 0,
+                antialias: true
+            });
+            
+            // Add navigation controls
+            map.addControl(new maplibregl.NavigationControl({
+                visualizePitch: true
+            }), 'top-left');
+            
+            // Initialize deck.gl overlay
+            deckOverlay = new deck.MapboxOverlay({
+                interleaved: true,
+                getTooltip: getTooltip
+            });
+            
+            map.addControl(deckOverlay);
+            
+            // Wait for map to load
+            await new Promise(resolve => map.on('load', resolve));
+        }
+        
+        // Toggle between globe and flat projection
+        function toggleProjection() {
+            currentProjection = currentProjection === 'globe' ? 'mercator' : 'globe';
+            map.setProjection({ type: currentProjection });
+            document.getElementById('projection-label').textContent = 
+                currentProjection === 'globe' ? 'Globe View' : 'Flat View';
+        }
+        
+        // Load ground station data
+        async function loadGroundStations() {
+            try {
+                const response = await fetch('/data/kepler_ground_stations.json');
+                const data = await response.json();
+                
+                groundStations = data.data.allData.map(station => ({
+                    ...station,
+                    coordinates: [station.longitude, station.latitude],
+                    color: COLORS[station.investment_recommendation] || COLORS.moderate,
+                    coverage_radius: 3000 // km
+                }));
+                
+                document.getElementById('active-stations').textContent = groundStations.length;
+                
+                return groundStations;
+            } catch (error) {
+                console.error('Error loading ground stations:', error);
+                return [];
+            }
+        }
+        
+        // Load satellite data
+        async function loadSatelliteData() {
+            try {
+                const [satResponse, footprintResponse] = await Promise.all([
+                    fetch('/data/geo_satellites.json'),
+                    fetch('/data/satellite_footprints.json')
+                ]);
+                
+                const satData = await satResponse.json();
+                const footprintData = await footprintResponse.json();
+                
+                satellites = satData.satellites;
+                satelliteFootprints = footprintData.footprints;
+                
+                document.getElementById('geo-satellites').textContent = satellites.length;
+                
+                console.log(`Loaded ${satellites.length} GEO satellites`);
+                
+                return { satellites, footprints: satelliteFootprints };
+            } catch (error) {
+                console.error('Error loading satellite data:', error);
+                return { satellites: [], footprints: [] };
+            }
+        }
+        
+        // Generate analysis grid
+        function generateAnalysisGrid() {
+            const grid = [];
+            const step = 5; // 5-degree grid
+            
+            for (let lat = -60; lat <= 60; lat += step) {
+                for (let lon = -180; lon <= 180; lon += step) {
+                    grid.push({
+                        id: `${lat}_${lon}`,
+                        coordinates: [lon, lat],
+                        coverage: 0,
+                        demand: calculateDemand(lon, lat),
+                        opportunity: 0,
+                        population: getPopulationDensity(lon, lat),
+                        maritime: isNearShippingLane(lon, lat),
+                        aviation: isNearFlightPath(lon, lat)
+                    });
+                }
+            }
+            
+            return grid;
+        }
+        
+        // Calculate coverage from ground stations
+        function calculateCoverage(grid, stations) {
+            grid.forEach(point => {
+                point.coverage = 0;
+                stations.forEach(station => {
+                    const distance = turf.distance(
+                        turf.point(point.coordinates),
+                        turf.point(station.coordinates),
+                        { units: 'kilometers' }
+                    );
+                    
+                    const maxRange = station.coverage_radius || 3000;
+                    if (distance < maxRange) {
+                        const strength = (1 - distance / maxRange) * 
+                                       (station.overall_investment_score / 100);
+                        point.coverage += strength;
+                    }
+                });
+                point.coverage = Math.min(point.coverage, 1); // Cap at 100%
+            });
+        }
+        
+        // Calculate demand based on various factors
+        function calculateDemand(lon, lat) {
+            const population = getPopulationDensity(lon, lat);
+            const maritime = isNearShippingLane(lon, lat) ? 0.3 : 0;
+            const aviation = isNearFlightPath(lon, lat) ? 0.2 : 0;
+            const economic = getEconomicActivity(lon, lat);
+            
+            // Weighted demand calculation
+            return (population * 0.4 + maritime + aviation + economic * 0.1);
+        }
+        
+        // Calculate opportunity scores
+        function calculateOpportunityScores(grid) {
+            grid.forEach(point => {
+                // High demand + low coverage = high opportunity
+                const coverageGap = 1 - point.coverage;
+                point.opportunity = point.demand * coverageGap;
+            });
+            
+            // Find coverage gaps
+            const gaps = grid.filter(p => p.coverage < 0.3 && p.demand > 0.5);
+            document.getElementById('coverage-gaps').textContent = gaps.length;
+            
+            // Calculate global coverage
+            const avgCoverage = grid.reduce((sum, p) => sum + p.coverage, 0) / grid.length;
+            document.getElementById('global-coverage').textContent = 
+                Math.round(avgCoverage * 100) + '%';
+        }
+        
+        // Get top opportunities
+        function getTopOpportunities(grid, count = 5) {
+            return grid
+                .filter(p => p.opportunity > 0.3)
+                .sort((a, b) => b.opportunity - a.opportunity)
+                .slice(0, count)
+                .map(p => ({
+                    ...p,
+                    region: getRegionName(p.coordinates)
+                }));
+        }
+        
+        // Helper functions for demand calculation
+        function getPopulationDensity(lon, lat) {
+            // Simplified - in real implementation, load actual population data
+            const majorCities = [
+                { coords: [-74, 40], density: 0.9 },  // New York
+                { coords: [2, 48], density: 0.8 },     // Paris
+                { coords: [0, 51], density: 0.8 },     // London
+                { coords: [139, 35], density: 0.9 },   // Tokyo
+                { coords: [121, 31], density: 0.85 },  // Shanghai
+                { coords: [-46, -23], density: 0.7 },  // São Paulo
+                { coords: [28, -26], density: 0.6 },   // Johannesburg
+                { coords: [77, 28], density: 0.8 },    // Delhi
+                { coords: [151, -33], density: 0.6 }   // Sydney
+            ];
+            
+            let maxDensity = 0;
+            majorCities.forEach(city => {
+                const distance = Math.sqrt(
+                    Math.pow(lon - city.coords[0], 2) + 
+                    Math.pow(lat - city.coords[1], 2)
+                );
+                if (distance < 10) {
+                    maxDensity = Math.max(maxDensity, city.density * (1 - distance / 10));
+                }
+            });
+            
+            return maxDensity;
+        }
+        
+        function isNearShippingLane(lon, lat) {
+            // Major shipping routes
+            const routes = [
+                { start: [-5, 36], end: [32, 30] },     // Gibraltar to Suez
+                { start: [103, 1], end: [80, 6] },      // Singapore to India
+                { start: [-80, 9], end: [-79, 9] },     // Panama Canal
+                { start: [120, 30], end: [-123, 37] }   // Trans-Pacific
+            ];
+            
+            return routes.some(route => {
+                const line = turf.lineString([route.start, route.end]);
+                const point = turf.point([lon, lat]);
+                const distance = turf.pointToLineDistance(point, line, { units: 'kilometers' });
+                return distance < 500;
+            });
+        }
+        
+        function isNearFlightPath(lon, lat) {
+            // Major flight corridors
+            return Math.abs(lat) < 60 && (
+                (lon > -150 && lon < -50) ||  // Americas
+                (lon > -30 && lon < 60) ||     // Europe-Africa
+                (lon > 60 && lon < 150)        // Asia-Pacific
+            );
+        }
+        
+        function getEconomicActivity(lon, lat) {
+            // Simplified economic zones
+            if ((lon > -130 && lon < -60 && lat > 25 && lat < 50) ||  // North America
+                (lon > -10 && lon < 40 && lat > 35 && lat < 60) ||    // Europe
+                (lon > 100 && lon < 150 && lat > 20 && lat < 45)) {   // East Asia
+                return 0.8;
+            }
+            return 0.3;
+        }
+        
+        function getRegionName(coords) {
+            const [lon, lat] = coords;
+            
+            if (lat > 60) return 'Arctic';
+            if (lat < -60) return 'Antarctic';
+            
+            if (lon >= -180 && lon < -30) {
+                if (lat > 30) return 'North America';
+                if (lat > 0) return 'Central America';
+                return 'South America';
+            }
+            if (lon >= -30 && lon < 30) {
+                if (lat > 30) return 'Europe';
+                return 'Africa';
+            }
+            if (lon >= 30 && lon < 90) {
+                if (lat > 30) return 'Central Asia';
+                return 'Middle East';
+            }
+            if (lon >= 90 && lon < 150) {
+                if (lat > 30) return 'East Asia';
+                return 'Southeast Asia';
+            }
+            return 'Pacific';
+        }
+        
+        // Create visualization layers
+        function createLayers() {
+            const layers = [];
+            
+            // Coverage heatmap
+            if (layerVisibility.coverage) {
+                const heatmapData = [];
+                groundStations.forEach(station => {
+                    // Create multiple points around each station for smoother heatmap
+                    for (let i = 0; i < 10; i++) {
+                        const angle = (i / 10) * Math.PI * 2;
+                        const distance = Math.random() * 500; // km
+                        const point = turf.destination(
+                            turf.point(station.coordinates),
+                            distance,
+                            angle * 180 / Math.PI,
+                            { units: 'kilometers' }
+                        );
+                        heatmapData.push({
+                            coordinates: point.geometry.coordinates,
+                            weight: station.overall_investment_score / 100
+                        });
+                    }
+                });
+                
+                layers.push(new deck.HeatmapLayer({
+                    id: 'coverage-heatmap',
+                    data: heatmapData,
+                    getPosition: d => d.coordinates,
+                    getWeight: d => d.weight,
+                    radiusPixels: 100,
+                    intensity: 1,
+                    threshold: 0.05,
+                    colorRange: [
+                        [0, 0, 0, 0],
+                        [0, 170, 255, 128],    // SES blue
+                        [255, 119, 0, 128],    // Intelsat orange
+                        [255, 255, 0, 200],    // High coverage yellow
+                        [255, 255, 255, 255]   // Maximum coverage white
+                    ]
+                }));
+            }
+            
+            // Opportunity zones
+            if (layerVisibility.opportunities) {
+                const opportunityData = analysisGrid
+                    .filter(p => p.opportunity > 0.3)
+                    .map(p => ({
+                        ...p,
+                        color: getOpportunityColor(p.opportunity)
+                    }));
+                
+                layers.push(new deck.HeatmapLayer({
+                    id: 'opportunity-heatmap',
+                    data: opportunityData,
+                    getPosition: d => d.coordinates,
+                    getWeight: d => d.opportunity,
+                    radiusPixels: 80,
+                    intensity: 0.8,
+                    threshold: 0.03,
+                    colorRange: [
+                        [0, 0, 0, 0],
+                        [0, 0, 255, 128],      // Low opportunity
+                        [0, 255, 0, 128],      // Medium opportunity
+                        [255, 255, 0, 128],    // High opportunity
+                        [255, 0, 0, 255]       // Critical opportunity
+                    ]
+                }));
+            }
+            
+            // Ground stations
+            if (layerVisibility.stations) {
+                layers.push(new deck.ScatterplotLayer({
+                    id: 'ground-stations',
+                    data: groundStations,
+                    pickable: true,
+                    opacity: 1,
+                    stroked: true,
+                    filled: true,
+                    radiusScale: 1,
+                    radiusMinPixels: 8,
+                    radiusMaxPixels: 20,
+                    lineWidthMinPixels: 2,
+                    getPosition: d => d.coordinates,
+                    getRadius: 50000,
+                    getFillColor: d => [...d.color, 255],
+                    getLineColor: [255, 255, 255]
+                }));
+                
+                // Station labels
+                layers.push(new deck.TextLayer({
+                    id: 'station-labels',
+                    data: groundStations,
+                    pickable: true,
+                    getPosition: d => d.coordinates,
+                    getText: d => d.name,
+                    getSize: 14,
+                    getAngle: 0,
+                    getTextAnchor: 'middle',
+                    getAlignmentBaseline: 'center',
+                    getPixelOffset: [0, -25],
+                    getColor: [255, 255, 255],
+                    getBackgroundColor: [13, 17, 23, 200],
+                    fontFamily: 'Arial',
+                    fontWeight: 'bold',
+                    billboard: true,
+                    sizeMinPixels: 10,
+                    sizeMaxPixels: 16,
+                    backgroundPadding: [4, 2]
+                }));
+            }
+            
+            // GEO satellites
+            if (layerVisibility.satellites && satellites.length > 0) {
+                layers.push(new deck.ScatterplotLayer({
+                    id: 'geo-satellites',
+                    data: satellites,
+                    pickable: true,
+                    opacity: 1,
+                    stroked: true,
+                    filled: true,
+                    radiusScale: 1,
+                    radiusMinPixels: 6,
+                    radiusMaxPixels: 15,
+                    lineWidthMinPixels: 2,
+                    getPosition: d => [d.longitude, 0],  // GEO satellites at equator
+                    getRadius: 30000,
+                    getFillColor: d => d.color || COLORS.ses,
+                    getLineColor: [255, 255, 255]
+                }));
+            }
+            
+            // Satellite footprints
+            if (layerVisibility.footprints && satelliteFootprints.length > 0) {
+                layers.push(new deck.PolygonLayer({
+                    id: 'satellite-footprints',
+                    data: satelliteFootprints,
+                    pickable: true,
+                    stroked: true,
+                    filled: true,
+                    wireframe: false,
+                    lineWidthMinPixels: 1,
+                    getPolygon: d => d.footprint,
+                    getFillColor: d => {
+                        const baseColor = d.operator_type === 'SES' ? COLORS.ses : COLORS.intelsat;
+                        return [...baseColor, 30];
+                    },
+                    getLineColor: d => {
+                        const baseColor = d.operator_type === 'SES' ? COLORS.ses : COLORS.intelsat;
+                        return [...baseColor, 100];
+                    },
+                    getLineWidth: 1
+                }));
+            }
+            
+            return layers;
+        }
+        
+        function getOpportunityColor(score) {
+            if (score > 0.8) return [255, 0, 0];      // Critical - Red
+            if (score > 0.6) return [255, 255, 0];    // High - Yellow
+            if (score > 0.4) return [0, 255, 0];      // Medium - Green
+            return [0, 0, 255];                       // Low - Blue
+        }
+        
+        // Tooltip handler
+        function getTooltip({object, coordinate}) {
+            if (!object) return null;
+            
+            // Ground station tooltip
+            if (object.station_id) {
+                return {
+                    html: `
+                        <div style="background: rgba(13, 17, 23, 0.95); padding: 12px; 
+                                  border-radius: 6px; color: #c9d1d9; font-size: 13px;">
+                            <div style="color: #58a6ff; font-weight: bold; margin-bottom: 8px;">
+                                ${object.name}
+                            </div>
+                            <div>Operator: ${object.operator}</div>
+                            <div>Score: ${object.overall_investment_score.toFixed(1)}</div>
+                            <div>Coverage: ~${object.coverage_radius}km radius</div>
+                        </div>
+                    `
+                };
+            }
+            
+            // Satellite tooltip
+            if (object.orbit_class) {
+                const color = object.operator_type === 'SES' ? '#00AAFF' : '#FF7700';
+                return {
+                    html: `
+                        <div style="background: rgba(13, 17, 23, 0.95); padding: 12px; 
+                                  border-radius: 6px; color: #c9d1d9; font-size: 13px;">
+                            <div style="color: ${color}; font-weight: bold; margin-bottom: 8px;">
+                                ${object.name}
+                            </div>
+                            <div>Operator: ${object.operator}</div>
+                            <div>Orbit: ${object.orbit_class}</div>
+                            <div>Longitude: ${object.longitude}°</div>
+                            ${object.purpose ? `<div>Purpose: ${object.purpose}</div>` : ''}
+                        </div>
+                    `
+                };
+            }
+            
+            // Satellite footprint tooltip
+            if (object.satellite_name) {
+                const color = object.operator_type === 'SES' ? '#00AAFF' : '#FF7700';
+                return {
+                    html: `
+                        <div style="background: rgba(13, 17, 23, 0.95); padding: 12px; 
+                                  border-radius: 6px; color: #c9d1d9; font-size: 13px;">
+                            <div style="color: ${color}; font-weight: bold; margin-bottom: 8px;">
+                                ${object.satellite_name} Coverage
+                            </div>
+                            <div>Operator: ${object.operator}</div>
+                            <div>Coverage Radius: ~${object.coverage_radius.toFixed(0)}°</div>
+                        </div>
+                    `
+                };
+            }
+            
+            return null;
+        }
+        
+        // Update visualization
+        function updateVisualization() {
+            const layers = createLayers();
+            deckOverlay.setProps({ layers });
+        }
+        
+        // Layer toggle
+        window.toggleLayer = function(layerName) {
+            layerVisibility[layerName] = !layerVisibility[layerName];
+            document.getElementById(`toggle-${layerName}`).classList.toggle('active');
+            updateVisualization();
+        };
+        
+        // Filter updates
+        window.updateFilters = function() {
+            const popDensity = document.getElementById('pop-density-filter').value;
+            const coverage = document.getElementById('coverage-filter').value;
+            
+            document.getElementById('pop-density-value').textContent = popDensity;
+            document.getElementById('coverage-value').textContent = coverage;
+            
+            // Re-run analysis with new filters
+            runAnalysis();
+        };
+        
+        // Display top opportunities
+        function displayOpportunities(opportunities) {
+            const container = document.getElementById('opportunity-list');
+            container.innerHTML = opportunities.map((opp, i) => `
+                <div class="opportunity-item" onclick="focusOnLocation([${opp.coordinates}])">
+                    <div class="opportunity-header">
+                        <span class="opportunity-location">${opp.region}</span>
+                        <span class="opportunity-score">${(opp.opportunity * 100).toFixed(0)}</span>
+                    </div>
+                    <div class="opportunity-details">
+                        <span>Demand: ${(opp.demand * 100).toFixed(0)}%</span>
+                        <span>Coverage: ${(opp.coverage * 100).toFixed(0)}%</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Focus on location
+        window.focusOnLocation = function(coordinates) {
+            map.flyTo({
+                center: coordinates,
+                zoom: 5,
+                pitch: 30,
+                bearing: 0,
+                duration: 2000
+            });
+        };
+        
+        // Run analysis
+        async function runAnalysis() {
+            // Generate analysis grid
+            analysisGrid = generateAnalysisGrid();
+            
+            // Calculate coverage
+            calculateCoverage(analysisGrid, groundStations);
+            
+            // Calculate opportunity scores
+            calculateOpportunityScores(analysisGrid);
+            
+            // Get top opportunities
+            const topOpportunities = getTopOpportunities(analysisGrid, 5);
+            displayOpportunities(topOpportunities);
+            
+            // Update visualization
+            updateVisualization();
+        }
+        
+        // Initialize application
+        async function initialize() {
+            try {
+                await initializeMap();
+                await Promise.all([
+                    loadGroundStations(),
+                    loadSatelliteData()
+                ]);
+                await runAnalysis();
+                
+                // Hide loading overlay
+                document.getElementById('loading').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                document.querySelector('.loading-text').textContent = 
+                    'Error loading application. Please refresh.';
+            }
+        }
+        
+        // Start the application
+        initialize();
+    </script>
+</body>
+</html>

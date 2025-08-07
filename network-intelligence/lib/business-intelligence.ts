@@ -8,6 +8,11 @@ import {
   GroundStationROIMetrics
 } from './types/ground-station';
 
+// Import new service-specific pricing and operational models
+import { servicePricingModel, ServiceType, ServiceContract } from './revenue/service-pricing-model';
+import { antennaConstraints } from './operational/antenna-constraints';
+import { interferenceCalculator } from './interference/interference-calculator';
+
 /**
  * Analyzes ground station utilization to identify expansion opportunities
  */
@@ -187,35 +192,51 @@ export function analyzeRegionalPerformance(stations: GroundStationAnalytics[]): 
 }
 
 /**
- * Calculates business metrics for a ground station
+ * Calculates business metrics for a ground station using service-specific pricing
  */
 export function calculateBusinessMetrics(
   station: GroundStationAnalytics,
   historicalData?: any[]
 ): GroundStationBusinessMetrics {
-  const baseRevenue = station.capacity_metrics.total_capacity_gbps * 10000; // $10k per Gbps base
-  const utilizationMultiplier = station.utilization_metrics.current_utilization / 100;
-  const monthlyRevenue = baseRevenue * utilizationMultiplier;
+  // Generate realistic service mix based on station characteristics
+  const serviceMix = generateServiceMix(station);
+  
+  // Calculate revenue using service-specific pricing
+  const serviceRevenue = calculateServiceSpecificRevenue(station, serviceMix);
+  
+  // Apply operational constraints impact
+  const constraintsImpact = calculateOperationalConstraintsImpact(station);
+  const adjustedRevenue = serviceRevenue.optimized * constraintsImpact.utilizationEfficiency;
+  
+  // Legacy calculation for comparison
+  const legacyRevenue = station.capacity_metrics.total_capacity_gbps * 10000 * (station.utilization_metrics.current_utilization / 100);
 
   const operationalCost = station.capacity_metrics.total_capacity_gbps * 3000; // $3k per Gbps operational
   const maintenanceCost = station.technical_specs.primary_antenna_size_m * 1000; // $1k per meter maintenance
 
   return {
-    monthly_revenue: monthlyRevenue,
-    revenue_per_gbps: monthlyRevenue / station.capacity_metrics.total_capacity_gbps,
-    revenue_per_antenna: monthlyRevenue / (1 + station.technical_specs.secondary_antennas),
+    monthly_revenue: adjustedRevenue,
+    legacy_monthly_revenue: legacyRevenue, // For comparison
+    revenue_optimization_potential: serviceRevenue.optimized - legacyRevenue,
+    revenue_per_gbps: adjustedRevenue / station.capacity_metrics.total_capacity_gbps,
+    revenue_per_antenna: adjustedRevenue / (1 + station.technical_specs.secondary_antennas),
     operational_cost_monthly: operationalCost,
     maintenance_cost_monthly: maintenanceCost,
-    profit_margin: ((monthlyRevenue - operationalCost - maintenanceCost) / monthlyRevenue) * 100,
+    profit_margin: ((adjustedRevenue - operationalCost - maintenanceCost) / adjustedRevenue) * 100,
     customer_count: Math.floor(station.capacity_metrics.total_capacity_gbps * 5), // 5 customers per Gbps
-    average_contract_value: monthlyRevenue / Math.max(1, Math.floor(station.capacity_metrics.total_capacity_gbps * 5)),
+    average_contract_value: adjustedRevenue / Math.max(1, Math.floor(station.capacity_metrics.total_capacity_gbps * 5)),
     contract_duration_avg_months: 24,
     churn_rate: station.utilization_metrics.current_utilization > 80 ? 5 : 12,
     revenue_growth_rate: station.utilization_metrics.utilization_trend === 'increasing' ? 15 : 
                         station.utilization_metrics.utilization_trend === 'decreasing' ? -5 : 8,
     cost_per_gb_transferred: (operationalCost + maintenanceCost) / (station.capacity_metrics.used_capacity_gbps * 30 * 24), // Per hour
-    sla_compliance_rate: Math.max(95, 100 - (station.coverage_metrics.weather_impact_days_per_year / 3.65))
-  };
+    sla_compliance_rate: Math.max(95, 100 - (station.coverage_metrics.weather_impact_days_per_year / 3.65)),
+    
+    // New operational insights
+    operational_efficiency: constraintsImpact.utilizationEfficiency,
+    capacity_loss_due_to_constraints: constraintsImpact.capacityLoss,
+    service_mix: serviceMix
+  } as GroundStationBusinessMetrics;
 }
 
 /**
@@ -407,4 +428,335 @@ function calculateIRR(cashFlows: number[]): number {
   }
   
   return rate * 100; // Return as percentage
+}
+
+/**
+ * Generate realistic service mix based on station characteristics
+ */
+function generateServiceMix(station: GroundStationAnalytics): Record<ServiceType, number> {
+  const location = station.location.country;
+  const capacity = station.capacity_metrics.total_capacity_gbps;
+  
+  // Base service distribution
+  let serviceMix: Record<ServiceType, number> = {
+    broadcast: 0,
+    data: 0,
+    government: 0,
+    mobility: 0,
+    iot: 0,
+    backhaul: 0
+  };
+  
+  // Large teleport stations (>200 Gbps) - diversified mix
+  if (capacity > 200) {
+    serviceMix = {
+      broadcast: 0.25,
+      data: 0.30,
+      government: 0.15,
+      mobility: 0.20,
+      iot: 0.05,
+      backhaul: 0.05
+    };
+  }
+  // Medium stations (50-200 Gbps) - focused on core services
+  else if (capacity > 50) {
+    serviceMix = {
+      broadcast: 0.35,
+      data: 0.35,
+      government: 0.10,
+      mobility: 0.15,
+      iot: 0.03,
+      backhaul: 0.02
+    };
+  }
+  // Small stations (<50 Gbps) - specialized services
+  else {
+    serviceMix = {
+      broadcast: 0.40,
+      data: 0.25,
+      government: 0.20,
+      mobility: 0.10,
+      iot: 0.03,
+      backhaul: 0.02
+    };
+  }
+  
+  // Regional adjustments
+  if (location.includes('Europe') || location.includes('USA')) {
+    serviceMix.government += 0.05;
+    serviceMix.mobility += 0.05;
+    serviceMix.broadcast -= 0.10;
+  }
+  
+  if (location.includes('Africa') || location.includes('Asia')) {
+    serviceMix.broadcast += 0.10;
+    serviceMix.backhaul += 0.05;
+    serviceMix.data -= 0.15;
+  }
+  
+  return serviceMix;
+}
+
+/**
+ * Calculate revenue using service-specific pricing model
+ */
+function calculateServiceSpecificRevenue(
+  station: GroundStationAnalytics,
+  serviceMix: Record<ServiceType, number>
+): { 
+  base: number;
+  optimized: number;
+  breakdown: Record<ServiceType, number>;
+} {
+  const totalCapacity = station.capacity_metrics.total_capacity_gbps;
+  const utilization = station.utilization_metrics.current_utilization / 100;
+  
+  let baseRevenue = 0;
+  let optimizedRevenue = 0;
+  const breakdown: Record<ServiceType, number> = {} as Record<ServiceType, number>;
+  
+  // Market factors (simplified)
+  const marketFactors = {
+    regionDemandIndex: 75,
+    competitionLevel: 'medium' as const,
+    marketMaturity: 'mature' as const,
+    seasonalFactor: 1.0,
+    economicIndicator: 2.5
+  };
+  
+  for (const [service, percentage] of Object.entries(serviceMix)) {
+    const serviceCapacity = totalCapacity * percentage * utilization;
+    
+    if (serviceCapacity > 0) {
+      // Base revenue (legacy pricing)
+      const baseServiceRevenue = serviceCapacity * 10000;
+      baseRevenue += baseServiceRevenue;
+      
+      // Optimized revenue (service-specific pricing)
+      const optimizedPricing = servicePricingModel.calculateDynamicPrice(
+        service as ServiceType,
+        serviceCapacity,
+        marketFactors,
+        24
+      );
+      
+      const optimizedServiceRevenue = optimizedPricing.monthlyRate;
+      optimizedRevenue += optimizedServiceRevenue;
+      breakdown[service as ServiceType] = optimizedServiceRevenue;
+    }
+  }
+  
+  return {
+    base: baseRevenue,
+    optimized: optimizedRevenue,
+    breakdown
+  };
+}
+
+/**
+ * Calculate operational constraints impact on capacity and revenue
+ */
+function calculateOperationalConstraintsImpact(station: GroundStationAnalytics): {
+  utilizationEfficiency: number;
+  capacityLoss: number;
+  slewTimeImpact: number;
+} {
+  const antennaSpec = antennaConstraints.generateAntennaSpec(
+    station.station_id,
+    station.technical_specs.primary_antenna_size_m
+  );
+  
+  // Simulate typical satellite passes for the day
+  const mockPasses = generateMockSatellitePasses(station);
+  
+  // Calculate capacity impact
+  const capacityImpact = antennaConstraints.calculateCapacityImpact(
+    antennaSpec,
+    mockPasses,
+    24 * 3600 // 24 hours in seconds
+  );
+  
+  return {
+    utilizationEfficiency: capacityImpact.utilizationEfficiency,
+    capacityLoss: capacityImpact.capacityLoss,
+    slewTimeImpact: capacityImpact.slewTimeOverhead
+  };
+}
+
+/**
+ * Generate mock satellite passes based on station characteristics
+ */
+function generateMockSatellitePasses(station: GroundStationAnalytics) {
+  const passes = [];
+  const utilization = station.utilization_metrics.current_utilization;
+  const passCount = Math.floor((utilization / 100) * 12); // 12 passes max per day
+  
+  for (let i = 0; i < passCount; i++) {
+    const startHour = Math.floor(Math.random() * 24);
+    const duration = 30 + Math.floor(Math.random() * 90); // 30-120 minutes
+    
+    passes.push({
+      satelliteId: `SAT-${i + 1}`,
+      startTime: new Date(2024, 0, 1, startHour, 0),
+      endTime: new Date(2024, 0, 1, startHour, duration),
+      maxElevation: 30 + Math.random() * 60,
+      startAzimuth: Math.random() * 360,
+      endAzimuth: Math.random() * 360,
+      priority: Math.floor(Math.random() * 10) + 1,
+      service: ['broadcast', 'data', 'government', 'mobility'][Math.floor(Math.random() * 4)] as any
+    });
+  }
+  
+  return passes;
+}
+
+/**
+ * Calculate interference impact on station operations and revenue
+ */
+export function calculateInterferenceImpact(
+  station: GroundStationAnalytics
+): {
+  cToIRatio: number;
+  capacityReduction: number;
+  revenueImpact: number;
+  serviceQualityImpact: 'none' | 'minimal' | 'moderate' | 'severe';
+  dominantSource: string;
+  mitigationRecommendations: string[];
+} {
+  // Simulate realistic interference sources based on station location
+  const interferenceSources = generateInterferenceSources(station);
+  
+  // Create link budget for the station's primary frequency
+  const linkBudget = {
+    frequency: 14000, // MHz - default frequency since frequency_bands is just string array
+    uplinkPower: 50, // dBW (typical)
+    antennaGain: Math.log10(station.technical_specs.primary_antenna_size_m) * 20 + 20, // Rough estimate
+    pathLoss: 210, // dB (typical GEO)
+    atmosphericLoss: 0.5, // dB
+    rainFade: station.coverage_metrics.weather_impact_days_per_year / 365 * 2, // Rough estimate
+    receivedPower: -120, // dBW (calculated)
+    polarization: 'RHCP' as const
+  };
+  
+  // Perform comprehensive interference assessment
+  const assessment = interferenceCalculator.performComprehensiveAssessment(
+    linkBudget,
+    interferenceSources,
+    290 // System noise temperature
+  );
+  
+  // Calculate revenue impact
+  const currentRevenue = station.business_metrics.monthly_revenue;
+  const revenueImpact = currentRevenue * (assessment.capacityReduction / 100);
+  
+  return {
+    cToIRatio: assessment.cToI,
+    capacityReduction: assessment.capacityReduction,
+    revenueImpact,
+    serviceQualityImpact: assessment.serviceQualityImpact,
+    dominantSource: assessment.dominantInterferenceSource,
+    mitigationRecommendations: assessment.recommendations
+  };
+}
+
+/**
+ * Generate realistic interference sources based on station location and characteristics
+ */
+function generateInterferenceSources(station: GroundStationAnalytics) {
+  const sources = [];
+  const location = station.location;
+  const frequency = 14000; // Default frequency since frequency_bands is string array
+  
+  // Adjacent Satellite Interference (ASI)
+  sources.push({
+    type: 'ASI' as const,
+    sourceName: 'Adjacent GEO Satellite',
+    frequency: frequency,
+    power: -125, // dBW
+    polarization: 'RHCP' as const
+  });
+  
+  // 5G C-band interference (if frequency overlaps)
+  if (frequency >= 3700 && frequency <= 4200) {
+    const countries5G = ['USA', 'UK', 'Germany', 'South Korea', 'Japan'];
+    const impactLevel = countries5G.includes(location.country) ? -110 : -120;
+    
+    sources.push({
+      type: 'terrestrial_5G' as const,
+      sourceName: '5G C-band Base Station',
+      frequency: frequency - 200, // Offset frequency
+      power: impactLevel, // dBW
+      location: {
+        latitude: location.latitude + 0.1,
+        longitude: location.longitude + 0.1,
+        elevation: 10
+      },
+      polarization: 'V' as const,
+      bandwidth: 100
+    });
+  }
+  
+  // Cross-polarization interference
+  if (station.technical_specs.frequency_bands.length > 1) {
+    sources.push({
+      type: 'cross_pol' as const,
+      sourceName: 'Co-frequency Cross-pol Signal',
+      frequency: frequency,
+      power: -130, // dBW
+      polarization: 'LHCP' as const
+    });
+  }
+  
+  // Radar interference (depending on frequency band)
+  if (frequency >= 5600 && frequency <= 5650) { // Weather radar
+    sources.push({
+      type: 'radar' as const,
+      sourceName: 'Weather Radar',
+      frequency: 5625,
+      power: -115, // dBW
+      location: {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        elevation: 5
+      }
+    });
+  }
+  
+  return sources;
+}
+
+/**
+ * Enhanced business metrics calculation with interference considerations
+ */
+export function calculateEnhancedBusinessMetrics(
+  station: GroundStationAnalytics
+): GroundStationBusinessMetrics & {
+  interferenceImpact: ReturnType<typeof calculateInterferenceImpact>;
+  operationalConstraints: ReturnType<typeof calculateOperationalConstraintsImpact>;
+  optimizationPotential: {
+    revenueIncrease: number;
+    marginImprovement: number;
+    implementationCost: number;
+  };
+} {
+  const baseMetrics = calculateBusinessMetrics(station);
+  const interferenceImpact = calculateInterferenceImpact(station);
+  const operationalConstraints = calculateOperationalConstraintsImpact(station);
+  
+  // Calculate optimization potential
+  const revenueIncrease = (baseMetrics as any).revenue_optimization_potential + 
+                         interferenceImpact.revenueImpact; // Revenue we could recover
+  const marginImprovement = revenueIncrease / baseMetrics.monthly_revenue * 100;
+  const implementationCost = station.capacity_metrics.total_capacity_gbps * 25000; // $25k per Gbps
+  
+  return {
+    ...baseMetrics,
+    interferenceImpact,
+    operationalConstraints,
+    optimizationPotential: {
+      revenueIncrease,
+      marginImprovement,
+      implementationCost
+    }
+  };
 }

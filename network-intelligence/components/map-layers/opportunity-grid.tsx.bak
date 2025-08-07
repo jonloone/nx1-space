@@ -1,0 +1,313 @@
+'use client';
+
+import React from 'react';
+import { GridLayer } from '@deck.gl/aggregation-layers';
+import { HexagonLayer } from '@deck.gl/aggregation-layers';
+import { PrecomputedStationScore } from '@/lib/data/precomputed-opportunity-scores';
+
+interface OpportunityGridProps {
+  stationData: PrecomputedStationScore[];
+  visible: boolean;
+  gridType: 'hexagon' | 'grid';
+  resolution: number;
+}
+
+interface GridDataPoint {
+  position: [number, number]; // [lng, lat]
+  score: number;
+  utilization: number;
+  revenue: number;
+  priority: string;
+  operator: string;
+  weight: number;
+}
+
+export function OpportunityGrid({ 
+  stationData, 
+  visible, 
+  gridType = 'hexagon', 
+  resolution = 1000 
+}: OpportunityGridProps) {
+  
+  if (!visible) return null;
+  
+  // Convert station data to grid points
+  const gridData: GridDataPoint[] = stationData.map(station => ({
+    position: [station.coordinates[1], station.coordinates[0]], // [lng, lat] for deck.gl
+    score: station.overallScore,
+    utilization: station.actualUtilization,
+    revenue: station.monthlyRevenue,
+    priority: station.priority,
+    operator: station.operator,
+    weight: calculateWeight(station)
+  }));
+  
+  // Calculate weight based on multiple factors
+  function calculateWeight(station: PrecomputedStationScore): number {
+    let weight = station.overallScore / 100; // Base weight from overall score
+    
+    // Boost for high revenue stations
+    if (station.monthlyRevenue > 3000000) weight *= 1.3;
+    else if (station.monthlyRevenue > 2000000) weight *= 1.2;
+    else if (station.monthlyRevenue > 1000000) weight *= 1.1;
+    
+    // Boost for underutilized high-capacity stations (opportunity for growth)
+    if (station.actualUtilization < 70 && station.capacityGbps > 150) {
+      weight *= 1.4;
+    }
+    
+    // Boost for critical priority
+    if (station.priority === 'critical') weight *= 1.3;
+    else if (station.priority === 'high') weight *= 1.2;
+    
+    // Boost for primary teleports
+    if (station.type === 'Primary Teleport') weight *= 1.2;
+    
+    return Math.min(1.0, weight); // Cap at 1.0
+  }
+  
+  // Color schemes for different visualizations
+  const opportunityColorRange = [
+    [1, 152, 189, 120],    // Light blue - low opportunity
+    [73, 227, 206, 140],   // Teal - moderate opportunity  
+    [216, 254, 181, 160],  // Light green - good opportunity
+    [254, 237, 177, 180],  // Light yellow - high opportunity
+    [254, 173, 84, 200],   // Orange - very high opportunity
+    [209, 55, 78, 220]     // Red - critical opportunity
+  ];
+  
+  const revenueColorRange = [
+    [30, 64, 175, 120],    // Dark blue - low revenue
+    [59, 130, 246, 140],   // Blue - moderate revenue
+    [147, 197, 253, 160],  // Light blue - good revenue
+    [34, 197, 94, 180],    // Green - high revenue
+    [251, 191, 36, 200],   // Yellow - very high revenue
+    [239, 68, 68, 220]     // Red - exceptional revenue
+  ];
+  
+  if (gridType === 'hexagon') {
+    return new HexagonLayer({
+      id: 'opportunity-hexagons',
+      data: gridData,
+      visible,
+      getPosition: (d: GridDataPoint) => d.position,
+      getElevationWeight: (d: GridDataPoint) => d.weight,
+      getColorWeight: (d: GridDataPoint) => d.score / 100,
+      radius: resolution,
+      elevationScale: 1000,
+      extruded: true,
+      coverage: 0.8,
+      colorRange: opportunityColorRange,
+      elevationRange: [0, 3000],
+      pickable: true,
+      autoHighlight: true,
+      onClick: (info) => {
+        if (info.object && info.object.points) {
+          console.log('Hexagon clicked:', info.object);
+          // Could emit an event or callback here
+        }
+      },
+      getTooltip: ({ object }) => {
+        if (!object || !object.points) return null;
+        
+        const points = object.points;
+        const avgScore = points.reduce((sum: number, p: any) => sum + p.source.score, 0) / points.length;
+        const avgUtilization = points.reduce((sum: number, p: any) => sum + p.source.utilization, 0) / points.length;
+        const totalRevenue = points.reduce((sum: number, p: any) => sum + p.source.revenue, 0);
+        
+        return {
+          html: `
+            <div class="bg-gray-900 border border-gray-700 rounded-lg p-3 text-white text-sm">
+              <div class="font-semibold text-blue-400">Opportunity Zone</div>
+              <div class="text-gray-300">${points.length} station(s)</div>
+              <div class="mt-1">
+                <div class="text-xs text-gray-400">Avg Score: <span class="text-white">${avgScore.toFixed(1)}</span></div>
+                <div class="text-xs text-gray-400">Avg Utilization: <span class="text-white">${avgUtilization.toFixed(1)}%</span></div>
+                <div class="text-xs text-gray-400">Total Revenue: <span class="text-white">$${(totalRevenue / 1000000).toFixed(1)}M</span></div>
+              </div>
+            </div>
+          `,
+          style: { zIndex: 1000 }
+        };
+      },
+      updateTriggers: {
+        getElevationWeight: [stationData],
+        getColorWeight: [stationData],
+        visible: [visible]
+      }
+    });
+  } else {
+    return new GridLayer({
+      id: 'opportunity-grid',
+      data: gridData,
+      visible,
+      getPosition: (d: GridDataPoint) => d.position,
+      getWeight: (d: GridDataPoint) => d.weight,
+      cellSize: resolution,
+      elevationScale: 2000,
+      extruded: true,
+      coverage: 0.9,
+      colorRange: opportunityColorRange,
+      elevationRange: [0, 4000],
+      pickable: true,
+      autoHighlight: true,
+      onClick: (info) => {
+        if (info.object) {
+          console.log('Grid cell clicked:', info.object);
+        }
+      },
+      getTooltip: ({ object }) => {
+        if (!object || !object.points) return null;
+        
+        const points = object.points;
+        const avgScore = points.reduce((sum: number, p: any) => sum + p.source.score, 0) / points.length;
+        const avgUtilization = points.reduce((sum: number, p: any) => sum + p.source.utilization, 0) / points.length;
+        const totalRevenue = points.reduce((sum: number, p: any) => sum + p.source.revenue, 0);
+        
+        return {
+          html: `
+            <div class="bg-gray-900 border border-gray-700 rounded-lg p-3 text-white text-sm">
+              <div class="font-semibold text-purple-400">Grid Cell</div>
+              <div class="text-gray-300">${points.length} station(s)</div>
+              <div class="mt-1">
+                <div class="text-xs text-gray-400">Avg Score: <span class="text-white">${avgScore.toFixed(1)}</span></div>
+                <div class="text-xs text-gray-400">Avg Utilization: <span class="text-white">${avgUtilization.toFixed(1)}%</span></div>
+                <div class="text-xs text-gray-400">Total Revenue: <span class="text-white">$${(totalRevenue / 1000000).toFixed(1)}M</span></div>
+              </div>
+            </div>
+          `,
+          style: { zIndex: 1000 }
+        };
+      },
+      updateTriggers: {
+        getWeight: [stationData],
+        visible: [visible]
+      }
+    });
+  }
+}
+
+// Helper function to create opportunity heatmap layer
+export function createOpportunityHeatmapLayer(
+  stationData: PrecomputedStationScore[], 
+  visible: boolean = true,
+  options: {
+    type?: 'hexagon' | 'grid';
+    resolution?: number;
+    metric?: 'opportunity' | 'revenue' | 'utilization';
+  } = {}
+) {
+  const { type = 'hexagon', resolution = 1000, metric = 'opportunity' } = options;
+  
+  // Convert station data to grid points
+  const gridData = stationData.map(station => ({
+    position: [station.coordinates[1], station.coordinates[0]],
+    score: station.overallScore,
+    utilization: station.actualUtilization,
+    revenue: station.monthlyRevenue,
+    priority: station.priority,
+    operator: station.operator,
+    weight: calculateWeight(station, metric)
+  }));
+  
+  function calculateWeight(station: PrecomputedStationScore, weightMetric: string): number {
+    let weight = 0;
+    
+    switch (weightMetric) {
+      case 'opportunity':
+        weight = station.overallScore / 100;
+        // Boost underutilized high-capacity stations
+        if (station.actualUtilization < 70 && station.capacityGbps > 150) {
+          weight *= 1.4;
+        }
+        break;
+      case 'revenue':
+        // Normalize revenue to 0-1 scale (assuming max revenue around 6M)
+        weight = Math.min(1.0, station.monthlyRevenue / 6000000);
+        break;
+      case 'utilization':
+        weight = station.actualUtilization / 100;
+        break;
+      default:
+        weight = station.overallScore / 100;
+    }
+    
+    // Apply priority boost
+    if (station.priority === 'critical') weight *= 1.3;
+    else if (station.priority === 'high') weight *= 1.2;
+    
+    return Math.min(1.0, weight);
+  }
+  
+  // Color schemes
+  const colorSchemes = {
+    opportunity: [
+      [1, 152, 189, 120],
+      [73, 227, 206, 140],
+      [216, 254, 181, 160],
+      [254, 237, 177, 180],
+      [254, 173, 84, 200],
+      [209, 55, 78, 220]
+    ],
+    revenue: [
+      [30, 64, 175, 120],
+      [59, 130, 246, 140],
+      [147, 197, 253, 160],
+      [34, 197, 94, 180],
+      [251, 191, 36, 200],
+      [239, 68, 68, 220]
+    ],
+    utilization: [
+      [127, 29, 29, 120],  // Dark red - low utilization
+      [185, 28, 28, 140],  // Red - moderate utilization
+      [251, 191, 36, 160], // Yellow - good utilization
+      [34, 197, 94, 180],  // Green - high utilization
+      [21, 128, 61, 200],  // Dark green - very high utilization
+      [5, 46, 22, 220]     // Very dark green - maximum utilization
+    ]
+  };
+  
+  if (type === 'hexagon') {
+    return new HexagonLayer({
+      id: `opportunity-hexagons-${metric}`,
+      data: gridData,
+      visible,
+      getPosition: (d: any) => d.position,
+      getElevationWeight: (d: any) => d.weight,
+      getColorWeight: (d: any) => d.weight,
+      radius: resolution,
+      elevationScale: 1000,
+      extruded: true,
+      coverage: 0.8,
+      colorRange: colorSchemes[metric as keyof typeof colorSchemes],
+      elevationRange: [0, 3000],
+      pickable: true,
+      autoHighlight: true,
+      updateTriggers: {
+        getElevationWeight: [stationData, metric],
+        getColorWeight: [stationData, metric],
+        visible: [visible]
+      }
+    });
+  } else {
+    return new GridLayer({
+      id: `opportunity-grid-${metric}`,
+      data: gridData,
+      visible,
+      getPosition: (d: any) => d.position,
+      getWeight: (d: any) => d.weight,
+      cellSize: resolution,
+      elevationScale: 2000,
+      extruded: true,
+      coverage: 0.9,
+      colorRange: colorSchemes[metric as keyof typeof colorSchemes],
+      elevationRange: [0, 4000],
+      pickable: true,
+      autoHighlight: true,
+      updateTriggers: {
+        getWeight: [stationData, metric],
+        visible: [visible]
+      }
+    });
+  }
+}

@@ -1,0 +1,256 @@
+'use client';
+
+import React, { useState, useCallback, useMemo } from 'react';
+import DeckGL from '@deck.gl/react';
+import { ScatterplotLayer, TextLayer } from '@deck.gl/layers';
+import { HeatmapLayer, HexagonLayer } from '@deck.gl/aggregation-layers';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Globe, Map as MapIcon, BarChart3, Activity, Filter, Search } from 'lucide-react';
+import { ALL_REAL_STATIONS } from '@/lib/data/real-ground-stations';
+import { SES_PRECOMPUTED_SCORES, INTELSAT_PRECOMPUTED_SCORES } from '@/lib/data/precomputed-opportunity-scores';
+import StaticMap from 'react-map-gl/maplibre';
+
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+
+const INITIAL_VIEW_STATE = {
+  longitude: -98,
+  latitude: 39,
+  zoom: 4,
+  pitch: 0,
+  bearing: 0
+};
+
+export function EnhancedMapSimple() {
+  const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
+  const [selectedStation, setSelectedStation] = useState<any>(null);
+  const [showHeatmap, setShowHeatmap] = useState(false);
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
+
+  // Combine all scores
+  const allScores = useMemo(() => {
+    return [...SES_PRECOMPUTED_SCORES, ...INTELSAT_PRECOMPUTED_SCORES];
+  }, []);
+
+  // Station layer
+  const stationLayer = new ScatterplotLayer({
+    id: 'stations',
+    data: allScores,
+    getPosition: (d: any) => [...d.coordinates].reverse(),
+    getRadius: (d: any) => {
+      const baseRadius = d.type?.includes('Primary') ? 80000 : 50000;
+      return baseRadius * (d.overallScore / 100);
+    },
+    getFillColor: (d: any) => {
+      if (d.overallScore > 80) return [0, 255, 0, 180];
+      if (d.overallScore > 60) return [255, 255, 0, 180];
+      return [255, 0, 0, 180];
+    },
+    pickable: true,
+    onClick: (info: any) => {
+      if (info.object) {
+        setSelectedStation(info.object);
+      }
+    },
+    radiusScale: 1,
+    radiusMinPixels: 3,
+    radiusMaxPixels: 30
+  });
+
+  // Labels layer
+  const labelLayer = new TextLayer({
+    id: 'station-labels',
+    data: allScores,
+    getPosition: (d: any) => [...d.coordinates].reverse(),
+    getText: (d: any) => d.name,
+    getSize: 12,
+    getColor: [255, 255, 255, 255],
+    getAngle: 0,
+    getTextAnchor: 'middle',
+    getAlignmentBaseline: 'top',
+    billboard: true,
+    pickable: false
+  });
+
+  // Heatmap layer
+  const heatmapLayer = showHeatmap ? new HeatmapLayer({
+    id: 'heatmap',
+    data: allScores,
+    getPosition: (d: any) => [...d.coordinates].reverse(),
+    getWeight: (d: any) => d.overallScore / 100,
+    radiusPixels: 50,
+    intensity: 1,
+    threshold: 0.03
+  }) : null;
+
+  const layers = [
+    heatmapLayer,
+    stationLayer,
+    labelLayer
+  ].filter(Boolean);
+
+  const handleViewStateChange = useCallback(({ viewState }: any) => {
+    setViewState(viewState);
+  }, []);
+
+  const toggleViewMode = () => {
+    setViewMode(mode => {
+      const newMode = mode === '2d' ? '3d' : '2d';
+      setViewState(prev => ({
+        ...prev,
+        pitch: newMode === '3d' ? 45 : 0,
+        bearing: newMode === '3d' ? -30 : 0
+      }));
+      return newMode;
+    });
+  };
+
+  return (
+    <div className="relative w-full h-full bg-black">
+      {/* Map Container */}
+      <DeckGL
+        viewState={viewState}
+        onViewStateChange={handleViewStateChange}
+        controller={true}
+        layers={layers}
+      >
+        <StaticMap 
+          mapStyle={MAP_STYLE}
+          mapLib={import('maplibre-gl')}
+        />
+      </DeckGL>
+
+      {/* Top Control Bar */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
+        <Card className="bg-gray-900/90 border-gray-700 backdrop-blur-sm">
+          <div className="flex items-center gap-2 p-2">
+            <Button
+              size="sm"
+              variant={viewMode === '2d' ? 'default' : 'outline'}
+              onClick={toggleViewMode}
+              className="text-xs"
+            >
+              {viewMode === '2d' ? <MapIcon className="w-4 h-4 mr-1" /> : <Globe className="w-4 h-4 mr-1" />}
+              {viewMode === '2d' ? '2D Map' : '3D View'}
+            </Button>
+            <Button
+              size="sm"
+              variant={showHeatmap ? 'default' : 'outline'}
+              onClick={() => setShowHeatmap(!showHeatmap)}
+              className="text-xs"
+            >
+              <BarChart3 className="w-4 h-4 mr-1" />
+              Heatmap
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setViewState(INITIAL_VIEW_STATE)}
+              className="text-xs"
+            >
+              Reset View
+            </Button>
+          </div>
+        </Card>
+      </div>
+
+      {/* Station Info Panel */}
+      {selectedStation && (
+        <div className="absolute top-20 right-4 z-10 w-80">
+          <Card className="bg-gray-900/90 border-gray-700 backdrop-blur-sm">
+            <div className="p-4">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{selectedStation.name}</h3>
+                  <p className="text-sm text-gray-400">{selectedStation.operator} • {selectedStation.country}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedStation(null)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Overall Score:</span>
+                  <span className="text-white font-medium">{selectedStation.overallScore?.toFixed(1)}/100</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Priority:</span>
+                  <span className={`font-medium ${
+                    selectedStation.priority === 'critical' ? 'text-red-500' :
+                    selectedStation.priority === 'high' ? 'text-orange-500' :
+                    selectedStation.priority === 'medium' ? 'text-yellow-500' :
+                    'text-green-500'
+                  }`}>
+                    {selectedStation.priority?.toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Utilization:</span>
+                  <span className="text-white">{selectedStation.utilization}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Monthly Revenue:</span>
+                  <span className="text-white">${(selectedStation.monthlyRevenue / 1000000).toFixed(1)}M</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Profit Margin:</span>
+                  <span className="text-white">{selectedStation.profitMargin}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Investment Rec:</span>
+                  <span className={`font-medium ${
+                    selectedStation.investmentRecommendation === 'excellent' ? 'text-green-500' :
+                    selectedStation.investmentRecommendation === 'good' ? 'text-blue-500' :
+                    selectedStation.investmentRecommendation === 'moderate' ? 'text-yellow-500' :
+                    'text-red-500'
+                  }`}>
+                    {selectedStation.investmentRecommendation?.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Bottom Stats Bar */}
+      <div className="absolute bottom-4 left-4 right-4 z-10">
+        <Card className="bg-gray-900/90 border-gray-700 backdrop-blur-sm">
+          <div className="flex items-center justify-between p-3">
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-blue-500" />
+                <span className="text-gray-400">Stations:</span>
+                <span className="text-white font-medium">{allScores.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">SES:</span>
+                <span className="text-blue-400 font-medium">{SES_PRECOMPUTED_SCORES.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Intelsat:</span>
+                <span className="text-purple-400 font-medium">{INTELSAT_PRECOMPUTED_SCORES.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Avg Score:</span>
+                <span className="text-white font-medium">
+                  {(allScores.reduce((sum, s) => sum + s.overallScore, 0) / allScores.length).toFixed(1)}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Total Revenue:</span>
+                <span className="text-green-400 font-medium">
+                  ${(allScores.reduce((sum, s) => sum + s.monthlyRevenue, 0) / 1000000).toFixed(1)}M/mo
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}

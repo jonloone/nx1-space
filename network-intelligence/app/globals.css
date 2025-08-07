@@ -1,6 +1,68 @@
+/* MapLibre GL CSS - Essential for map rendering */
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Enhanced map styles with depth and polish */
+@layer components {
+  /* Glass morphism effect for panels */
+  .glass-panel {
+    @apply bg-gray-900/95 backdrop-blur-sm border border-gray-700/50;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+  
+  /* Subtle animations for smooth transitions */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  /* Enhanced button hover effects */
+  .btn-3d {
+    @apply relative overflow-hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .btn-3d:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Station glow effect */
+  @keyframes station-pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.1);
+    }
+  }
+  
+  .station-critical {
+    animation: station-pulse 2s ease-in-out infinite;
+  }
+  
+  /* Lighting presets visual indicators */
+  .lighting-dawn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
+  }
+  
+  .lighting-day {
+    background: linear-gradient(135deg, #6bcf7f 0%, #4a90e2 100%);
+  }
+  
+  .lighting-dusk {
+    background: linear-gradient(135deg, #f2994a 0%, #8e44ad 100%);
+  }
+  
+  .lighting-night {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  }
+}
 
 @layer base {
   :root {

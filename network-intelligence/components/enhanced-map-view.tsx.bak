@@ -1,0 +1,425 @@
+'use client';
+
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import Map from 'react-map-gl/maplibre';
+import { DeckGL } from '@deck.gl/react';
+import type { ViewState as MapViewState } from 'react-map-gl/maplibre';
+import { ViewStateManager, ViewMode } from '@/lib/map/view-state-manager';
+import { ScatterplotLayer } from '@deck.gl/layers';
+import { HeatmapLayer } from '@deck.gl/aggregation-layers';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Globe, Map as MapIcon, Settings, BarChart3, Info } from 'lucide-react';
+import { LeftPanel } from '@/components/map-panels/left-panel';
+import { RightPanel } from '@/components/map-panels/right-panel';
+import { BottomPanel } from '@/components/map-panels/bottom-panel';
+import { createFlowLayer } from '@/components/map-layers/flow-layer';
+import { createOpportunityHeatmapLayer } from '@/components/map-layers/opportunity-grid';
+import { createSatelliteOrbitLayers } from '@/components/map-layers/satellite-orbit-layer';
+import { TerrainPortal } from '@/components/terrain-portal';
+import { ALL_REAL_STATIONS, GroundStationEnrichmentService } from '@/lib/data/real-ground-stations';
+import { SES_PRECOMPUTED_SCORES, INTELSAT_PRECOMPUTED_SCORES, PrecomputedStationScore } from '@/lib/data/precomputed-opportunity-scores';
+
+// MapLibre style for the base map
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+
+interface EnhancedMapViewProps {
+  className?: string;
+}
+
+interface SelectedStation {
+  station: PrecomputedStationScore;
+  coordinates: [number, number];
+}
+
+export function EnhancedMapView({ className }: EnhancedMapViewProps) {
+  // View state management
+  const [viewStateManager] = useState(() => new ViewStateManager({
+    defaultView: {
+      longitude: 0,
+      latitude: 20,
+      zoom: 2.5,
+      bearing: 0,
+      pitch: 0
+    }
+  }));
+
+  const [viewState, setViewState] = useState<MapViewState>(() => viewStateManager.getCurrentView());
+  const [viewMode, setViewMode] = useState<ViewMode>('2d');
+  
+  // Panel states
+  const [leftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const [bottomPanelOpen, setBottomPanelOpen] = useState(true);
+  const [terrainPortalOpen, setTerrainPortalOpen] = useState(false);
+  
+  // Map interaction states
+  const [selectedStation, setSelectedStation] = useState<SelectedStation | null>(null);
+  const [hoveredStation, setHoveredStation] = useState<PrecomputedStationScore | null>(null);
+  const [showHeatmap, setShowHeatmap] = useState(true);
+  const [showFlows, setShowFlows] = useState(false);
+  const [showClusters, setShowClusters] = useState(false);
+  const [showSatellites, setShowSatellites] = useState(false);
+  const [animationTime, setAnimationTime] = useState(0);
+
+  // Data preparation
+  const enrichmentService = useMemo(() => new GroundStationEnrichmentService(), []);
+  
+  const allStationScores = useMemo(() => {
+    return [...SES_PRECOMPUTED_SCORES, ...INTELSAT_PRECOMPUTED_SCORES];
+  }, []);
+
+  const stationData = useMemo(() => {
+    return allStationScores.map(score => ({
+      position: [score.coordinates[1], score.coordinates[0]], // [lng, lat] for deck.gl
+      score: score.overallScore,
+      utilization: score.actualUtilization,
+      operator: score.operator,
+      name: score.name,
+      country: score.country,
+      priority: score.priority,
+      monthlyRevenue: score.monthlyRevenue,
+      ...score
+    }));
+  }, [allStationScores]);
+
+  // Handle view state changes
+  const handleViewStateChange = useCallback((viewState: MapViewState) => {
+    setViewState(viewState);
+    viewStateManager.updateView(viewState);
+  }, [viewStateManager]);
+
+  // Handle view mode toggle
+  const handleViewModeChange = useCallback((mode: ViewMode) => {
+    setViewMode(mode);
+    const newViewState = viewStateManager.switchViewMode(mode);
+    setViewState(newViewState);
+  }, [viewStateManager]);
+
+  // Handle station selection
+  const handleStationClick = useCallback((station: any) => {
+    const stationScore = allStationScores.find(s => s.name === station.name);
+    if (stationScore) {
+      setSelectedStation({
+        station: stationScore,
+        coordinates: [stationScore.coordinates[0], stationScore.coordinates[1]]
+      });
+      setRightPanelOpen(true);
+      
+      // Focus on the selected station
+      const newViewState = viewStateManager.focusOnStation({
+        coordinates: stationScore.coordinates,
+        name: stationScore.name
+      });
+      setViewState(newViewState);
+    }
+  }, [allStationScores, viewStateManager]);
+
+  // Station hover handlers
+  const handleStationHover = useCallback((info: any) => {
+    if (info.picked && info.object) {
+      const stationScore = allStationScores.find(s => s.name === info.object.name);
+      setHoveredStation(stationScore || null);
+    } else {
+      setHoveredStation(null);
+    }
+  }, [allStationScores]);
+
+  // Create deck.gl layers
+  const layers = useMemo(() => {
+    const layerList: any[] = [];
+
+    // Ground stations scatter plot layer
+    layerList.push(
+      new ScatterplotLayer({
+        id: 'ground-stations',
+        data: stationData,
+        getPosition: (d: any) => d.position,
+        getRadius: (d: any) => {
+          const baseRadius = viewState.zoom * 50000;
+          const scoreMultiplier = Math.max(0.5, d.score / 100);
+          return baseRadius * scoreMultiplier;
+        },
+        getFillColor: (d: any) => {
+          if (d.priority === 'critical') return [220, 38, 127, 200]; // Pink
+          if (d.priority === 'high') return [251, 146, 60, 200];    // Orange
+          if (d.priority === 'medium') return [34, 197, 94, 200];  // Green
+          return [156, 163, 175, 200]; // Gray for low priority
+        },
+        getLineColor: (d: any) => d.operator === 'SES' ? [59, 130, 246] : [168, 85, 247], // Blue for SES, Purple for Intelsat
+        getLineWidth: 2000,
+        stroked: true,
+        filled: true,
+        radiusMinPixels: 8,
+        radiusMaxPixels: 30,
+        pickable: true,
+        onClick: handleStationClick,
+        onHover: handleStationHover,
+        updateTriggers: {
+          getRadius: [viewState.zoom],
+          getFillColor: [selectedStation],
+          getLineColor: [selectedStation]
+        }
+      })
+    );
+
+    // Heatmap layer for opportunity scores
+    if (showHeatmap) {
+      layerList.push(
+        createOpportunityHeatmapLayer(allStationScores, true, {
+          type: 'hexagon',
+          resolution: 100000,
+          metric: 'opportunity'
+        })
+      );
+    }
+
+    // Flow layer for station relationships
+    if (showFlows) {
+      layerList.push(
+        createFlowLayer(allStationScores, true)
+      );
+    }
+
+    // Satellite orbit visualization
+    if (showSatellites) {
+      const satelliteLayers = createSatelliteOrbitLayers(true, animationTime);
+      layerList.push(...satelliteLayers);
+    }
+
+    return layerList;
+  }, [stationData, viewState.zoom, selectedStation, showHeatmap, showFlows, showSatellites, animationTime, allStationScores, handleStationClick, handleStationHover]);
+
+  // Animation loop for satellites
+  useEffect(() => {
+    if (!showSatellites) return;
+
+    const interval = setInterval(() => {
+      setAnimationTime(prev => prev + 1);
+    }, 100); // Update every 100ms
+
+    return () => clearInterval(interval);
+  }, [showSatellites]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'g' || event.key === 'G') {
+        handleViewModeChange(viewMode === '2d' ? '3d' : '2d');
+      }
+      if (event.key === 'r' || event.key === 'R') {
+        const newViewState = viewStateManager.reset();
+        setViewState(newViewState);
+        setViewMode('2d');
+      }
+      if (event.key === 's' || event.key === 'S') {
+        setShowSatellites(!showSatellites);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [viewMode, handleViewModeChange, viewStateManager, showSatellites]);
+
+  return (
+    <div className={`relative w-full h-screen bg-gray-900 ${className}`}>
+      {/* Main map container */}
+      <div className="absolute inset-0">
+        <DeckGL
+          viewState={viewState}
+          onViewStateChange={({ viewState }) => handleViewStateChange(viewState)}
+          controller={{
+            doubleClickZoom: false,
+            touchRotate: viewMode === '3d',
+            dragRotate: viewMode === '3d'
+          }}
+          layers={layers}
+          getTooltip={({ object }) => {
+            if (!object) return null;
+            return {
+              html: `
+                <div class="bg-gray-900 border border-gray-700 rounded-lg p-3 text-white text-sm">
+                  <div class="font-semibold text-blue-400">${object.name}</div>
+                  <div class="text-gray-300">${object.country} • ${object.operator}</div>
+                  <div class="mt-1">
+                    <div class="text-xs text-gray-400">Score: <span class="text-white">${object.score}/100</span></div>
+                    <div class="text-xs text-gray-400">Utilization: <span class="text-white">${object.utilization}%</span></div>
+                    <div class="text-xs text-gray-400">Revenue: <span class="text-white">$${(object.monthlyRevenue / 1000000).toFixed(1)}M</span></div>
+                  </div>
+                </div>
+              `,
+              style: { zIndex: 1000 }
+            };
+          }}
+        >
+          {viewMode === '2d' && (
+            <Map
+              mapStyle={MAP_STYLE}
+              attributionControl={false}
+              reuseMaps
+            />
+          )}
+        </DeckGL>
+      </div>
+
+      {/* Top control bar */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
+        <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg p-2 flex items-center space-x-2">
+          {/* View mode toggle */}
+          <Tabs value={viewMode} onValueChange={handleViewModeChange}>
+            <TabsList className="bg-gray-800">
+              <TabsTrigger value="2d" className="flex items-center space-x-2">
+                <MapIcon size={16} />
+                <span>2D Map</span>
+              </TabsTrigger>
+              <TabsTrigger value="3d" className="flex items-center space-x-2">
+                <Globe size={16} />
+                <span>3D Globe</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          {/* Layer controls */}
+          <div className="border-l border-gray-600 pl-2 flex space-x-1">
+            <Button
+              variant={showHeatmap ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowHeatmap(!showHeatmap)}
+              className="text-xs"
+            >
+              Heatmap
+            </Button>
+            <Button
+              variant={showFlows ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowFlows(!showFlows)}
+              className="text-xs"
+            >
+              Flows
+            </Button>
+            <Button
+              variant={showClusters ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowClusters(!showClusters)}
+              className="text-xs"
+            >
+              Clusters
+            </Button>
+            <Button
+              variant={showSatellites ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowSatellites(!showSatellites)}
+              className="text-xs"
+            >
+              Satellites
+            </Button>
+          </div>
+
+          {/* Additional controls */}
+          <div className="border-l border-gray-600 pl-2 flex space-x-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setTerrainPortalOpen(true)}
+              className="text-xs"
+            >
+              Terrain
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Panel toggle controls */}
+      <div className="absolute top-4 left-4 z-30 flex flex-col space-y-2">
+        <Button
+          variant={leftPanelOpen ? "default" : "outline"}
+          size="sm"
+          onClick={() => setLeftPanelOpen(!leftPanelOpen)}
+        >
+          <Settings size={16} />
+        </Button>
+      </div>
+
+      <div className="absolute top-4 right-4 z-30 flex flex-col space-y-2">
+        <Button
+          variant={rightPanelOpen ? "default" : "outline"}
+          size="sm"
+          onClick={() => setRightPanelOpen(!rightPanelOpen)}
+        >
+          <Info size={16} />
+        </Button>
+      </div>
+
+      <div className="absolute bottom-4 right-4 z-30">
+        <Button
+          variant={bottomPanelOpen ? "default" : "outline"}
+          size="sm"
+          onClick={() => setBottomPanelOpen(!bottomPanelOpen)}
+        >
+          <BarChart3 size={16} />
+        </Button>
+      </div>
+
+      {/* Left panel - Analysis filters */}
+      <LeftPanel
+        isOpen={leftPanelOpen}
+        onClose={() => setLeftPanelOpen(false)}
+        stationData={allStationScores}
+        onStationSelect={(station) => {
+          const stationScore = allStationScores.find(s => s.stationId === station.stationId);
+          if (stationScore) {
+            setSelectedStation({
+              station: stationScore,
+              coordinates: stationScore.coordinates
+            });
+            setRightPanelOpen(true);
+          }
+        }}
+        onFilterChange={(filters) => {
+          // Handle filter changes
+          console.log('Filters changed:', filters);
+        }}
+        viewStateManager={viewStateManager}
+        onViewStateChange={handleViewStateChange}
+      />
+
+      {/* Right panel - Station details */}
+      <RightPanel
+        isOpen={rightPanelOpen}
+        onClose={() => setRightPanelOpen(false)}
+        selectedStation={selectedStation}
+        onActionTaken={(action) => {
+          console.log('Action taken:', action);
+        }}
+      />
+
+      {/* Bottom panel - KPIs */}
+      <BottomPanel
+        isOpen={bottomPanelOpen}
+        onClose={() => setBottomPanelOpen(false)}
+        stationData={allStationScores}
+        selectedStation={selectedStation?.station || null}
+      />
+
+      {/* Terrain portal modal */}
+      <TerrainPortal
+        isOpen={terrainPortalOpen}
+        onClose={() => setTerrainPortalOpen(false)}
+        selectedStation={selectedStation}
+      />
+
+      {/* Status indicator */}
+      <div className="absolute bottom-4 left-4 z-30">
+        <div className="bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300">
+          <div>Stations: {allStationScores.length}</div>
+          <div>View: {viewMode.toUpperCase()}</div>
+          {hoveredStation && (
+            <div className="text-blue-400 mt-1">
+              Hover: {hoveredStation.name}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

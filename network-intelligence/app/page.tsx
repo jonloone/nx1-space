@@ -10,10 +10,19 @@ import {
   TrendingUp,
   Target,
   Users,
-  ArrowRight
+  ArrowRight,
+  Shield,
+  AlertTriangle
 } from 'lucide-react';
+import { 
+  ENHANCED_OPPORTUNITY_SUMMARY,
+  analyzeGlobalCompetitiveLandscape 
+} from '@/lib/data/precomputed-opportunity-scores';
+import { COMPETITOR_INTELLIGENCE_SUMMARY } from '@/lib/data/competitorStations';
 
 export default function HomePage() {
+  const competitiveData = analyzeGlobalCompetitiveLandscape();
+  
   return (
     <div className="min-h-screen bg-black">
       {/* Hero Section */}
@@ -25,22 +34,28 @@ export default function HomePage() {
                 Network Intelligence Platform
               </h1>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                AI-powered ground station analysis with multi-agent intelligence system. 
-                Analyze 32 real SES and Intelsat stations for investment opportunities.
+                AI-powered ground station analysis with competitive intelligence. 
+                Analyze 32 real SES and Intelsat stations plus {COMPETITOR_INTELLIGENCE_SUMMARY.totalCompetitorStations} competitor facilities across AWS, Starlink, Telesat, and KSAT.
               </p>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/enhanced-map">
+                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 text-lg shadow-lg">
+                  <Globe className="h-5 w-5 mr-2" />
+                  Enhanced Intelligence Map
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
               <Link href="/opportunity-analysis">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
                   <Target className="h-5 w-5 mr-2" />
                   Multi-Agent Opportunity Analysis
-                  <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
               <Link href="/simple">
                 <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 text-lg">
-                  <Globe className="h-5 w-5 mr-2" />
+                  <BarChart3 className="h-5 w-5 mr-2" />
                   Interactive BI Dashboard
                 </Button>
               </Link>
@@ -125,18 +140,18 @@ export default function HomePage() {
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-3">
                 <Globe className="h-6 w-6 text-purple-500" />
-                Interactive Visualization
+                Enhanced Intelligence Map
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-gray-400">
-                Full-screen deck.gl visualization with terrain overlays, heatmaps, 
-                and real-time ground station analytics.
+                Advanced MapLibre/deck.gl visualization with dual 2D/3D views, relationship flows, 
+                opportunity heatmaps, and satellite orbit tracking.
               </p>
               <div className="space-y-2">
-                <div className="text-sm text-blue-400">• Isometric terrain views</div>
-                <div className="text-sm text-green-400">• Interactive heatmaps</div>
-                <div className="text-sm text-purple-400">• Station deep-dive popups</div>
+                <div className="text-sm text-blue-400">• Three-panel professional layout</div>
+                <div className="text-sm text-green-400">• Station relationship flows</div>
+                <div className="text-sm text-purple-400">• 3D terrain analysis portal</div>
               </div>
             </CardContent>
           </Card>
@@ -180,6 +195,164 @@ export default function HomePage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </div>
+
+      {/* Competitive Intelligence Section */}
+      <div className="bg-gray-900/30 border-t border-gray-700">
+        <div className="container mx-auto px-6 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Competitive Intelligence Dashboard
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Real-time analysis of {COMPETITOR_INTELLIGENCE_SUMMARY.totalCompetitorStations} competitor ground stations across major operators
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Total Competitors */}
+            <Card className="bg-gray-900/70 border-gray-600">
+              <CardContent className="p-6 text-center">
+                <Shield className="h-12 w-12 text-blue-500 mx-auto mb-3" />
+                <div className="text-3xl font-bold text-white mb-2">
+                  {COMPETITOR_INTELLIGENCE_SUMMARY.totalCompetitorStations}
+                </div>
+                <div className="text-gray-400">Total Competitor Stations</div>
+              </CardContent>
+            </Card>
+
+            {/* Critical Threats */}
+            <Card className="bg-gray-900/70 border-gray-600">
+              <CardContent className="p-6 text-center">
+                <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-3" />
+                <div className="text-3xl font-bold text-white mb-2">
+                  {ENHANCED_OPPORTUNITY_SUMMARY.competitiveIntelligence.criticalThreats}
+                </div>
+                <div className="text-gray-400">Critical Threat Stations</div>
+              </CardContent>
+            </Card>
+
+            {/* AWS Stations */}
+            <Card className="bg-gray-900/70 border-gray-600">
+              <CardContent className="p-6 text-center">
+                <Globe className="h-12 w-12 text-orange-500 mx-auto mb-3" />
+                <div className="text-3xl font-bold text-white mb-2">
+                  {COMPETITOR_INTELLIGENCE_SUMMARY.dominantOperators.aws}
+                </div>
+                <div className="text-gray-400">AWS Ground Stations</div>
+              </CardContent>
+            </Card>
+
+            {/* Starlink Stations */}
+            <Card className="bg-gray-900/70 border-gray-600">
+              <CardContent className="p-6 text-center">
+                <Satellite className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                <div className="text-3xl font-bold text-white mb-2">
+                  {COMPETITOR_INTELLIGENCE_SUMMARY.dominantOperators.starlink}
+                </div>
+                <div className="text-gray-400">Starlink Gateways</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Threat Matrix */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-gray-900/50 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <AlertTriangle className="h-6 w-6 text-red-500" />
+                  Threat Assessment Matrix
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-300">AWS Ground Station</span>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-red-500 h-2 w-16 rounded"></div>
+                      <span className="text-white font-medium">{competitiveData.threatMatrix.awsThreat}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-300">SpaceX Starlink</span>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-orange-500 h-2 w-14 rounded"></div>
+                      <span className="text-white font-medium">{competitiveData.threatMatrix.starlinkThreat}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-300">Telesat</span>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-yellow-500 h-2 w-10 rounded"></div>
+                      <span className="text-white font-medium">{competitiveData.threatMatrix.telsatThreat}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-300">KSAT</span>
+                    <div className="flex items-center gap-2">
+                      <div className="bg-purple-500 h-2 w-8 rounded"></div>
+                      <span className="text-white font-medium">{competitiveData.threatMatrix.ksatThreat}</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900/50 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <Target className="h-6 w-6 text-green-500" />
+                  Market Opportunities
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {competitiveData.marketOpportunities.slice(0, 3).map((opportunity, index) => (
+                  <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+                    <div className="font-semibold text-white">{opportunity.region}</div>
+                    <div className="text-sm text-gray-400 mb-1">{opportunity.opportunity}</div>
+                    <div className="text-xs text-green-400">
+                      Market Size: ${(opportunity.marketSize / 1000000).toFixed(0)}M
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Key Trends */}
+          <div className="mt-8">
+            <Card className="bg-gray-900/50 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-3">
+                  <TrendingUp className="h-6 w-6 text-blue-500" />
+                  Key Market Trends
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-white">Competitive Trends</h4>
+                    {COMPETITOR_INTELLIGENCE_SUMMARY.keyTrends.slice(0, 3).map((trend, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-gray-300 text-sm">{trend}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-white">Strategic Recommendations</h4>
+                    {COMPETITOR_INTELLIGENCE_SUMMARY.strategicRecommendations.slice(0, 3).map((rec, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-gray-300 text-sm">{rec}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
