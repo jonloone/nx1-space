@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * H3 Ground Station Opportunity Analysis Demo Page
  */
@@ -35,8 +37,3 @@ export default function H3DemoPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: 'H3 Ground Station Opportunity Analysis - Network Intelligence',
-  description: 'Discover optimal locations for ground station deployment using H3 hexagonal grid analysis with market intelligence, competition analysis, and environmental factors.',
-};
