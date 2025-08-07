@@ -8,9 +8,14 @@ import { HeatmapLayer } from '@deck.gl/aggregation-layers'
 import Map from 'react-map-gl/maplibre'
 import { motion, AnimatePresence } from 'framer-motion'
 
+// Import data services
+import { stationDataService, type Station as StationData } from '@/lib/services/stationDataService'
+import { competitorDataService, type CompetitorStation } from '@/lib/services/competitorDataService'
+
 // Import our new H3 and Maritime layers
 import { createH3OpportunityLayer } from '@/components/map-layers/H3OpportunityLayer'
 import { createMaritimeHeatmapLayers } from '@/components/map-layers/MaritimeHeatmapLayer'
+import { GlowingStationLayer } from '@/components/map-layers/GlowingStationLayer'
 import type { H3HexagonOpportunity } from '@/lib/services/h3GridService'
 
 // Import new simplified components
@@ -18,60 +23,11 @@ import SimplifiedBottomNavigation from '@/components/layout/simplified-bottom-na
 import QuickStats from '@/components/stats/quick-stats'
 import ContextualPanels from '@/components/panels/contextual-panels'
 import FloatingInsights from '@/components/insights/floating-insights'
+import CompetitorFilter from '@/components/filters/CompetitorFilter'
 import { useMapSelection, type Station, type Hexagon, type Satellite } from '@/lib/hooks/useMapSelection'
 
-// Sample ground station data
-const ALL_STATIONS: Station[] = [
-  { 
-    id: 'ses-betzdorf', 
-    name: 'Betzdorf', 
-    location: 'Luxembourg',
-    coordinates: [6.3501, 49.6847], 
-    utilization: 85,
-    revenue: 3.5,
-    margin: 23,
-    status: 'active',
-    services: [
-      { type: 'Broadcast', percentage: 45 },
-      { type: 'Data', percentage: 35 },
-      { type: 'Government', percentage: 20 }
-    ],
-    utilizationHistory: [82, 83, 84, 85, 84, 85, 85],
-    utilizationTrend: 0.5
-  },
-  { 
-    id: 'ses-manassas', 
-    name: 'Manassas VA', 
-    location: 'USA',
-    coordinates: [-77.4753, 38.7509], 
-    utilization: 72,
-    revenue: 3.2,
-    margin: 18,
-    status: 'active',
-    services: [
-      { type: 'Enterprise', percentage: 60 },
-      { type: 'Government', percentage: 40 }
-    ],
-    utilizationHistory: [70, 71, 72, 71, 72, 73, 72],
-    utilizationTrend: 0.3
-  },
-  { 
-    id: 'intelsat-riverside', 
-    name: 'Riverside CA', 
-    location: 'USA',
-    coordinates: [-117.3962, 33.9533], 
-    utilization: 45,
-    revenue: 2.8,
-    margin: 12,
-    status: 'idle',
-    services: [
-      { type: 'Broadcast', percentage: 70 },
-      { type: 'Data', percentage: 30 }
-    ],
-    utilizationHistory: [48, 47, 46, 45, 44, 45, 45],
-    utilizationTrend: -0.5
-  }
-]
+// We'll load real station data from services
+let ALL_STATIONS: Station[] = []
 
 // Sample satellite data
 const SATELLITES: Satellite[] = [
@@ -92,6 +48,11 @@ const UnifiedMapV2: React.FC = () => {
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE)
   const [hoveredObject, setHoveredObject] = useState<any>(null)
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
+  const [allStations, setAllStations] = useState<Station[]>([])
+  const [sesStations, setSesStations] = useState<StationData[]>([])
+  const [competitorStations, setCompetitorStations] = useState<CompetitorStation[]>([])
+  const [selectedOperators, setSelectedOperators] = useState(['SES'])
+  const [loading, setLoading] = useState(true)
   
   const {
     viewContext,
@@ -101,6 +62,71 @@ const UnifiedMapV2: React.FC = () => {
     clearSelection,
     setHoveredItem
   } = useMapSelection()
+  
+  // Load all station data on mount
+  useEffect(() => {
+    loadAllStationData()
+  }, [])
+  
+  const loadAllStationData = async () => {
+    try {
+      setLoading(true)
+      
+      // Load SES stations
+      const ses = await stationDataService.loadAllStations()
+      setSesStations(ses)
+      
+      // Load competitor stations
+      const competitors = await competitorDataService.loadCompetitorStations()
+      setCompetitorStations(competitors)
+      
+      // Convert to unified Station format for map selection
+      const unifiedStations: Station[] = [
+        ...ses.map(s => ({
+          id: s.id,
+          name: s.name,
+          location: s.country,
+          coordinates: [s.longitude, s.latitude] as [number, number],
+          utilization: s.utilization || 50,
+          revenue: s.revenue || 1,
+          margin: s.margin || 0,
+          status: s.status as 'active' | 'idle' | 'critical' || 'active',
+          services: [
+            { type: 'Broadcast', percentage: 40 },
+            { type: 'Data', percentage: 35 },
+            { type: 'Enterprise', percentage: 25 }
+          ],
+          utilizationHistory: Array(7).fill(0).map(() => 40 + Math.random() * 50),
+          utilizationTrend: Math.random() * 2 - 1
+        })),
+        ...competitors.map(c => ({
+          id: c.id,
+          name: c.name,
+          location: c.country || 'Unknown',
+          coordinates: [c.longitude, c.latitude] as [number, number],
+          utilization: 50 + Math.random() * 40,
+          revenue: 0.5 + Math.random() * 3,
+          margin: -10 + Math.random() * 30,
+          status: 'active' as const,
+          services: [
+            { type: 'Commercial', percentage: 60 },
+            { type: 'Government', percentage: 40 }
+          ],
+          utilizationHistory: Array(7).fill(0).map(() => 40 + Math.random() * 50),
+          utilizationTrend: Math.random() * 2 - 1
+        }))
+      ]
+      
+      setAllStations(unifiedStations)
+      ALL_STATIONS = unifiedStations
+      
+      console.log(`Loaded ${ses.length} SES stations and ${competitors.length} competitor stations`)
+    } catch (error) {
+      console.error('Error loading station data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
   
   // Calculate tooltip position to avoid edge overflow
   const getTooltipStyle = () => {
@@ -153,6 +179,25 @@ const UnifiedMapV2: React.FC = () => {
       selectSatellite(info.object)
     }
   }
+  
+  // Filter stations based on selected operators
+  const visibleStations = useMemo(() => {
+    const allStationData: StationData[] = [
+      ...sesStations,
+      ...competitorStations.map(cs => ({
+        ...cs,
+        operator: cs.operator,
+        utilization: 50 + Math.random() * 40,
+        revenue: 0.5 + Math.random() * 3,
+        profit: -0.5 + Math.random() * 2,
+        margin: -10 + Math.random() * 30,
+        status: 'operational' as const,
+        opportunityScore: Math.random()
+      }))
+    ]
+    
+    return allStationData.filter(s => selectedOperators.includes(s.operator))
+  }, [sesStations, competitorStations, selectedOperators])
   
   // Create layers based on current view and filter
   const layers = useMemo(() => {
@@ -220,47 +265,51 @@ const UnifiedMapV2: React.FC = () => {
         baseLayers.push(...maritimeLayers)
       }
       
-      // Ground stations layer (always visible in stations view)
+      // Ground stations layer with glowing effect (always visible in stations view)
       baseLayers.push(
-        new ScatterplotLayer({
+        new GlowingStationLayer({
           id: 'ground-stations',
-          data: ALL_STATIONS,
-          getPosition: (d: Station) => d.coordinates,
-          getRadius: 15000,
-          getFillColor: (d: Station) => {
-            if (viewContext.filter === 'utilization') {
-              return d.utilization > 70 ? [34, 197, 94] : d.utilization > 50 ? [234, 179, 8] : [239, 68, 68]
-            } else if (viewContext.filter === 'profit') {
-              return d.margin > 20 ? [34, 197, 94] : d.margin > 10 ? [234, 179, 8] : [239, 68, 68]
-            }
-            return [99, 102, 241]
-          },
-          getLineColor: [255, 255, 255, 100],
-          getLineWidth: 2,
-          stroked: true,
-          filled: true,
-          radiusMinPixels: 8,
-          radiusMaxPixels: 40,
+          data: visibleStations,
+          analysisMode: viewContext.filter as any,
           pickable: true,
-          onClick: handleClick,
+          onClick: (info: any) => {
+            if (info.object) {
+              // Convert to Station format for selection
+              const station: Station = {
+                id: info.object.id,
+                name: info.object.name,
+                location: info.object.country || 'Unknown',
+                coordinates: [info.object.longitude, info.object.latitude],
+                utilization: info.object.utilization || 50,
+                revenue: info.object.revenue || 1,
+                margin: info.object.margin || 0,
+                status: info.object.status || 'active',
+                services: [
+                  { type: 'Broadcast', percentage: 40 },
+                  { type: 'Data', percentage: 35 },
+                  { type: 'Enterprise', percentage: 25 }
+                ],
+                utilizationHistory: Array(7).fill(0).map(() => 40 + Math.random() * 50),
+                utilizationTrend: Math.random() * 2 - 1
+              }
+              selectStation(station)
+            }
+          },
           onHover: (info: any) => {
             setHoveredObject(info.object ? { ...info.object, type: 'station' } : null)
             if (info.object && info.x !== undefined && info.y !== undefined) {
               setCursorPosition({ x: info.x, y: info.y })
             }
             setHoveredItem(info.object)
-          },
-          updateTriggers: {
-            getFillColor: viewContext.filter
           }
         })
       )
       
-      // Station labels
-      baseLayers.push(
-        new TextLayer({
-          id: 'station-labels',
-          data: ALL_STATIONS,
+      // Station labels are now included in GlowingStationLayer
+      // baseLayers.push(
+      //   new TextLayer({
+      //     id: 'station-labels',
+      //     data: ALL_STATIONS,
           getPosition: (d: Station) => d.coordinates,
           getText: (d: Station) => d.name,
           getSize: 12,
@@ -308,7 +357,7 @@ const UnifiedMapV2: React.FC = () => {
     }
     
     return baseLayers
-  }, [viewContext, selectStation, selectHexagon, selectSatellite, setHoveredItem])
+  }, [viewContext, visibleStations, selectStation, selectHexagon, selectSatellite, setHoveredItem, sesStations, competitorStations, selectedOperators])
   
   return (
     <div className="w-full h-screen relative overflow-hidden bg-slate-950">
@@ -336,6 +385,14 @@ const UnifiedMapV2: React.FC = () => {
       {/* Floating Insights */}
       <FloatingInsights />
       
+      {/* Competitor Filter - positioned top right */}
+      <div className="absolute top-4 right-4 z-20 w-64">
+        <CompetitorFilter
+          selectedOperators={selectedOperators}
+          onOperatorChange={setSelectedOperators}
+        />
+      </div>
+      
       {/* Contextual Panels */}
       <ContextualPanels />
       
@@ -356,11 +413,56 @@ const UnifiedMapV2: React.FC = () => {
               <div className="text-sm text-white">
                 {hoveredObject.type === 'station' ? (
                   <>
-                    <div className="font-semibold mb-1">{hoveredObject.name}</div>
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <div className="font-semibold flex items-center gap-2">
+                          <i className="fas fa-satellite-dish text-xs" />
+                          {hoveredObject.name}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-0.5">{hoveredObject.operator || 'Unknown'}</div>
+                      </div>
+                      {hoveredObject.operator && (
+                        <div 
+                          className="w-3 h-3 rounded-full"
+                          style={{ 
+                            backgroundColor: 
+                              hoveredObject.operator === 'SES' ? '#3B82F6' :
+                              hoveredObject.operator === 'AWS' ? '#FF9900' :
+                              hoveredObject.operator === 'Telesat' ? '#9C27B0' :
+                              hoveredObject.operator === 'SpaceX' ? '#00BCD4' :
+                              hoveredObject.operator === 'KSAT' ? '#FFEB3B' :
+                              '#9CA3AF'
+                          }}
+                        />
+                      )}
+                    </div>
                     <div className="text-white/70 text-xs space-y-1">
-                      <div>Location: {hoveredObject.location}</div>
-                      <div>Utilization: {hoveredObject.utilization}%</div>
-                      <div>Status: {hoveredObject.status}</div>
+                      <div className="flex items-center gap-2">
+                        <i className="fas fa-map-marker-alt text-gray-500" />
+                        <span>Location: {hoveredObject.location || hoveredObject.country}</span>
+                      </div>
+                      {hoveredObject.utilization && (
+                        <div className="flex items-center gap-2">
+                          <i className="fas fa-chart-line text-gray-500" />
+                          <span>Utilization: {hoveredObject.utilization.toFixed(0)}%</span>
+                        </div>
+                      )}
+                      {hoveredObject.margin !== undefined && (
+                        <div className="flex items-center gap-2">
+                          <i className="fas fa-dollar-sign text-gray-500" />
+                          <span>Margin: {hoveredObject.margin?.toFixed(0)}%</span>
+                        </div>
+                      )}
+                      {hoveredObject.threatLevel && (
+                        <div className="flex items-center gap-2">
+                          <i className={`fas fa-exclamation-triangle text-xs ${
+                            hoveredObject.threatLevel === 'HIGH' ? 'text-red-400' :
+                            hoveredObject.threatLevel === 'MEDIUM' ? 'text-yellow-400' :
+                            'text-green-400'
+                          }`} />
+                          <span>Threat Level: {hoveredObject.threatLevel}</span>
+                        </div>
+                      )}
                     </div>
                   </>
                 ) : hoveredObject.type === 'hexagon' ? (
@@ -396,6 +498,18 @@ const UnifiedMapV2: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Loading Indicator */}
+      {loading && (
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-black/80 border border-white/10 rounded-xl p-6">
+            <div className="flex items-center gap-3">
+              <i className="fas fa-circle-notch fa-spin text-blue-400 text-xl" />
+              <span className="text-white">Loading station data...</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
