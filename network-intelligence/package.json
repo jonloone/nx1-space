@@ -7,9 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration",
+    "test:validation": "jest tests/validation",
+    "test:tdd": "tdd-guard && jest",
     "test:browser": "node test-browser.js",
     "test:comprehensive": "node test-local.js",
-    "test:verification": "node test-manual-verification.js"
+    "test:verification": "node test-manual-verification.js",
+    "validate-poc": "ts-node scripts/validate-poc.ts",
+    "test:accuracy": "ts-node lib/testing/poc-validation-test.ts"
   },
   "dependencies": {
     "2": "^3.0.0",
@@ -17,6 +26,8 @@
     "@deck.gl/geo-layers": "^9.1.14",
     "@deck.gl/layers": "^9.1.14",
     "@deck.gl/mapbox": "^9.1.14",
+    "@google-cloud/storage": "^7.16.0",
+    "@google/earthengine": "^1.6.2",
     "@radix-ui/react-checkbox": "^1.3.2",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
@@ -33,12 +44,13 @@
     "clsx": "^2.1.1",
     "d3": "^7.9.0",
     "deck.gl": "^9.1.14",
+    "dotenv": "^17.2.1",
     "framer-motion": "^12.23.12",
+    "googleapis": "^155.0.0",
     "graphology": "^0.26.0",
     "graphology-layout": "^0.6.1",
     "graphology-layout-forceatlas2": "^0.10.1",
     "graphology-metrics": "^2.4.0",
-    "h3-js": "^4.2.1",
     "lucide-react": "^0.536.0",
     "maplibre-gl": "^5.6.1",
     "next": "15.4.5",
@@ -50,14 +62,19 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "@jest/globals": "^30.0.5",
     "@tailwindcss/postcss": "^4",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
+    "jest": "^30.0.5",
     "postcss": "^8.5.6",
     "puppeteer": "^24.16.0",
     "tailwindcss": "^3.4.17",
+    "tdd-guard": "^0.9.0",
+    "ts-jest": "^29.4.1",
     "typescript": "^5"
   }
 }

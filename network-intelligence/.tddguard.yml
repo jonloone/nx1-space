@@ -1,0 +1,52 @@
+# TDD-Guard Configuration for Ground Station Intelligence
+version: 1.0
+
+project:
+  name: "Ground Station Intelligence"
+  type: "data-science"
+  
+rules:
+  enforce_tests_first: true
+  minimum_coverage: 70  # Matches our accuracy requirement
+  
+  critical_paths:
+    # These MUST have tests before implementation
+    - "lib/scoring/empirical-weight-calibration.ts"
+    - "lib/scoring/reality-based-spatial-scoring.ts"
+    - "lib/scoring/confidence-calculator.ts"
+    - "lib/validation/station-accuracy-validator.ts"
+    
+  test_requirements:
+    scoring:
+      - "empirical_weight_derivation"
+      - "confidence_bounds"
+      - "validation_accuracy"
+    
+    visualization:
+      - "no_hexagons_remain"
+      - "confidence_shown_in_opacity"
+      - "real_data_connected"
+
+guards:
+  pre_commit:
+    - run_tests: true
+    - check_coverage: true
+    - validate_confidence: true
+    
+  continuous:
+    - watch_files: ["lib/**/*.ts", "components/**/*.tsx"]
+    - auto_run_tests: true
+    - fail_on_regression: true
+
+validation:
+  data_science:
+    # Specific to our ML/scoring needs
+    - "weights_must_be_normalized"
+    - "scores_between_0_and_1"
+    - "confidence_required_on_all_outputs"
+    - "minimum_70_percent_accuracy"
+
+test_patterns:
+  unit: "tests/unit/**/*.test.ts"
+  integration: "tests/integration/**/*.test.ts"
+  validation: "tests/validation/**/*.test.ts"

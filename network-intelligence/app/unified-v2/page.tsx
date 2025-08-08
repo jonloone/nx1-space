@@ -14,24 +14,17 @@ import { competitorDataService, type CompetitorStation } from '@/lib/services/co
 
 // Import verification and scoring systems
 import { DataVerificationService } from '@/lib/services/maritimeDataVerification'
-import { GlobalHexVerification } from '@/lib/services/globalHexVerification'
 import { ConditionalOpportunityScorer } from '@/lib/scoring/conditional-opportunity-scorer'
-import { H3OpportunityIntegration } from '@/lib/scoring/h3-opportunity-integration'
 
 // Import new demo and coverage systems
-import { H3GlobalCoverageSystem } from '@/lib/map/h3-coverage-system'
 import { OpportunityAnalysisSystem } from '@/lib/map/opportunity-analysis-system'
 import { MaritimeDemoScenariosService } from '@/lib/services/maritimeDemoScenariosService'
 import { StatisticalMaritimeDataService } from '@/lib/services/statisticalMaritimeDataService'
 import ComprehensiveSystemTest from '@/lib/testing/comprehensiveSystemTest'
 
-// Import our new H3 and Maritime layers
-import { createH3OpportunityLayer } from '@/components/map-layers/H3OpportunityLayer'
+// Import maritime and station layers
 import { createMaritimeHeatmapLayers } from '@/components/map-layers/MaritimeHeatmapLayer'
 import { GlowingStationLayer } from '@/components/map-layers/GlowingStationLayer'
-import { GlobalH3Layer } from '@/components/map-layers/GlobalH3Layer'
-import { H3HexagonLayer } from '@deck.gl/geo-layers'
-import type { H3HexagonOpportunity } from '@/lib/services/h3GridService'
 
 // Import new simplified components
 import SimplifiedBottomNavigation from '@/components/layout/simplified-bottom-navigation'
@@ -39,7 +32,7 @@ import QuickStats from '@/components/stats/quick-stats'
 import ContextualPanels from '@/components/panels/contextual-panels'
 import FloatingInsights from '@/components/insights/floating-insights'
 import CompetitorFilter from '@/components/filters/CompetitorFilter'
-import { useMapSelection, type Station, type Hexagon, type Satellite } from '@/lib/hooks/useMapSelection'
+import { useMapSelection, type Station, type Satellite } from '@/lib/hooks/useMapSelection'
 
 // We'll load real station data from services
 let ALL_STATIONS: Station[] = []
