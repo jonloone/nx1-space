@@ -158,7 +158,7 @@ export function StationDetails({ station }: StationDetailsProps) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {station.services.map((service) => (
+            {(station.services || ['Data', 'Video', 'Voice']).map((service) => (
               <Badge key={service} variant="secondary" className="text-xs">
                 {service}
               </Badge>

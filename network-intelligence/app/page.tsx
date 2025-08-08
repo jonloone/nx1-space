@@ -40,6 +40,13 @@ export default function HomePage() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/global-coverage">
+                <Button className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 text-lg shadow-lg">
+                  <Globe className="h-5 w-5 mr-2" />
+                  Global H3 Coverage System
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
               <Link href="/enhanced-map">
                 <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 text-lg shadow-lg">
                   <Globe className="h-5 w-5 mr-2" />
@@ -56,6 +63,8 @@ export default function HomePage() {
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
               <Link href="/opportunity-analysis">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
                   <Target className="h-5 w-5 mr-2" />
@@ -141,6 +150,27 @@ export default function HomePage() {
                 <div className="text-sm text-blue-400">• Opportunity scoring (0-100)</div>
                 <div className="text-sm text-green-400">• Portfolio optimization</div>
                 <div className="text-sm text-purple-400">• Risk assessment</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-900/50 border-gray-700 hover:bg-gray-800/50 transition-colors">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-3">
+                <Globe className="h-6 w-6 text-emerald-500" />
+                Global H3 Coverage System
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-gray-400">
+                Complete Earth coverage using H3 spatial indexing with 10,000+ hexagons covering 
+                every landmass. Conditional visualization: base mode (gray) vs opportunities mode (colored scoring).
+              </p>
+              <div className="space-y-2">
+                <div className="text-sm text-emerald-400">• Complete global landmass coverage</div>
+                <div className="text-sm text-green-400">• Multi-resolution H3 indexing (2-6)</div>
+                <div className="text-sm text-blue-400">• Memory-optimized 15,000+ hexagons</div>
+                <div className="text-sm text-purple-400">• Conditional scoring visualization</div>
               </div>
             </CardContent>
           </Card>

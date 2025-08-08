@@ -152,7 +152,11 @@ const UtilizationAnalytics: React.FC<{ station: Station }> = ({ station }) => {
           Service Mix
         </h4>
         <div className="space-y-2">
-          {station.services.map(service => (
+          {(station.services || [
+            { type: 'Data', percentage: 45 },
+            { type: 'Video', percentage: 30 },
+            { type: 'Voice', percentage: 25 }
+          ]).map(service => (
             <div key={service.type} className="flex items-center justify-between">
               <span className="text-gray-300 text-sm">{service.type}</span>
               <div className="flex items-center gap-2">

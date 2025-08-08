@@ -187,8 +187,8 @@ const FloatingInsights: React.FC = () => {
   const currentItems = activeTab === 'notifications' ? notifications : insights
   
   return (
-    <div className={`fixed top-20 left-4 z-20 transition-all duration-300 
-                   ${isMinimized ? 'w-12' : 'w-[360px]'}`}>
+    <div className={`fixed top-20 left-4 z-30 transition-all duration-300 
+                   ${isMinimized ? 'w-12' : 'w-[320px]'}`}>
       {/* Header with Tabs */}
       <motion.div 
         initial={{ opacity: 0, y: -10 }}

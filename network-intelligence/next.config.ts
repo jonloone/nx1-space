@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '10mb',
     },
   },
+  // Suppress hydration warnings caused by browser extensions like Grammarly
+  reactStrictMode: false,
   transpilePackages: ['@deck.gl/core', '@deck.gl/layers', '@deck.gl/mapbox', '@deck.gl/aggregation-layers'],
 };
 

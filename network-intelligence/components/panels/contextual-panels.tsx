@@ -6,7 +6,7 @@ import { useMapSelection } from '@/lib/hooks/useMapSelection'
 import StationDetailPanel from './station-detail-panel'
 import OpportunityPanel from './opportunity-panel'
 import SatellitePanel from './satellite-panel'
-import StationInsights from './station-insights'
+// import StationInsights from './station-insights' // Removed per request
 import SatelliteInsights from './satellite-insights'
 
 const ContextualPanels: React.FC = () => {
@@ -48,14 +48,7 @@ const ContextualPanels: React.FC = () => {
       })
     }
     
-    // View-specific context panels - but not when opportunities filter is active (operator filter shows instead)
-    if (viewContext.view === 'stations' && !selectedStation && viewContext.filter !== 'opportunities') {
-      panels.push({
-        id: 'station-insights',
-        component: <StationInsights filter={viewContext.filter} />,
-        position: 'top-right' as const
-      })
-    }
+    // View-specific context panels - removed StationInsights completely
     
     if (viewContext.view === 'satellites' && !selectedSatellite) {
       panels.push({
