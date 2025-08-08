@@ -8,12 +8,11 @@ import { HeatmapLayer, ContourLayer } from '@deck.gl/aggregation-layers'
 import Map from 'react-map-gl/maplibre'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Import real data services
-import { unifiedDataService, type UnifiedDataPoint, type OpportunityAnalysis } from '@/lib/data/unified-data-service'
+// Import real data services (client-safe versions)
+import { unifiedDataServiceClient, type UnifiedDataPoint, type OpportunityAnalysis } from '@/lib/data/unified-data-service-client'
 import { celestrakService } from '@/lib/data/celestrak-service'
 import { marineCadastreService } from '@/lib/data/marine-cadastre-service'
 import { naturalEarthService } from '@/lib/data/natural-earth-service'
-import { stationDataService } from '@/lib/services/stationDataService'
 
 // Import simplified components
 import SimplifiedBottomNavigation from '@/components/layout/simplified-bottom-navigation'
@@ -87,7 +86,7 @@ const UnifiedMVPMap: React.FC = () => {
       
       const opportunities = await Promise.all(
         keyLocations.map(loc => 
-          unifiedDataService.fetchLocationData(loc.lat, loc.lon, 300)
+          unifiedDataServiceClient.fetchLocationData(loc.lat, loc.lon, 300)
         )
       )
       
@@ -121,7 +120,7 @@ const UnifiedMVPMap: React.FC = () => {
       setLoading(true)
       
       try {
-        const analysis = await unifiedDataService.fetchLocationData(lat, lon, 300)
+        const analysis = await unifiedDataServiceClient.fetchLocationData(lat, lon, 300)
         setSelectedLocation(analysis)
       } catch (error) {
         console.error('Error analyzing location:', error)
