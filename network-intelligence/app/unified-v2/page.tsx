@@ -14,13 +14,9 @@ import { competitorDataService, type CompetitorStation } from '@/lib/services/co
 
 // Import verification and scoring systems
 import { DataVerificationService } from '@/lib/services/maritimeDataVerification'
-import { ConditionalOpportunityScorer } from '@/lib/scoring/conditional-opportunity-scorer'
-
-// Import new demo and coverage systems
-import { OpportunityAnalysisSystem } from '@/lib/map/opportunity-analysis-system'
+import { unifiedDataServiceClient } from '@/lib/data/unified-data-service-client'
 import { MaritimeDemoScenariosService } from '@/lib/services/maritimeDemoScenariosService'
 import { StatisticalMaritimeDataService } from '@/lib/services/statisticalMaritimeDataService'
-import ComprehensiveSystemTest from '@/lib/testing/comprehensiveSystemTest'
 
 // Import maritime and station layers
 import { createMaritimeHeatmapLayers } from '@/components/map-layers/MaritimeHeatmapLayer'

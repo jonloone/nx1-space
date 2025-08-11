@@ -6,9 +6,9 @@ import { MapView } from '@deck.gl/core'
 import Map from 'react-map-gl/maplibre'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Reality-based visualization layers
-import { RealityBasedLayers } from '@/components/map-layers/RealityLayers'
-import { OperationalAnalysisModes, getAnalysisLayers } from '@/lib/analysis/OperationalAnalysisModes'
+// Components
+import { createGroundStationLayers } from '@/components/layers/GroundStationLayer'
+import { createMaritimeLayers } from '@/components/layers/MaritimeLayers'
 
 // Data services
 import { stationDataService } from '@/lib/services/stationDataService'

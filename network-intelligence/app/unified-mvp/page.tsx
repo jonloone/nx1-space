@@ -3,8 +3,9 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import DeckGL from '@deck.gl/react'
 import { MapView } from '@deck.gl/core'
-import { ScatterplotLayer, TextLayer } from '@deck.gl/layers'
+import { ScatterplotLayer, TextLayer, BitmapLayer } from '@deck.gl/layers'
 import { HeatmapLayer, ContourLayer } from '@deck.gl/aggregation-layers'
+import { TileLayer } from '@deck.gl/geo-layers'
 import Map from 'react-map-gl/maplibre'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -14,8 +15,8 @@ import { celestrakService } from '@/lib/data/celestrak-service'
 import { marineCadastreService } from '@/lib/data/marine-cadastre-service'
 import { naturalEarthService } from '@/lib/data/natural-earth-service'
 
-// Import simplified components
-import SimplifiedBottomNavigation from '@/components/layout/simplified-bottom-navigation'
+// Import station-focused components
+import StationFocusedNavigation from '@/components/layout/station-focused-navigation'
 import QuickStats from '@/components/stats/quick-stats'
 import ContextualPanels from '@/components/panels/contextual-panels'
 import FloatingInsights from '@/components/insights/floating-insights'
@@ -33,6 +34,8 @@ const UnifiedMVPMap: React.FC = () => {
   const [hoveredObject, setHoveredObject] = useState<any>(null)
   const [selectedLocation, setSelectedLocation] = useState<OpportunityAnalysis | null>(null)
   const [loading, setLoading] = useState(false)
+  const [currentView, setCurrentView] = useState<'insights' | 'opportunities'>('insights')
+  const [maritimeEnabled, setMaritimeEnabled] = useState(true)
   const [realData, setRealData] = useState<{
     satellites: any[]
     vessels: any[]
@@ -130,12 +133,33 @@ const UnifiedMVPMap: React.FC = () => {
     }
   }, [])
 
-  // Create layers
+  // Create layers based on current view
   const layers = useMemo(() => {
     const layerList = []
     
-    // Maritime vessel heatmap
-    if (realData.vessels.length > 0) {
+    // GEE Nightlights Layer (always visible for ground station context)
+    layerList.push(
+      new TileLayer({
+        id: 'gee-nightlights',
+        data: (({x, y, z}) => `/api/gee/tiles/${z}/${x}/${y}?dataset=nightlights`),
+        minZoom: 0,
+        maxZoom: 8,
+        tileSize: 256,
+        opacity: 0.6,
+        pickable: false,
+        renderSubLayers: (props: any) => {
+          const {boundingBox, data} = props
+          return new BitmapLayer({
+            ...props,
+            image: data,
+            bounds: boundingBox
+          })
+        }
+      })
+    )
+    
+    // Maritime vessel heatmap (only if maritime enabled)
+    if (maritimeEnabled && realData.vessels.length > 0) {
       layerList.push(
         new HeatmapLayer({
           id: 'vessel-heatmap',
@@ -157,7 +181,7 @@ const UnifiedMVPMap: React.FC = () => {
       )
     }
     
-    // Port markers
+    // Port markers (show in both views as ground station context)
     if (realData.ports.length > 0) {
       layerList.push(
         new ScatterplotLayer({
@@ -197,8 +221,8 @@ const UnifiedMVPMap: React.FC = () => {
       )
     }
     
-    // Opportunity zones from scored locations
-    if (realData.opportunities.length > 0) {
+    // Opportunity zones (only show in opportunities view)
+    if (currentView === 'opportunities' && realData.opportunities.length > 0) {
       const heatmapData = realData.opportunities.flatMap(opp => {
         // Generate points around each opportunity for smooth heatmap
         const points = []
@@ -239,12 +263,12 @@ const UnifiedMVPMap: React.FC = () => {
       )
     }
     
-    // Vessel markers (show top value vessels)
+    // Vessel markers (show top value vessels, only if maritime enabled)
     const topVessels = realData.vessels
       .sort((a: any, b: any) => b.value.score - a.value.score)
       .slice(0, 50)
     
-    if (topVessels.length > 0) {
+    if (maritimeEnabled && topVessels.length > 0) {
       layerList.push(
         new ScatterplotLayer({
           id: 'vessel-markers',
@@ -266,7 +290,7 @@ const UnifiedMVPMap: React.FC = () => {
     }
     
     return layerList
-  }, [realData])
+  }, [realData, currentView, maritimeEnabled])
 
   // Generate insights
   const insights = useMemo(() => {
@@ -417,23 +441,27 @@ const UnifiedMVPMap: React.FC = () => {
         </motion.div>
       )}
 
-      {/* Bottom Navigation */}
-      <SimplifiedBottomNavigation
+      {/* Station-Focused Navigation */}
+      <StationFocusedNavigation
         onViewChange={(view) => {
-          // Handle view changes
-          if (view === 'atlantic') {
+          setCurrentView(view)
+          // Adjust view based on selection
+          if (view === 'insights') {
+            // Focus on North Atlantic for utilization insights
             setViewState({
               ...viewState,
               longitude: -40,
               latitude: 40,
               zoom: 4
             })
-          } else if (view === 'global') {
-            setViewState({
-              ...INITIAL_VIEW_STATE,
-              zoom: 2
-            })
           }
+        }}
+        onMaritimeToggle={(enabled) => {
+          setMaritimeEnabled(enabled)
+        }}
+        onLayerToggle={(layer, enabled) => {
+          // Handle additional layer toggles
+          console.log(`Toggle ${layer}: ${enabled}`)
         }}
       />
 

@@ -573,10 +573,13 @@ export class MarineCadastreService {
     centerLon: number,
     radiusNm: number = 50
   ): Promise<{
-    totalVessels: number;
-    vesselsByType: Record<string, number>;
-    avgSpeed: number;
-    totalValue: number;
+    vesselCount: number;
+    density: number;
+    averageSpeed: number;
+    totalVessels?: number;
+    vesselsByType?: Record<string, number>;
+    avgSpeed?: number;
+    totalValue?: number;
   }> {
     const vessels = await this.fetchAISData();
     
@@ -601,10 +604,19 @@ export class MarineCadastreService {
       totalValue += vessel.value.monthlyRevenuePotential;
     });
     
+    const area = Math.PI * Math.pow(radiusNm, 2); // Square nautical miles
+    const vesselCount = nearbyVessels.length;
+    const density = vesselCount / area;
+    const averageSpeed = nearbyVessels.length > 0 ? totalSpeed / nearbyVessels.length : 0;
+    
     return {
-      totalVessels: nearbyVessels.length,
+      vesselCount,
+      density,
+      averageSpeed,
+      // Legacy compatibility
+      totalVessels: vesselCount,
       vesselsByType,
-      avgSpeed: nearbyVessels.length > 0 ? totalSpeed / nearbyVessels.length : 0,
+      avgSpeed: averageSpeed,
       totalValue
     };
   }
