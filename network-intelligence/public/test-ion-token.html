@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cesium Ion Token Test</title>
+  <script>window.CESIUM_BASE_URL = '/cesium/';</script>
+  <script src="/cesium/Cesium.js"></script>
+  <link href="/cesium/Widgets/widgets.css" rel="stylesheet">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #status { margin: 20px 0; }
+    .success { color: green; }
+    .error { color: red; }
+    .info { color: blue; }
+    #cesiumContainer { width: 800px; height: 400px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>Cesium Ion Token Test</h1>
+  <div id="status"></div>
+  <div id="cesiumContainer"></div>
+  
+  <script>
+    const statusDiv = document.getElementById('status');
+    
+    function addStatus(message, className = 'info') {
+      const p = document.createElement('p');
+      p.className = className;
+      p.textContent = message;
+      statusDiv.appendChild(p);
+    }
+    
+    // Set the Ion token
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5MDgxNDg3ZS01Mjc4LTQyYmUtOTExMi1kNjM3ODNiYzhhOTUiLCJpZCI6MzMxNjgwLCJpYXQiOjE3NTUwOTk5MDV9.E4s_kL0HClK1eRmDipNDzg4EDEBhi4MPJK679FnWXSE';
+    
+    if (typeof Cesium !== 'undefined') {
+      addStatus('✅ Cesium library loaded', 'success');
+      
+      // Set the token
+      Cesium.Ion.defaultAccessToken = token;
+      addStatus(`✅ Token set: ${token.substring(0, 30)}...`, 'success');
+      
+      // Test token by trying to load Cesium World Terrain
+      addStatus('🔄 Testing token with Cesium World Terrain...', 'info');
+      
+      Cesium.CesiumTerrainProvider.fromIonAssetId(1)
+        .then(terrainProvider => {
+          addStatus('✅ Token is valid! Successfully loaded Cesium World Terrain', 'success');
+          
+          // Try to create a viewer with Ion services
+          try {
+            const viewer = new Cesium.Viewer('cesiumContainer', {
+              terrainProvider: terrainProvider,
+              baseLayerPicker: false,
+              geocoder: false,
+              homeButton: false,
+              sceneModePicker: false,
+              navigationHelpButton: false,
+              animation: false,
+              timeline: false,
+              fullscreenButton: false
+            });
+            
+            addStatus('✅ Cesium Viewer created successfully with Ion services', 'success');
+            
+            // Check for Ion imagery
+            viewer.imageryLayers.removeAll();
+            Cesium.IonImageryProvider.fromAssetId(3).then(imageryProvider => {
+              viewer.imageryLayers.addImageryProvider(imageryProvider);
+              addStatus('✅ Ion World Imagery loaded successfully', 'success');
+            }).catch(error => {
+              addStatus(`⚠️ Ion World Imagery failed: ${error.message}`, 'error');
+            });
+            
+          } catch (viewerError) {
+            addStatus(`❌ Viewer creation failed: ${viewerError.message}`, 'error');
+          }
+        })
+        .catch(error => {
+          addStatus(`❌ Token validation failed: ${error.message}`, 'error');
+          
+          if (error.message.includes('403')) {
+            addStatus('🔒 403 Forbidden - Token may be invalid or expired', 'error');
+          } else if (error.message.includes('401')) {
+            addStatus('🔑 401 Unauthorized - Authentication failed', 'error');
+          } else if (error.message.includes('network')) {
+            addStatus('🌐 Network error - Check internet connection', 'error');
+          }
+          
+          // Try with non-Ion services
+          addStatus('🔄 Falling back to non-Ion services...', 'info');
+          try {
+            const viewer = new Cesium.Viewer('cesiumContainer', {
+              terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+              imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+                url: 'https://a.tile.openstreetmap.org/'
+              }),
+              baseLayerPicker: false,
+              geocoder: false,
+              homeButton: false,
+              sceneModePicker: false,
+              navigationHelpButton: false,
+              animation: false,
+              timeline: false,
+              fullscreenButton: false
+            });
+            addStatus('✅ Fallback viewer created with OpenStreetMap', 'success');
+          } catch (fallbackError) {
+            addStatus(`❌ Even fallback failed: ${fallbackError.message}`, 'error');
+          }
+        });
+      
+    } else {
+      addStatus('❌ Cesium library not loaded', 'error');
+    }
+    
+    // Monitor network requests
+    if (window.performance && window.performance.getEntriesByType) {
+      setTimeout(() => {
+        const resources = window.performance.getEntriesByType('resource');
+        const ionRequests = resources.filter(r => 
+          r.name.includes('api.cesium.com') || 
+          r.name.includes('assets.ion.cesium.com')
+        );
+        
+        if (ionRequests.length > 0) {
+          addStatus(`📡 Found ${ionRequests.length} Ion API requests`, 'info');
+          ionRequests.forEach(req => {
+            const status = req.transferSize === 0 ? '❌ Failed' : '✅ Success';
+            addStatus(`  ${status}: ${req.name.substring(0, 80)}...`, 'info');
+          });
+        }
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

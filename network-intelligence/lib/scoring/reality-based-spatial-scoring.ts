@@ -12,6 +12,7 @@
 import { getGroundStationOptimizer } from '@/lib/services/groundStationOptimizer';
 import { getEmpiricalWeightCalibrator } from '@/lib/scoring/empirical-weight-calibration';
 import type { EmpiricalWeights, SpatialInterpolationPoint } from '@/lib/scoring/empirical-weight-calibration';
+import { mlOpportunityScorer } from '@/lib/scoring/ml-opportunity-scorer';
 
 export interface ScoringPoint {
   latitude: number;
@@ -195,13 +196,22 @@ export class RealityBasedSpatialScorer {
     // Get detailed scoring components
     const components = await this.calculateScoringComponents(latitude, longitude);
     
-    // Apply empirical weights to components
+    // Use ML scorer for primary scoring
+    const mlFeatures = this.convertComponentsToMLFeatures(components);
+    const mlResult = mlOpportunityScorer.scoreOpportunity(latitude, longitude, mlFeatures);
+    const mlScore = mlResult.score / 100; // Convert to 0-1 range
+    
+    // Apply empirical weights to components (for comparison)
     const weightedScore = this.applyEmpiricalWeights(components, this.weights);
     
-    // Blend interpolated score with component-based score based on confidence
-    const blendFactor = interpolationPoint.confidence;
-    const finalScore = (interpolationPoint.value * blendFactor) + 
-                      (weightedScore * (1 - blendFactor));
+    // Blend ML, interpolated, and empirical scores based on confidence levels
+    const mlWeight = mlResult.confidence * 0.5;
+    const interpolationWeight = interpolationPoint.confidence * 0.3;
+    const empiricalWeight = 1 - mlWeight - interpolationWeight;
+    
+    const finalScore = (mlScore * mlWeight) + 
+                      (interpolationPoint.value * interpolationWeight) +
+                      (weightedScore * empiricalWeight);
 
     // Calculate interpolation metadata
     const interpolationMetadata = {
@@ -495,6 +505,22 @@ export class RealityBasedSpatialScorer {
 
     // Convert to score (higher competition = lower score)
     return Math.round((1 - competitionLevel) * 100);
+  }
+
+  /**
+   * Convert scoring components to ML features
+   */
+  private convertComponentsToMLFeatures(components: ScoringComponents): any {
+    return {
+      gdpPerCapita: components.economic * 100000, // Scale economic to GDP range
+      populationDensity: components.market * 1000, // Scale market to population density
+      competitorCount: (1 - components.competition / 100) * 10, // Invert and scale competition
+      infrastructureScore: components.infrastructure / 100, // Convert to 0-1 range
+      maritimeDensity: 30, // Default maritime density for spatial scoring
+      elevation: 100, // Default elevation
+      weatherReliability: components.weather / 100, // Convert to 0-1 range
+      regulatoryScore: components.geographical / 100 // Use geographical as regulatory proxy
+    };
   }
 
   /**

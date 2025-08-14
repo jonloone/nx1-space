@@ -108,20 +108,6 @@ const ProfessionalNavigation: React.FC<NavigationProps> = ({
           <div className="bg-black/30 backdrop-blur-2xl border border-white/10 rounded-2xl p-2">
             <div className="flex items-center gap-2">
               
-              {/* Brand indicator */}
-              <div className="px-3 py-2 bg-white/5 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                  <div className="text-left">
-                    <div className="text-xs font-semibold text-white">Intelligence</div>
-                    <div className="text-[10px] text-gray-400">Platform</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Divider */}
-              <div className="h-12 w-px bg-white/10" />
-              
               {/* View toggles */}
               {Object.entries(navigationViews).map(([viewId, view]) => (
                 <button

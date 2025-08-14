@@ -1,5 +1,5 @@
-/* MapLibre GL CSS - Essential for map rendering */
-@import 'maplibre-gl/dist/maplibre-gl.css';
+/* Cesium CSS - Essential for 3D globe rendering */
+/* Cesium styles are loaded directly in components */
 
 @tailwind base;
 @tailwind components;

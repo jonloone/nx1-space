@@ -1,20 +1,48 @@
 'use client'
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
-import DeckGL from '@deck.gl/react'
-import { MapView, FlyToInterpolator } from '@deck.gl/core'
-import Map from 'react-map-gl/maplibre'
 import { motion, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import { FlyToInterpolator } from '@deck.gl/core'
 
 // Components
-import ProfessionalNavigation from './navigation/ProfessionalNavigation'
+import ThreeLayerNavigation, { type Layer, type OperationsMode, type OptimizerMode, type OpportunitiesMode } from './navigation/ThreeLayerNavigation'
+import StreamlinedBottomNav from './navigation/StreamlinedBottomNav'
+import LayerControlPanel from './controls/LayerControlPanel'
 import { createGroundStationLayers, type GroundStation } from './layers/GroundStationLayer'
 import { createMaritimeLayers, generateMajorShippingLanes, createSimpleLandMask } from './layers/MaritimeLayers'
+import { createSatelliteLayers, calculateSatellitePosition, generateOrbitPath, type SatelliteData, type OrbitPath } from './layers/SatelliteLayer'
+import { createEarthLayers } from './layers/EarthLayer'
+import { createOptimizerLayers, calculateCoverageCones, type OptimizerPoint } from './layers/OptimizerLayer'
+import { createMEOGlobeLayers, generateMEOSatellites, calculateMEOAdvantages } from './Globe/MEOGlobeView'
+import { createEnterpriseLayers } from './layers/EnterpriseLayer'
+import CompetitorFilter from './ui/CompetitorFilter'
+import SatelliteSearchPanel, { type SatelliteInfo } from './panels/SatelliteSearchPanel'
+import LayerToggle, { type LayerConfig } from './ui/LayerToggle'
+import Enhanced3DGlobe, { type Satellite3D, type OrbitPath3D } from './Globe/Enhanced3DGlobe'
 
-// Services
-import { celestrakService } from '@/lib/data/celestrak-service'
-import { marineCadastreService } from '@/lib/data/marine-cadastre-service'
-import { naturalEarthService } from '@/lib/data/natural-earth-service'
+// Dynamically import Hybrid Globe/Map as the primary 3D solution
+const HybridGlobeMap = dynamic(
+  () => import('./Map/HybridGlobeMap').then(mod => ({ default: mod.HybridGlobeMap })),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full bg-black flex items-center justify-center">
+        <div className="text-white">Loading 3D Globe...</div>
+      </div>
+    )
+  }
+)
+
+// Import ClientOnly wrapper
+import ClientOnly from './ClientOnly'
+
+// Services - temporarily simplified to avoid performance issues
+// import { celestrakService } from '@/lib/data/celestrak-service'
+// import { marineCadastreService } from '@/lib/data/marine-cadastre-service'
+// import { naturalEarthService } from '@/lib/data/natural-earth-service'
+import { meoEnterpriseScorer } from '@/lib/scoring/meo-enterprise-scorer'
+// import { EmpiricalStationScoring } from '@/lib/services/empirical-station-scoring'
 
 const INITIAL_VIEW_STATE = {
   longitude: -40,
@@ -23,6 +51,10 @@ const INITIAL_VIEW_STATE = {
   pitch: 0,
   bearing: 0
 }
+
+// ESRI World Imagery configuration
+const ESRI_SATELLITE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+const ESRI_REFERENCE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
 
 interface ViewState {
   longitude: number
@@ -33,33 +65,97 @@ interface ViewState {
 }
 
 interface PlatformState {
-  view: 'groundStations' | 'satellites'
-  mode: 'operations' | 'opportunities' | 'coverage' | 'orbits'
+  layer: Layer
+  mode: OperationsMode | OptimizerMode | OpportunitiesMode
   selectedStation: GroundStation | null
+  selectedSatellite: SatelliteInfo | null
+  showSatellitePanel: boolean
   hoveredObject: any
   loading: boolean
+  show3DTerrain: boolean
+  show3DGlobe: boolean
+  competitorFilters: {
+    showSES: boolean
+    showViasat: boolean
+    showSpaceX: boolean
+    showOthers: boolean
+  }
 }
 
 const ProfessionalIntelligencePlatform: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE)
   const [platformState, setPlatformState] = useState<PlatformState>({
-    view: 'groundStations',
-    mode: 'operations',
+    layer: 'operations',
+    mode: 'utilization',
     selectedStation: null,
+    selectedSatellite: null,
+    showSatellitePanel: false,
     hoveredObject: null,
-    loading: true
+    loading: true,
+    show3DTerrain: false,
+    show3DGlobe: false,
+    competitorFilters: {
+      showSES: true,
+      showViasat: true,
+      showSpaceX: true,
+      showOthers: true
+    }
   })
   
   // Data state
   const [groundStations, setGroundStations] = useState<GroundStation[]>([])
+  const [satelliteData, setSatelliteData] = useState<SatelliteData[]>([])
+  const [orbitPaths, setOrbitPaths] = useState<OrbitPath[]>([])
   const [realTimeData, setRealTimeData] = useState({
     vessels: [],
     ports: [],
     satellites: []
   })
+  const [modelAccuracy, setModelAccuracy] = useState<number>(0.72) // 72% default
+  // const [empiricalScoring] = useState(() => new EmpiricalStationScoring())
+  const [optimizerPoints, setOptimizerPoints] = useState<OptimizerPoint[]>([])
+  const [coverageCones, setCoverageCones] = useState<any[]>([])
   
-  // Generate sample ground stations (SES/Intelsat network)
-  const sampleGroundStations: GroundStation[] = [
+  // Import complete ground station network
+  const [groundStationData, setGroundStationData] = useState<GroundStation[]>([])
+  
+  // Layer toggle state
+  const [enabledLayers, setEnabledLayers] = useState<LayerConfig>({
+    satellites: false,
+    orbits: false,
+    stations: true,
+    coverage: false,
+    enterprise: true,
+    heatmap: true
+  })
+  
+  const toggleLayer = (key: keyof LayerConfig) => {
+    setEnabledLayers(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
+  
+  useEffect(() => {
+    // Load complete ground station network including competitors
+    import('@/data/groundStations').then(async module => {
+      const stations = module.completeGroundStationNetwork || module.groundStationNetwork
+      
+      // For now, just use the stations as-is without empirical scoring
+      // TODO: Fix empirical scoring service
+      const scoredStations = stations.map(station => ({
+        ...station,
+        empiricalScore: 0.7, // Default score
+        empiricalConfidence: 0.8 // Default confidence
+      }))
+      
+      setModelAccuracy(0.72) // Default accuracy
+      setGroundStationData(scoredStations)
+    })
+  }, [])
+  
+  // Temporary fallback stations until data loads
+  const fallbackStations: GroundStation[] = [
     {
       id: 'ses-betzdorf',
       name: 'Betzdorf',
@@ -150,18 +246,148 @@ const ProfessionalIntelligencePlatform: React.FC = () => {
       risks: ['Brexit regulations', 'Spectrum conflicts'],
       isActive: true
     },
-    // Add more sample stations...
     {
-      id: 'competitor-viasat',
-      name: 'ViaSat Ground Station',
-      operator: 'Other',
-      latitude: 33.1581,
-      longitude: -117.3506,
-      utilization: 80,
-      revenue: 25.0,
-      profit: 5.0,
-      margin: 0.20,
+      id: 'ses-woodbine',
+      name: 'Woodbine',
+      operator: 'SES',
+      latitude: 39.3611,
+      longitude: -76.7330,
+      utilization: 75,
+      revenue: 32.5,
+      profit: 9.8,
+      margin: 0.30,
+      confidence: 0.85,
+      satellitesVisible: 12,
+      avgPassDuration: 40,
+      dataCapacity: 85,
+      opportunities: ['Government contracts', 'Enterprise backup'],
+      risks: ['Infrastructure aging'],
+      isActive: true
+    },
+    {
+      id: 'ses-manassas',
+      name: 'Manassas',
+      operator: 'SES',
+      latitude: 38.7509,
+      longitude: -77.4753,
+      utilization: 68,
+      revenue: 28.3,
+      profit: 7.1,
+      margin: 0.25,
+      confidence: 0.82,
+      satellitesVisible: 14,
+      avgPassDuration: 41,
+      dataCapacity: 75,
+      opportunities: ['Federal services', 'Data center connectivity'],
+      risks: ['Competition from fiber'],
+      isActive: true
+    },
+    {
+      id: 'ses-hawaii',
+      name: 'Hawaii Teleport',
+      operator: 'SES',
+      latitude: 21.3099,
+      longitude: -157.8581,
+      utilization: 88,
+      revenue: 48.6,
+      profit: 16.5,
+      margin: 0.34,
+      confidence: 0.93,
+      satellitesVisible: 22,
+      avgPassDuration: 50,
+      dataCapacity: 180,
+      opportunities: ['Trans-Pacific coverage', 'Island connectivity'],
+      risks: ['Natural disasters', 'High operational costs'],
+      isActive: true
+    },
+    {
+      id: 'intelsat-riverside',
+      name: 'Riverside',
+      operator: 'Intelsat',
+      latitude: 33.9533,
+      longitude: -117.3962,
+      utilization: 72,
+      revenue: 35.2,
+      profit: 5.3,
+      margin: 0.15,
+      confidence: 0.78,
+      satellitesVisible: 15,
+      avgPassDuration: 44,
+      dataCapacity: 90,
+      opportunities: ['West Coast coverage', 'Media distribution'],
+      risks: ['Earthquake zone', 'High real estate costs'],
+      isActive: true
+    },
+    {
+      id: 'intelsat-mountainside',
+      name: 'Mountainside',
+      operator: 'Intelsat',
+      latitude: 40.6792,
+      longitude: -74.3578,
+      utilization: 83,
+      revenue: 44.1,
+      profit: 11.0,
+      margin: 0.25,
+      confidence: 0.89,
+      satellitesVisible: 17,
+      avgPassDuration: 43,
+      dataCapacity: 115,
+      opportunities: ['NYC market proximity', 'Financial services'],
+      risks: ['Weather interruptions', 'Spectrum congestion'],
+      isActive: true
+    },
+    {
+      id: 'intelsat-fuchsstadt',
+      name: 'Fuchsstadt',
+      operator: 'Intelsat',
+      latitude: 50.1078,
+      longitude: 10.1469,
+      utilization: 79,
+      revenue: 38.7,
+      profit: 8.5,
+      margin: 0.22,
+      confidence: 0.86,
+      satellitesVisible: 13,
+      avgPassDuration: 37,
+      dataCapacity: 95,
+      opportunities: ['European distribution', 'Broadcast services'],
+      risks: ['Regulatory changes', 'Energy costs'],
+      isActive: true
+    },
+    {
+      id: 'intelsat-ellenwood',
+      name: 'Ellenwood',
+      operator: 'Intelsat',
+      latitude: 33.6318,
+      longitude: -84.2646,
+      utilization: 65,
+      revenue: 29.8,
+      profit: 3.0,
+      margin: 0.10,
       confidence: 0.75,
+      satellitesVisible: 11,
+      avgPassDuration: 36,
+      dataCapacity: 70,
+      opportunities: ['Southeast market', 'Disaster recovery'],
+      risks: ['High competition', 'Infrastructure needs upgrade'],
+      isActive: true
+    },
+    {
+      id: 'ses-luxembourg',
+      name: 'Luxembourg HQ',
+      operator: 'SES',
+      latitude: 49.6117,
+      longitude: 6.1300,
+      utilization: 91,
+      revenue: 55.3,
+      profit: 19.4,
+      margin: 0.35,
+      confidence: 0.96,
+      satellitesVisible: 18,
+      avgPassDuration: 46,
+      dataCapacity: 160,
+      opportunities: ['European hub', 'Regulatory advantages'],
+      risks: ['Limited expansion space'],
       isActive: true
     }
   ]
@@ -169,81 +395,98 @@ const ProfessionalIntelligencePlatform: React.FC = () => {
   const shippingLanes = useMemo(() => generateMajorShippingLanes(), [])
   const landMask = useMemo(() => createSimpleLandMask(), [])
   
-  // Load real-time data
+  // Load essential data only - remove expensive real-time API calls
   useEffect(() => {
-    loadRealTimeData()
-  }, [])
+    // Simplified loading without heavy API calls
+    setGroundStations(groundStationData.length > 0 ? groundStationData : fallbackStations)
+    setPlatformState(prev => ({ ...prev, loading: false }))
+  }, [groundStationData])
   
+  // Simplified data loading - removed expensive API calls
   const loadRealTimeData = async () => {
-    setPlatformState(prev => ({ ...prev, loading: true }))
+    // This function now does minimal work to avoid timeouts
+    console.log('📡 Loading simplified intelligence data...')
     
     try {
-      console.log('📡 Loading real-time intelligence data...')
-      
-      // Load vessels for maritime analysis
-      const vessels = await marineCadastreService.fetchAISData()
-      
-      // Load ports for context
-      const ports = naturalEarthService.getPortsWithMetrics()
-      
-      // Load satellites for coverage analysis
-      const satellites = await celestrakService.fetchHighValueSatellites()
-      
+      // Use fallback data instead of expensive API calls
       setRealTimeData({
-        vessels: vessels.slice(0, 1000), // Limit for performance
-        ports,
-        satellites: satellites.slice(0, 200) // Sample for visualization
+        vessels: [], // Empty for now to avoid performance issues
+        ports: [], // Empty for now to avoid performance issues
+        satellites: [] // Empty for now to avoid performance issues
       })
       
-      setGroundStations(sampleGroundStations)
-      
-      console.log(`✅ Loaded ${vessels.length} vessels, ${ports.length} ports, ${satellites.length} satellites`)
+      console.log('✅ Loaded simplified data successfully')
       
     } catch (error) {
-      console.error('❌ Failed to load real-time data:', error)
-    } finally {
-      setPlatformState(prev => ({ ...prev, loading: false }))
+      console.error('❌ Failed to load data:', error)
+    }
+  }
+  
+  // Simplified satellite loading - removed expensive calculations
+  const loadSatelliteData = async () => {
+    try {
+      console.log('🛰️ Loading simplified satellite data...')
+      
+      // Use static satellite data instead of expensive real-time calculations
+      const simplifiedSatellites: SatelliteData[] = [
+        {
+          id: 'ses-1',
+          name: 'SES-17',
+          operator: 'SES',
+          position: [-77, 38, 35786000], // GEO position over Americas
+          type: 'GEO',
+          constellation: 'SES'
+        },
+        {
+          id: 'ses-2',
+          name: 'SES-14',
+          operator: 'SES',
+          position: [-45, 0, 35786000], // GEO position over Atlantic
+          type: 'GEO',
+          constellation: 'SES'
+        }
+      ]
+      
+      setSatelliteData(simplifiedSatellites)
+      setOrbitPaths([]) // No orbit paths to avoid performance issues
+      
+      console.log(`✅ Loaded ${simplifiedSatellites.length} simplified satellites`)
+      
+    } catch (error) {
+      console.error('❌ Failed to load satellite data:', error)
     }
   }
   
   // Navigation handlers
-  const handleViewChange = useCallback((view: 'groundStations' | 'satellites') => {
+  const handleLayerChange = useCallback((layer: Layer) => {
     setPlatformState(prev => ({ 
       ...prev, 
-      view,
-      selectedStation: null // Clear selection when switching views
+      layer,
+      mode: layer === 'operations' ? 'utilization' : layer === 'optimizer' ? 'coverage' : 'market',
+      selectedStation: null,
+      selectedSatellite: null,
+      showSatellitePanel: false
     }))
     
-    // Adjust camera for different views
-    if (view === 'satellites') {
+    // Adjust camera for different layers
+    if (layer === 'optimizer') {
       setViewState(prev => ({
         ...prev,
-        zoom: Math.max(3, prev.zoom - 1), // Zoom out for satellite view
-        pitch: 30 // Add pitch for 3D effect
+        zoom: 1, // Zoom out for technical analysis
+        pitch: 0,
+        bearing: 0
       }))
-    } else {
-      setViewState(prev => ({
-        ...prev,
-        pitch: 0 // Flat view for ground stations
-      }))
-    }
-  }, [])
-  
-  const handleModeChange = useCallback((mode: 'operations' | 'opportunities' | 'coverage' | 'orbits') => {
-    setPlatformState(prev => ({ ...prev, mode }))
-    
-    // Adjust view based on mode
-    if (mode === 'opportunities') {
-      // Focus on North Atlantic for maritime opportunities
+    } else if (layer === 'opportunities') {
+      // Focus on enterprise hubs (Northern Virginia data center region)
       setViewState({
-        longitude: -40,
-        latitude: 40,
-        zoom: 5,
+        longitude: -77,
+        latitude: 38.9,
+        zoom: 6,
         pitch: 0,
         bearing: 0
       })
-    } else if (mode === 'operations') {
-      // Focus on populated areas with ground stations
+    } else {
+      // Operations layer - focus on populated areas
       setViewState({
         longitude: -20,
         latitude: 45,
@@ -252,6 +495,10 @@ const ProfessionalIntelligencePlatform: React.FC = () => {
         bearing: 0
       })
     }
+  }, [])
+  
+  const handleModeChange = useCallback((mode: OperationsMode | OptimizerMode | OpportunitiesMode) => {
+    setPlatformState(prev => ({ ...prev, mode }))
   }, [])
   
   const handleStationClick = useCallback((station: GroundStation) => {
@@ -272,117 +519,243 @@ const ProfessionalIntelligencePlatform: React.FC = () => {
     setPlatformState(prev => ({ ...prev, hoveredObject: station }))
   }, [])
   
+  const handleSatelliteSelect = useCallback((satellite: SatelliteInfo) => {
+    setPlatformState(prev => ({ ...prev, selectedSatellite: satellite }))
+    
+    // Fly to satellite position
+    if (satellite.position) {
+      setViewState(prev => ({
+        ...prev,
+        longitude: satellite.position[0],
+        latitude: satellite.position[1],
+        zoom: 3,
+        transitionDuration: 1500,
+        transitionInterpolator: new FlyToInterpolator()
+      }))
+    }
+  }, [])
+  
+  const handleCloseSatellitePanel = useCallback(() => {
+    setPlatformState(prev => ({ ...prev, showSatellitePanel: false }))
+  }, [])
+  
   // Layer visibility rules
   const layerVisibility = useMemo(() => {
-    const { view, mode } = platformState
+    const { layer, mode } = platformState
     
     return {
       groundStations: true, // Always visible for context
-      maritimeHeatmap: view === 'groundStations' && mode === 'opportunities',
-      shippingLanes: view === 'groundStations' && mode === 'opportunities', 
-      ports: view === 'groundStations' && mode === 'opportunities',
-      satelliteOrbits: view === 'satellites',
-      satelliteCoverage: view === 'satellites' && mode === 'coverage'
+      maritimeHeatmap: false, // Deprecated - replaced by enterprise
+      shippingLanes: false, // Deprecated - replaced by enterprise
+      ports: false, // Deprecated - replaced by enterprise
+      enterpriseLocations: layer === 'opportunities',
+      satelliteOrbits: layer === 'optimizer',
+      satelliteCoverage: layer === 'optimizer' && mode === 'coverage',
+      performanceHalos: layer === 'operations',
+      technicalAnalysis: layer === 'optimizer',
+      marketIntelligence: layer === 'opportunities'
     }
   }, [platformState])
   
-  // Create deck.gl layers
+  // Deck.gl layers are no longer needed - using DeckTerrainMap
+  // Keeping layer configuration for future use if needed
   const layers = useMemo(() => {
+    // All layer logic moved to DeckTerrainMap component
+    return []
+    
+    /* Original layer code preserved for reference:
     const allLayers = []
     
-    // Ground station layers (always include for context)
-    const stationLayers = createGroundStationLayers({
-      stations: groundStations,
-      visible: layerVisibility.groundStations,
-      onHover: handleStationHover,
-      onClick: handleStationClick,
-      showLabels: viewState.zoom > 5,
-      mode: platformState.mode
-    })
-    allLayers.push(...stationLayers)
-    
-    // Maritime layers (opportunities mode only)
-    if (layerVisibility.maritimeHeatmap || layerVisibility.shippingLanes) {
-      const maritimeLayers = createMaritimeLayers({
-        vessels: realTimeData.vessels.map(v => ({
-          id: v.mmsi,
-          latitude: v.position.latitude,
-          longitude: v.position.longitude,
-          vesselType: v.vessel.type,
-          speed: v.movement.speedKnots,
-          heading: v.movement.course,
-          timestamp: new Date(),
-          confidence: 0.9
-        })),
-        shippingLanes,
-        ports: realTimeData.ports.map(p => ({
-          id: p.name,
-          name: p.name,
-          latitude: p.coordinates[1],
-          longitude: p.coordinates[0],
-          rank: p.rank as 1 | 2 | 3,
-          vesselCapacity: p.vesselCapacity,
-          monthlyThroughput: p.vesselCapacity * 10
-        })),
-        visible: layerVisibility.maritimeHeatmap,
-        zoom: viewState.zoom,
-        landMask
-      })
-      allLayers.push(...maritimeLayers)
+    // Add ESRI satellite base layer when in map mode
+    if (platformState.layer !== 'optimizer' || viewState.zoom > 2) {
+      // ESRI World Imagery base layer
+      allLayers.push(
+        new TileLayer({
+          id: 'esri-satellite',
+          data: ESRI_SATELLITE_URL,
+          minZoom: 0,
+          maxZoom: 19,
+          tileSize: 256,
+          opacity: 0.9, // Slightly reduce opacity to make data overlays more visible
+          renderSubLayers: props => {
+            const {
+              bbox: { west, south, east, north }
+            } = props.tile
+            
+            return new BitmapLayer(props, {
+              data: null,
+              image: props.data,
+              bounds: [west, south, east, north]
+            })
+          }
+        })
+      )
+      
+      // Add reference overlay for context (boundaries and place names)
+      if (viewState.zoom > 3) {
+        allLayers.push(
+          new TileLayer({
+            id: 'esri-reference',
+            data: ESRI_REFERENCE_URL,
+            minZoom: 3,
+            maxZoom: 12,
+            tileSize: 256,
+            opacity: 0.3,
+            renderSubLayers: props => {
+              const {
+                bbox: { west, south, east, north }
+              } = props.tile
+              
+              return new BitmapLayer(props, {
+                data: null,
+                image: props.data,
+                bounds: [west, south, east, north]
+              })
+            }
+          })
+        )
+      }
     }
     
-    // TODO: Add satellite orbit layers for satellite view mode
+    // Simplified optimizer layers - temporarily disabled complex 3D globe
+    // Will re-enable with proper LOD system based on zoom level
+    // This fixes the optimization view breaking issue
+    
+    // Filter ground stations based on competitor filters (in opportunities layer)
+    let filteredStations = groundStations
+    if (platformState.layer === 'opportunities') {
+      filteredStations = groundStations.filter(station => {
+        if (station.operator === 'SES' && !platformState.competitorFilters.showSES) return false
+        if (station.operator === 'Viasat' && !platformState.competitorFilters.showViasat) return false
+        if (station.operator === 'SpaceX' && !platformState.competitorFilters.showSpaceX) return false
+        if (!['SES', 'Viasat', 'SpaceX'].includes(station.operator) && 
+            !platformState.competitorFilters.showOthers) return false
+        return true
+      })
+    }
+    
+    // Ground station layers (respect toggle state)
+    if (enabledLayers.stations) {
+      const stationLayers = createGroundStationLayers({
+        stations: filteredStations,
+        visible: layerVisibility.groundStations,
+        onHover: handleStationHover,
+        onClick: handleStationClick,
+        showLabels: viewState.zoom > 5,
+        mode: platformState.mode,
+        layer: platformState.layer
+      })
+      allLayers.push(...stationLayers)
+    }
+    
+    // Enterprise layers (opportunities mode only) - REPLACED MARITIME
+    if (layerVisibility.enterpriseLocations && enabledLayers.enterprise) {
+      // Determine enterprise mode based on opportunities sub-mode
+      let enterpriseMode: 'data_centers' | 'government' | 'telecom' | 'economic' = 'data_centers'
+      if (platformState.mode === 'market') enterpriseMode = 'data_centers'
+      else if (platformState.mode === 'competition') enterpriseMode = 'telecom'
+      else if (platformState.mode === 'expansion') enterpriseMode = 'economic'
+      
+      const enterpriseLayers = createEnterpriseLayers({
+        visible: true,
+        mode: enterpriseMode,
+        showLabels: viewState.zoom > 5,
+        onHover: (object) => {
+          if (object) {
+            const score = meoEnterpriseScorer.scoreLocation(object.latitude, object.longitude)
+            setPlatformState(prev => ({ 
+              ...prev, 
+              hoveredObject: {
+                ...object,
+                meoScore: score.score,
+                meoConfidence: score.confidence,
+                recommendations: score.recommendations
+              }
+            }))
+          } else {
+            setPlatformState(prev => ({ ...prev, hoveredObject: null }))
+          }
+        },
+        onClick: (object) => {
+          const score = meoEnterpriseScorer.scoreLocation(object.latitude, object.longitude)
+          console.log('Enterprise location clicked:', object, 'MEO Score:', score)
+        }
+      })
+      allLayers.push(...enterpriseLayers)
+    }
+    
+    // Optimizer layers for technical validation - SIMPLIFIED
+    if (platformState.layer === 'optimizer') {
+      // Level of Detail (LOD) based rendering
+      const zoomLevel = viewState.zoom
+      
+      // Simplified optimizer layers - removed expensive calculations
+      if (zoomLevel > 2) {
+        // Skip expensive coverage calculations for now
+        console.log('Optimizer mode active - simplified view')
+        // TODO: Re-implement with performance optimization
+      }
+      
+      // Simplified satellite rendering - reduced complexity
+      if (zoomLevel > 5 && satelliteData.length > 0 && enabledLayers.satellites) {
+        // Show minimal satellites to avoid performance issues
+        const satelliteCount = Math.min(5, satelliteData.length)
+        try {
+          const satelliteLayers = createSatelliteLayers({
+            satellites: satelliteData.slice(0, satelliteCount),
+            orbits: [], // No orbits for now to avoid performance issues
+            visible: true,
+            showLabels: false, // No labels for performance
+            onHover: (sat) => setPlatformState(prev => ({ ...prev, hoveredObject: sat })),
+            onClick: (sat) => {
+              const satelliteInfo: SatelliteInfo = sat as SatelliteInfo
+              handleSatelliteSelect(satelliteInfo)
+            }
+          })
+          allLayers.push(...satelliteLayers)
+        } catch (error) {
+          console.warn('Satellite layer error:', error)
+        }
+      }
+    }
     
     return allLayers
-  }, [
-    groundStations,
-    realTimeData,
-    layerVisibility,
-    viewState.zoom,
-    shippingLanes,
-    landMask,
-    handleStationHover,
-    handleStationClick,
-    platformState.mode
-  ])
+    */
+  }, [])
   
+  // Views are handled by DeckTerrainMap component now
+
+  // Always use the Unified 3D Globe + Terrain as the main view
+  // All old conditional rendering has been removed - we only use the unified 3D globe now
+  
+  // Main render - Use DeckTerrainMap as the primary 3D visualization
   return (
-    <div className="relative w-full h-screen bg-gray-900 overflow-hidden">
-      {/* Main Map */}
-      <DeckGL
-        viewState={viewState}
-        onViewStateChange={({ viewState }) => setViewState(viewState)}
-        controller={true}
-        layers={layers}
-        getTooltip={({ object }) => {
-          if (!object) return null
-          
-          if (object.name) {
-            // Ground station tooltip
-            return {
-              html: `
-                <div class="bg-black/80 text-white p-3 rounded-lg text-xs">
-                  <div class="font-semibold">${object.name}</div>
-                  <div class="text-gray-300">${object.operator}</div>
-                  <div class="mt-2">
-                    <div>Revenue: $${object.revenue?.toFixed(1)}M/mo</div>
-                    <div>Margin: ${((object.margin || 0) * 100).toFixed(1)}%</div>
-                    <div>Utilization: ${object.utilization || 0}%</div>
-                  </div>
-                </div>
-              `,
-              style: { pointerEvents: 'none' }
-            }
-          }
-          
-          return null
-        }}
+    <div className="relative w-full h-screen bg-black overflow-hidden" suppressHydrationWarning>
+      {/* Render HybridGlobeMap as the main and only map with hydration safety */}
+      <ClientOnly
+        fallback={
+          <div className="w-full h-full bg-black flex items-center justify-center">
+            <div className="text-white">Initializing 3D Globe...</div>
+          </div>
+        }
       >
-        <Map
-          mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
-          attributionControl={false}
+        <HybridGlobeMap 
+          activeTab={platformState.layer}
+          showTerrain={true}
+          showCoverage={enabledLayers.coverage}
+          showLabels={true}
+          showSatellites={enabledLayers.satellites}
+          selectedStation={platformState.selectedStation?.id || null}
+          onStationClick={handleStationClick}
         />
-      </DeckGL>
+      </ClientOnly>
+      
+      {/* Layer Control Panel - New design on the right */}
+      <LayerControlPanel
+        layers={enabledLayers}
+        onToggle={toggleLayer}
+        currentView={platformState.layer}
+      />
       
       {/* Loading Indicator */}
       <AnimatePresence>
@@ -423,7 +796,9 @@ const ProfessionalIntelligencePlatform: React.FC = () => {
                   onClick={() => setPlatformState(prev => ({ ...prev, selectedStation: null }))}
                   className="text-gray-400 hover:text-white"
                 >
-                  ✕
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
               
@@ -501,46 +876,55 @@ const ProfessionalIntelligencePlatform: React.FC = () => {
         )}
       </AnimatePresence>
       
-      {/* Statistics Bar */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-xl 
-                    border border-white/10 rounded-xl px-6 py-3 text-white">
-        <div className="flex items-center space-x-8 text-sm">
-          <div className="flex items-center space-x-2">
-            <i className="fas fa-satellite-dish text-blue-400"></i>
-            <span className="text-gray-400">Stations:</span>
-            <span className="font-bold">{groundStations.filter(s => s.isActive).length}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <i className="fas fa-ship text-cyan-400"></i>
-            <span className="text-gray-400">Vessels:</span>
-            <span className="font-bold">{realTimeData.vessels.length.toLocaleString()}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <i className="fas fa-satellite text-green-400"></i>
-            <span className="text-gray-400">Satellites:</span>
-            <span className="font-bold">{realTimeData.satellites.length}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-gray-400">Live Data</span>
-          </div>
-        </div>
-      </div>
       
-      {/* Professional Navigation */}
-      <ProfessionalNavigation
-        onViewChange={handleViewChange}
-        onModeChange={handleModeChange}
+      {/* Satellite Search Panel (Optimizer Layer Only) */}
+      <SatelliteSearchPanel
+        satellites={satelliteData as SatelliteInfo[]}
+        selectedSatellite={platformState.selectedSatellite}
+        onSelectSatellite={handleSatelliteSelect}
+        onClose={handleCloseSatellitePanel}
+        visible={platformState.showSatellitePanel}
       />
       
-      {/* Professional Badge */}
-      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur text-white px-3 py-1.5 
-                    rounded-full text-xs font-semibold border border-white/20">
-        <div className="flex items-center space-x-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span>GROUND STATION INTELLIGENCE</span>
-        </div>
-      </div>
+      {/* Satellite Search Toggle Button (when panel is hidden) */}
+      {platformState.layer === 'optimizer' && !platformState.showSatellitePanel && (
+        <button
+          onClick={() => setPlatformState(prev => ({ ...prev, showSatellitePanel: true }))}
+          className="absolute right-4 top-20 bg-black/80 backdrop-blur-xl text-white px-4 py-2 
+                     rounded-lg border border-white/20 hover:bg-black/90 transition-colors
+                     flex items-center gap-2 text-sm font-medium"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Search Satellites
+        </button>
+      )}
+      
+      {/* Competitor Filter (Opportunities Layer Only) */}
+      <CompetitorFilter
+        filters={platformState.competitorFilters}
+        onFilterChange={(operator, value) => {
+          setPlatformState(prev => ({
+            ...prev,
+            competitorFilters: {
+              ...prev.competitorFilters,
+              [operator]: value
+            }
+          }))
+        }}
+        visible={platformState.layer === 'opportunities'}
+      />
+      
+      {/* No need for 3D toggle buttons - always in 3D mode */}
+      
+      {/* Streamlined Bottom Navigation */}
+      <StreamlinedBottomNav
+        currentLayer={platformState.layer}
+        onLayerChange={handleLayerChange}
+      />
+      
     </div>
   )
 }

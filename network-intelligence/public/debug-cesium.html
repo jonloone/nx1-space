@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cesium Debug Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: monospace;
+            background: #000;
+            color: #0f0;
+        }
+        .test {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #333;
+        }
+        .pass { color: #0f0; }
+        .fail { color: #f00; }
+        .info { color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>Cesium Debug Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+        
+        // Test 1: Check WebGL Support
+        log('=== Testing WebGL Support ===');
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        const gl2 = canvas.getContext('webgl2');
+        
+        if (gl2) {
+            log('✓ WebGL2 is supported', 'pass');
+        } else if (gl) {
+            log('✓ WebGL1 is supported', 'pass');
+        } else {
+            log('✗ WebGL is NOT supported', 'fail');
+        }
+        
+        // Test 2: Check Cesium Base URL
+        log('=== Testing Cesium Base URL ===');
+        if (typeof window.CESIUM_BASE_URL !== 'undefined') {
+            log(`✓ CESIUM_BASE_URL is set to: ${window.CESIUM_BASE_URL}`, 'pass');
+        } else {
+            log('✗ CESIUM_BASE_URL is not defined', 'fail');
+            window.CESIUM_BASE_URL = '/cesium/';
+            log('→ Setting CESIUM_BASE_URL to /cesium/', 'info');
+        }
+        
+        // Test 3: Check Cesium Assets
+        log('=== Testing Cesium Assets ===');
+        fetch('/cesium/Assets/approximateTerrainHeights.json')
+            .then(response => {
+                if (response.ok) {
+                    log('✓ Cesium assets are accessible', 'pass');
+                } else {
+                    log(`✗ Cesium assets returned ${response.status}`, 'fail');
+                }
+            })
+            .catch(error => {
+                log(`✗ Failed to fetch Cesium assets: ${error.message}`, 'fail');
+            });
+        
+        // Test 4: Check Workers
+        log('=== Testing Cesium Workers ===');
+        fetch('/cesium/Workers/transferTypedArrayTest.js')
+            .then(response => {
+                if (response.ok) {
+                    log('✓ Cesium workers are accessible', 'pass');
+                } else {
+                    log(`✗ Cesium workers returned ${response.status}`, 'fail');
+                }
+            })
+            .catch(error => {
+                log(`✗ Failed to fetch Cesium workers: ${error.message}`, 'fail');
+            });
+        
+        // Test 5: Check WebAssembly
+        log('=== Testing WebAssembly Support ===');
+        if (typeof WebAssembly !== 'undefined') {
+            log('✓ WebAssembly is supported', 'pass');
+            
+            // Check for specific Cesium WASM files
+            fetch('/cesium/ThirdParty/draco_decoder.wasm')
+                .then(response => {
+                    if (response.ok) {
+                        log('✓ Draco decoder WASM is accessible', 'pass');
+                    } else {
+                        log(`⚠ Draco decoder WASM returned ${response.status}`, 'info');
+                    }
+                })
+                .catch(error => {
+                    log(`⚠ Draco decoder WASM not found (optional): ${error.message}`, 'info');
+                });
+        } else {
+            log('✗ WebAssembly is NOT supported', 'fail');
+        }
+        
+        // Test 6: Check Cross-Origin Isolation
+        log('=== Testing Cross-Origin Isolation ===');
+        if (self.crossOriginIsolated) {
+            log('✓ Page is cross-origin isolated', 'pass');
+        } else {
+            log('⚠ Page is NOT cross-origin isolated (may affect SharedArrayBuffer)', 'info');
+        }
+        
+        // Test 7: Check SharedArrayBuffer
+        log('=== Testing SharedArrayBuffer ===');
+        if (typeof SharedArrayBuffer !== 'undefined') {
+            log('✓ SharedArrayBuffer is available', 'pass');
+        } else {
+            log('⚠ SharedArrayBuffer is NOT available (Cesium will use fallback)', 'info');
+        }
+        
+        // Test 8: Check for Content Security Policy issues
+        log('=== Testing CSP ===');
+        const meta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+        if (meta) {
+            log(`⚠ CSP is set: ${meta.content}`, 'info');
+        } else {
+            log('✓ No restrictive CSP found', 'pass');
+        }
+        
+        // Summary
+        setTimeout(() => {
+            log('=== SUMMARY ===');
+            const passed = results.querySelectorAll('.pass').length;
+            const failed = results.querySelectorAll('.fail').length;
+            const warnings = results.querySelectorAll('.info').length;
+            
+            log(`Tests Passed: ${passed}`, 'pass');
+            if (failed > 0) {
+                log(`Tests Failed: ${failed}`, 'fail');
+            }
+            if (warnings > 0) {
+                log(`Warnings: ${warnings}`, 'info');
+            }
+            
+            if (failed === 0) {
+                log('✓ All critical tests passed! Cesium should work.', 'pass');
+            } else {
+                log('✗ Some critical tests failed. Check the errors above.', 'fail');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

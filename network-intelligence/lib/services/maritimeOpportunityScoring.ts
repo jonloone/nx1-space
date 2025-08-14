@@ -1,6 +1,6 @@
 /**
  * Maritime Opportunity Scoring Service
- * Integrates maritime factors into hexagon opportunity scoring
+ * Integrates maritime factors using ML-based opportunity scorer
  */
 
 import * as h3 from 'h3-js';
@@ -8,6 +8,7 @@ import { maritimeCoverageService } from './maritimeCoverage';
 import { GLOBAL_SHIPPING_LANES } from '../data/shippingLanes';
 import { MARITIME_COMPETITORS } from '../data/maritimeCompetitors';
 import { maritimeDataService } from '../data/maritimeDataSources';
+import { mlOpportunityScorer } from '@/lib/scoring/ml-opportunity-scorer';
 
 interface MaritimeOpportunity {
   type: 'SHIPPING_LANE_GAP' | 'OFFSHORE_CLUSTER' | 'PORT_EXPANSION' | 'MARITIME_ENTRY' | 'MARITIME_EXPANSION';
@@ -80,19 +81,18 @@ export class MaritimeOpportunityScoring {
       const offshoreActivity = this.getOffshoreActivity(lat, lon);
       const maritimeCompetition = this.getMaritimeCompetition(lat, lon);
       
-      // Calculate maritime score components
-      const densityScore = Math.min(shippingDensity / 100, 1) * 0.25;
-      const laneScore = Math.max(0, 1 - (nearestLane.distance / 500)) * 0.20;
-      const portScore = Math.max(0, 1 - (nearestPort.distance / 300)) * 0.15;
-      const offshoreScore = Math.min(offshoreActivity / 50, 1) * 0.20;
-      const competitionScore = (1 - maritimeCompetition) * 0.20;
+      // Use ML-based opportunity scorer instead of hardcoded weights
+      const features = {
+        maritimeDensity: shippingDensity,
+        competitorCount: maritimeCompetition * 10, // Convert to count estimate
+        elevation: 100, // Default coastal elevation
+        infrastructureScore: Math.max(0, 1 - (nearestPort.distance / 300)),
+        weatherReliability: 0.8, // Default for coastal areas
+        regulatoryScore: 0.7 // Default regulatory environment
+      };
       
-      const maritimeScore = 
-        densityScore + 
-        laneScore + 
-        portScore + 
-        offshoreScore + 
-        competitionScore;
+      const mlResult = mlOpportunityScorer.scoreOpportunity(lat, lon, features);
+      const maritimeScore = mlResult.score / 100; // Convert to 0-1 range
       
       // Determine opportunity type
       let opportunityType = terrestrialScore.type;
@@ -107,14 +107,12 @@ export class MaritimeOpportunityScoring {
         opportunityType = 'PORT_EXPANSION';
       }
       
-      // Calculate revenue opportunity
-      const revenueOpportunity = this.calculateMaritimeRevenue({
-        shipping_density: shippingDensity,
-        lane_proximity: nearestLane.distance,
-        port_proximity: nearestPort.distance,
-        offshore_activity: offshoreActivity,
-        maritime_competition: maritimeCompetition
-      });
+      // Calculate revenue opportunity using ML insights
+      const revenueOpportunity = this.calculateMLBasedRevenue(
+        mlResult, 
+        shippingDensity,
+        nearestPort.distance
+      );
       
       // Combine scores (weight maritime higher for coastal areas)
       const combinedScore = terrestrialScore.overall * 0.4 + maritimeScore * 0.6;
@@ -265,7 +263,35 @@ export class MaritimeOpportunityScoring {
   }
 
   /**
-   * Calculate maritime revenue potential
+   * Calculate ML-based revenue potential using ML scorer insights
+   */
+  private calculateMLBasedRevenue(
+    mlResult: any, 
+    shippingDensity: number, 
+    portDistance: number
+  ): number {
+    // Base revenue using ML score as multiplier
+    const baseRevenue = 100000; // $100k base annual revenue
+    
+    // ML score provides revenue multiplier (0-100 -> 0-10x)
+    const mlMultiplier = mlResult.score / 10;
+    
+    // Shipping density bonus
+    const shippingBonus = Math.min(shippingDensity * 1000, 50000);
+    
+    // Port proximity bonus
+    const portBonus = Math.max(0, 20000 * (1 - portDistance / 300));
+    
+    // Confidence affects revenue stability
+    const confidenceAdjustment = mlResult.confidence;
+    
+    const totalRevenue = (baseRevenue * mlMultiplier + shippingBonus + portBonus) * confidenceAdjustment;
+    
+    return Math.round(totalRevenue);
+  }
+
+  /**
+   * Calculate maritime revenue potential (legacy method - kept for compatibility)
    */
   private calculateMaritimeRevenue(metrics: any): number {
     // Base revenue calculations
