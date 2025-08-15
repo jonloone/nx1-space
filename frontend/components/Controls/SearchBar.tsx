@@ -70,7 +70,7 @@ export function SearchBar() {
     
     // Configure Fuse.js
     const fuseInstance = new Fuse(searchData, {
-      keys: ['name', 'id', 'type', 'vessel_name', 'vessel_type'],
+      keys: ['name', 'id', 'type', 'vessel_name', 'vessel_type', 'operator', 'city', 'country', 'region'],
       threshold: 0.3,
       includeScore: true,
       minMatchCharLength: 2,

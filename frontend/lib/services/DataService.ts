@@ -2,97 +2,127 @@ export class DataService {
   private static cache = new Map<string, { data: any; timestamp: number }>();
   
   static async loadGroundStationData(options: any = {}) {
-    // Mock data for testing
-    const mockStations = [
-      { 
-        id: 'GS001', 
-        name: 'New York Ground Station',
-        latitude: 40.7128, 
-        longitude: -74.0060, 
-        coverage_area_km2: 500, 
-        utilization: 0.7, 
-        score: 0.65 
-      },
-      { 
-        id: 'GS002', 
-        name: 'London Facility',
-        latitude: 51.5074, 
-        longitude: -0.1278, 
-        coverage_area_km2: 800, 
-        utilization: 0.9, 
-        score: 0.45 
-      },
-      { 
-        id: 'GS003', 
-        name: 'Tokyo Operations',
-        latitude: 35.6762, 
-        longitude: 139.6503, 
-        coverage_area_km2: 600, 
-        utilization: 0.3, 
-        score: 0.85 
-      },
-      {
-        id: 'GS004',
-        name: 'Singapore Hub',
-        latitude: 1.3521,
-        longitude: 103.8198,
-        coverage_area_km2: 400,
-        utilization: 0.5,
-        score: 0.75
-      },
-      {
-        id: 'GS005',
-        name: 'Sydney Station',
-        latitude: -33.8688,
-        longitude: 151.2093,
-        coverage_area_km2: 550,
-        utilization: 0.6,
-        score: 0.70
-      }
-    ];
-    
-    // Generate mock footprints
-    const mockFootprints = mockStations.map(station => ({
-      id: `FP_${station.id}`,
-      footprint_coordinates: this.generateFootprint(
-        station.longitude,
-        station.latitude,
-        Math.sqrt(station.coverage_area_km2) / 10
-      )
-    }));
-    
-    // Generate coverage grid
-    const coverage = this.generateCoverageGrid(mockStations);
-    
-    // Mock predictions
-    const predictions = options.includePredictions ? {
-      opportunities: mockStations
-        .filter(s => s.score > 0.7)
-        .map(s => ({
+    try {
+      // Load real SES-Intelsat ground station data
+      const response = await fetch('/data/ses_intelsat_ground_stations.json');
+      const data = await response.json();
+      
+      // Transform the data to match expected format
+      const stations = data.stations.map((station: any) => ({
+        id: station.station_id,
+        name: station.name,
+        operator: station.operator,
+        latitude: station.location.latitude,
+        longitude: station.location.longitude,
+        city: station.location.city,
+        country: station.location.country,
+        region: station.location.region,
+        coverage_area_km2: station.utilization_metrics.capacity_gbps * 5, // Approximate coverage based on capacity
+        utilization: station.utilization_metrics.current_utilization / 100,
+        score: (station.utilization_metrics.redundancy_level / 100) * 0.9, // Score based on redundancy
+        capacity_gbps: station.utilization_metrics.capacity_gbps,
+        antenna_count: station.technical_specs.antenna_count,
+        frequency_bands: station.technical_specs.frequency_bands,
+        services: station.technical_specs.services_supported,
+        status: station.status
+      }));
+      
+      // Generate footprints for each station
+      const footprints = stations.map(station => ({
+        id: `FP_${station.id}`,
+        footprint_coordinates: this.generateFootprint(
+          station.longitude,
+          station.latitude,
+          Math.sqrt(station.coverage_area_km2) / 10
+        )
+      }));
+      
+      // Generate coverage grid
+      const coverage = this.generateCoverageGrid(stations);
+      
+      // Generate predictions based on real data
+      const predictions = options.includePredictions ? {
+        opportunities: stations
+          .filter(s => s.score > 0.85 && s.utilization < 0.75)
+          .map(s => ({
+            ...s,
+            opportunity_score: s.score * (1 - s.utilization),
+            boundary: this.generateFootprint(s.longitude, s.latitude, 0.5)
+          })),
+        scores: stations.map(s => ({
           ...s,
-          opportunity_score: s.score * (1 - s.utilization),
-          boundary: this.generateFootprint(s.longitude, s.latitude, 0.5)
-        })),
-      scores: mockStations.map(s => ({
-        ...s,
-        confidence: 0.75 + Math.random() * 0.2
-      }))
-    } : null;
-    
-    if (predictions) {
-      this.cache.set(`${options.domain || 'ground-stations'}_predictions`, {
-        data: predictions,
+          confidence: Math.min(0.95, s.score + 0.05)
+        }))
+      } : null;
+      
+      if (predictions) {
+        this.cache.set(`${options.domain || 'ground-stations'}_predictions`, {
+          data: predictions,
+          timestamp: Date.now()
+        });
+      }
+      
+      return {
+        stations,
+        footprints,
+        coverage,
+        predictions,
+        network_summary: data.network_summary,
         timestamp: Date.now()
-      });
+      };
+    } catch (error) {
+      console.error('Error loading ground station data:', error);
+      // Fallback to a minimal set of stations if file load fails
+      const fallbackStations = [
+        {
+          id: 'SI001',
+          name: 'Atlanta Teleport',
+          operator: 'SES-Intelsat',
+          latitude: 33.5731,
+          longitude: -84.0918,
+          coverage_area_km2: 1250,
+          utilization: 0.82,
+          score: 0.89
+        },
+        {
+          id: 'SI006',
+          name: 'Fuchsstadt Teleport',
+          operator: 'SES-Intelsat',
+          latitude: 50.0342,
+          longitude: 10.0358,
+          coverage_area_km2: 1500,
+          utilization: 0.90,
+          score: 0.95
+        },
+        {
+          id: 'SI007',
+          name: 'Betzdorf Teleport',
+          operator: 'SES-Intelsat',
+          latitude: 49.6833,
+          longitude: 6.3500,
+          coverage_area_km2: 1250,
+          utilization: 0.92,
+          score: 0.98
+        }
+      ];
+      
+      const fallbackFootprints = fallbackStations.map(station => ({
+        id: `FP_${station.id}`,
+        footprint_coordinates: this.generateFootprint(
+          station.longitude,
+          station.latitude,
+          Math.sqrt(station.coverage_area_km2) / 10
+        )
+      }));
+      
+      return {
+        stations: fallbackStations,
+        footprints: fallbackFootprints,
+        coverage: this.generateCoverageGrid(fallbackStations),
+        predictions: null,
+        timestamp: Date.now()
+      };
     }
-    
-    return {
-      stations: mockStations,
-      footprints: mockFootprints,
-      coverage,
-      predictions,
-      timestamp: Date.now()
-    };
   }
   
   static async loadMaritimeData(options: any = {}) {

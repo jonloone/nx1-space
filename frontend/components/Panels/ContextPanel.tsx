@@ -56,9 +56,14 @@ export const ContextPanel: React.FC = () => {
     // Generate table data
     const tableData = [
       { property: 'ID', value: selectedFeature.id },
-      { property: 'Type', value: selectedFeature.type || 'Unknown' },
+      { property: 'Type', value: selectedFeature.type || 'Ground Station' },
+      { property: 'Operator', value: selectedFeature.operator || 'Unknown' },
+      { property: 'Location', value: selectedFeature.city && selectedFeature.country ? `${selectedFeature.city}, ${selectedFeature.country}` : 'Unknown' },
+      { property: 'Region', value: selectedFeature.region || 'Unknown' },
       { property: 'Score', value: `${((selectedFeature.score || 0) * 100).toFixed(1)}%` },
       { property: 'Utilization', value: `${((selectedFeature.utilization || 0) * 100).toFixed(1)}%` },
+      { property: 'Capacity', value: selectedFeature.capacity_gbps ? `${selectedFeature.capacity_gbps} Gbps` : 'N/A' },
+      { property: 'Antennas', value: selectedFeature.antenna_count || 'N/A' },
       { property: 'Status', value: selectedFeature.status || 'Active' },
       { property: 'Last Updated', value: new Date().toLocaleString() },
     ];
@@ -90,6 +95,22 @@ export const ContextPanel: React.FC = () => {
                   {((selectedFeature?.utilization || 0) * 100).toFixed(1)}%
                 </div>
               </div>
+              {selectedFeature?.capacity_gbps && (
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <div className="text-xs text-white/50 mb-1">Capacity</div>
+                  <div className="text-2xl font-bold text-white">
+                    {selectedFeature.capacity_gbps} Gbps
+                  </div>
+                </div>
+              )}
+              {selectedFeature?.antenna_count && (
+                <div className="p-3 bg-white/5 rounded-lg">
+                  <div className="text-xs text-white/50 mb-1">Antennas</div>
+                  <div className="text-2xl font-bold text-white">
+                    {selectedFeature.antenna_count}
+                  </div>
+                </div>
+              )}
             </div>
             
             <ChartWrapper

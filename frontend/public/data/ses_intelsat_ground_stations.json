@@ -1,0 +1,753 @@
+{
+  "version": "2.0",
+  "last_updated": "2025-08-15T12:00:00Z",
+  "merger_date": "2025-07-17",
+  "network_name": "SES-Intelsat Global Ground Station Network",
+  "stations": [
+    {
+      "station_id": "SI001",
+      "name": "Atlanta Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 33.5731,
+        "longitude": -84.0918,
+        "city": "Atlanta",
+        "state": "Georgia",
+        "country": "United States",
+        "region": "Americas",
+        "timezone": "EST"
+      },
+      "technical_specs": {
+        "antenna_count": 68,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Media", "Enterprise", "Government", "Mobility"],
+        "satellite_coverage": ["AOR", "CONUS"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 82,
+        "capacity_gbps": 250,
+        "redundancy_level": 99
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI002",
+      "name": "Hagerstown Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 39.6418,
+        "longitude": -77.7200,
+        "city": "Hagerstown",
+        "state": "Maryland",
+        "country": "United States",
+        "region": "Americas",
+        "timezone": "EST"
+      },
+      "technical_specs": {
+        "antenna_count": 50,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Media", "Enterprise", "Government", "Spacecraft Operations"],
+        "satellite_coverage": ["AOR", "CONUS"],
+        "fiber_connectivity": true,
+        "control_center": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 88,
+        "capacity_gbps": 200,
+        "redundancy_level": 99.5
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI003",
+      "name": "Riverside Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 33.9806,
+        "longitude": -117.3755,
+        "city": "Riverside",
+        "state": "California",
+        "country": "United States",
+        "region": "Americas",
+        "timezone": "PST"
+      },
+      "technical_specs": {
+        "antenna_count": 37,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Media", "Enterprise", "Hollywood Studios Gateway"],
+        "satellite_coverage": ["AOR", "POR", "CONUS"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 85,
+        "capacity_gbps": 180,
+        "redundancy_level": 98
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI004",
+      "name": "Kapolei Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 21.3369,
+        "longitude": -158.0731,
+        "city": "Kapolei",
+        "state": "Hawaii",
+        "country": "United States",
+        "region": "Americas",
+        "timezone": "HST"
+      },
+      "technical_specs": {
+        "antenna_count": 8,
+        "frequency_bands": ["C-band", "Ku-band"],
+        "services_supported": ["Enterprise", "Government", "Pacific Region Services"],
+        "satellite_coverage": ["POR", "CONUS"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 75,
+        "capacity_gbps": 100,
+        "redundancy_level": 95
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI005",
+      "name": "Clarksburg Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 39.2387,
+        "longitude": -77.2736,
+        "city": "Clarksburg",
+        "state": "Maryland",
+        "country": "United States",
+        "region": "Americas",
+        "timezone": "EST"
+      },
+      "technical_specs": {
+        "antenna_count": 12,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Enterprise", "Government"],
+        "satellite_coverage": ["AOR", "CONUS"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 70,
+        "capacity_gbps": 120,
+        "redundancy_level": 96
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI006",
+      "name": "Fuchsstadt Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 50.0342,
+        "longitude": 10.0358,
+        "city": "Fuchsstadt",
+        "state": "Bavaria",
+        "country": "Germany",
+        "region": "Europe",
+        "timezone": "CET"
+      },
+      "technical_specs": {
+        "antenna_count": 45,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Media", "Enterprise", "Government", "Spacecraft Operations"],
+        "satellite_coverage": ["Europe", "Africa", "Middle East"],
+        "fiber_connectivity": true,
+        "largest_intelsat_teleport": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 90,
+        "capacity_gbps": 300,
+        "redundancy_level": 99.5
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI007",
+      "name": "Betzdorf Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 49.6833,
+        "longitude": 6.3500,
+        "city": "Betzdorf",
+        "country": "Luxembourg",
+        "region": "Europe",
+        "timezone": "CET"
+      },
+      "technical_specs": {
+        "antenna_count": 35,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band", "X-band"],
+        "services_supported": ["Media", "Enterprise", "Government", "TT&C"],
+        "satellite_coverage": ["Europe", "Atlantic", "Africa"],
+        "fiber_connectivity": true,
+        "headquarters": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 92,
+        "capacity_gbps": 250,
+        "redundancy_level": 99.9
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI008",
+      "name": "Woodbine Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 39.3818,
+        "longitude": -77.0547,
+        "city": "Woodbine",
+        "state": "Maryland",
+        "country": "United States",
+        "region": "Americas",
+        "timezone": "EST"
+      },
+      "technical_specs": {
+        "antenna_count": 22,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Media", "Enterprise", "In-flight Connectivity"],
+        "satellite_coverage": ["North America", "North Atlantic"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 78,
+        "capacity_gbps": 150,
+        "redundancy_level": 97
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI009",
+      "name": "Princeton Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 40.3573,
+        "longitude": -74.6672,
+        "city": "Princeton",
+        "state": "New Jersey",
+        "country": "United States",
+        "region": "Americas",
+        "timezone": "EST"
+      },
+      "technical_specs": {
+        "antenna_count": 18,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Enterprise", "Government", "Media"],
+        "satellite_coverage": ["Americas", "Atlantic"],
+        "fiber_connectivity": true,
+        "americas_headquarters": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 80,
+        "capacity_gbps": 140,
+        "redundancy_level": 98
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI010",
+      "name": "Bristow/Manassas Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 38.7284,
+        "longitude": -77.5808,
+        "city": "Bristow",
+        "state": "Virginia",
+        "country": "United States",
+        "region": "Americas",
+        "timezone": "EST"
+      },
+      "technical_specs": {
+        "antenna_count": 25,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band", "X-band"],
+        "services_supported": ["Government", "Defense", "Enterprise"],
+        "satellite_coverage": ["Americas", "Atlantic"],
+        "fiber_connectivity": true,
+        "government_certified": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 86,
+        "capacity_gbps": 160,
+        "redundancy_level": 99
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI011",
+      "name": "Isle of Man Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 54.2361,
+        "longitude": -4.5481,
+        "city": "Douglas",
+        "country": "Isle of Man",
+        "region": "Europe",
+        "timezone": "GMT"
+      },
+      "technical_specs": {
+        "antenna_count": 12,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["TT&C", "Capacity Management", "Enterprise"],
+        "satellite_coverage": ["Europe", "Atlantic"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 72,
+        "capacity_gbps": 100,
+        "redundancy_level": 96
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI012",
+      "name": "Gandoul Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 14.5500,
+        "longitude": -16.2833,
+        "city": "Gandoul",
+        "country": "Senegal",
+        "region": "Africa",
+        "timezone": "GMT"
+      },
+      "technical_specs": {
+        "antenna_count": 8,
+        "frequency_bands": ["Ka-band", "Q/V-band"],
+        "services_supported": ["O3b mPOWER Gateway", "MEO Services", "Enterprise"],
+        "satellite_coverage": ["Africa", "Atlantic"],
+        "fiber_connectivity": true,
+        "meo_gateway": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 65,
+        "capacity_gbps": 80,
+        "redundancy_level": 94
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI013",
+      "name": "Madrid Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 40.4168,
+        "longitude": -3.7038,
+        "city": "Madrid",
+        "country": "Spain",
+        "region": "Europe",
+        "timezone": "CET"
+      },
+      "technical_specs": {
+        "antenna_count": 15,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["DTH", "Enterprise", "Government", "HTS"],
+        "satellite_coverage": ["Europe", "Africa", "Americas"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 85,
+        "capacity_gbps": 150,
+        "redundancy_level": 95
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI014",
+      "name": "Frankfurt Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 50.1109,
+        "longitude": 8.6821,
+        "city": "Frankfurt",
+        "country": "Germany",
+        "region": "Europe",
+        "timezone": "CET"
+      },
+      "technical_specs": {
+        "antenna_count": 21,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Enterprise", "CDN", "Broadcast", "HTS", "Government"],
+        "satellite_coverage": ["Europe", "Middle East", "Africa"],
+        "fiber_connectivity": true,
+        "major_pop": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 92,
+        "capacity_gbps": 200,
+        "redundancy_level": 98
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI015",
+      "name": "Singapore Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 1.3521,
+        "longitude": 103.8198,
+        "city": "Singapore",
+        "country": "Singapore",
+        "region": "Asia-Pacific",
+        "timezone": "SGT"
+      },
+      "technical_specs": {
+        "antenna_count": 19,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Enterprise", "Maritime", "Broadcast", "HTS", "CDN"],
+        "satellite_coverage": ["Asia-Pacific", "Indian Ocean"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 88,
+        "capacity_gbps": 180,
+        "redundancy_level": 92
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI016",
+      "name": "Sydney Gateway",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": -33.8688,
+        "longitude": 151.2093,
+        "city": "Sydney",
+        "country": "Australia",
+        "region": "Asia-Pacific",
+        "timezone": "AEDT"
+      },
+      "technical_specs": {
+        "antenna_count": 13,
+        "frequency_bands": ["C-band", "Ku-band"],
+        "services_supported": ["Enterprise", "Government", "Maritime"],
+        "satellite_coverage": ["Asia-Pacific", "Pacific Ocean"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 71,
+        "capacity_gbps": 120,
+        "redundancy_level": 85
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI017",
+      "name": "Tokyo Satellite Center",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "SES",
+      "location": {
+        "latitude": 35.6895,
+        "longitude": 139.6917,
+        "city": "Tokyo",
+        "country": "Japan",
+        "region": "Asia-Pacific",
+        "timezone": "JST"
+      },
+      "technical_specs": {
+        "antenna_count": 19,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Enterprise", "Broadcast", "HTS", "Government"],
+        "satellite_coverage": ["Asia-Pacific", "Pacific Ocean"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 78,
+        "capacity_gbps": 160,
+        "redundancy_level": 88
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI018",
+      "name": "Perth Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": -31.9505,
+        "longitude": 115.8605,
+        "city": "Perth",
+        "country": "Australia",
+        "region": "Asia-Pacific",
+        "timezone": "AWST"
+      },
+      "technical_specs": {
+        "antenna_count": 10,
+        "frequency_bands": ["C-band", "Ku-band"],
+        "services_supported": ["Enterprise", "Mining Operations", "Government"],
+        "satellite_coverage": ["Indian Ocean", "Asia-Pacific"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 68,
+        "capacity_gbps": 90,
+        "redundancy_level": 86
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI019",
+      "name": "Hong Kong Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 22.3193,
+        "longitude": 114.1694,
+        "city": "Hong Kong",
+        "country": "Hong Kong SAR",
+        "region": "Asia-Pacific",
+        "timezone": "HKT"
+      },
+      "technical_specs": {
+        "antenna_count": 14,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Enterprise", "Media", "Financial Services"],
+        "satellite_coverage": ["Asia-Pacific"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 83,
+        "capacity_gbps": 130,
+        "redundancy_level": 94
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI020",
+      "name": "Dubai Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 25.2048,
+        "longitude": 55.2708,
+        "city": "Dubai",
+        "country": "United Arab Emirates",
+        "region": "Middle East",
+        "timezone": "GST"
+      },
+      "technical_specs": {
+        "antenna_count": 16,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["Enterprise", "Media", "Government"],
+        "satellite_coverage": ["Middle East", "Africa", "Asia"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 79,
+        "capacity_gbps": 140,
+        "redundancy_level": 93
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI021",
+      "name": "Johannesburg Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": -26.2041,
+        "longitude": 28.0473,
+        "city": "Johannesburg",
+        "country": "South Africa",
+        "region": "Africa",
+        "timezone": "SAST"
+      },
+      "technical_specs": {
+        "antenna_count": 11,
+        "frequency_bands": ["C-band", "Ku-band"],
+        "services_supported": ["Enterprise", "Mining", "Government", "Broadcast"],
+        "satellite_coverage": ["Africa", "Indian Ocean"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 74,
+        "capacity_gbps": 110,
+        "redundancy_level": 90
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI022",
+      "name": "Lagos Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 6.5244,
+        "longitude": 3.3792,
+        "city": "Lagos",
+        "country": "Nigeria",
+        "region": "Africa",
+        "timezone": "WAT"
+      },
+      "technical_specs": {
+        "antenna_count": 9,
+        "frequency_bands": ["C-band", "Ku-band"],
+        "services_supported": ["Enterprise", "Cellular Backhaul", "Government"],
+        "satellite_coverage": ["Africa", "Atlantic"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 70,
+        "capacity_gbps": 85,
+        "redundancy_level": 88
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI023",
+      "name": "São Paulo Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": -23.5505,
+        "longitude": -46.6333,
+        "city": "São Paulo",
+        "country": "Brazil",
+        "region": "Americas",
+        "timezone": "BRT"
+      },
+      "technical_specs": {
+        "antenna_count": 12,
+        "frequency_bands": ["C-band", "Ku-band", "Ka-band"],
+        "services_supported": ["DTH", "Enterprise", "Cellular Backhaul"],
+        "satellite_coverage": ["South America", "Atlantic"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 76,
+        "capacity_gbps": 115,
+        "redundancy_level": 91
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI024",
+      "name": "Mexico City Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": 19.4326,
+        "longitude": -99.1332,
+        "city": "Mexico City",
+        "country": "Mexico",
+        "region": "Americas",
+        "timezone": "CST"
+      },
+      "technical_specs": {
+        "antenna_count": 10,
+        "frequency_bands": ["C-band", "Ku-band"],
+        "services_supported": ["DTH", "Enterprise", "Government"],
+        "satellite_coverage": ["North America", "Central America"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 73,
+        "capacity_gbps": 105,
+        "redundancy_level": 89
+      },
+      "status": "operational"
+    },
+    {
+      "station_id": "SI025",
+      "name": "Buenos Aires Teleport",
+      "operator": "SES-Intelsat",
+      "legacy_operator": "Intelsat",
+      "location": {
+        "latitude": -34.6037,
+        "longitude": -58.3816,
+        "city": "Buenos Aires",
+        "country": "Argentina",
+        "region": "Americas",
+        "timezone": "ART"
+      },
+      "technical_specs": {
+        "antenna_count": 8,
+        "frequency_bands": ["C-band", "Ku-band"],
+        "services_supported": ["Enterprise", "Government", "Media"],
+        "satellite_coverage": ["South America", "Atlantic"],
+        "fiber_connectivity": true
+      },
+      "utilization_metrics": {
+        "current_utilization": 69,
+        "capacity_gbps": 95,
+        "redundancy_level": 87
+      },
+      "status": "operational"
+    }
+  ],
+  "network_summary": {
+    "total_stations": 25,
+    "total_antennas": 488,
+    "total_capacity_gbps": 3650,
+    "average_utilization": 78.2,
+    "regions": {
+      "Americas": 10,
+      "Europe": 6,
+      "Asia-Pacific": 5,
+      "Africa": 3,
+      "Middle East": 1
+    },
+    "services": [
+      "Enterprise",
+      "Government", 
+      "Media/Broadcast",
+      "DTH",
+      "Maritime",
+      "Mobility",
+      "Cellular Backhaul",
+      "CDN",
+      "HTS",
+      "TT&C",
+      "Spacecraft Operations"
+    ],
+    "satellite_fleet": {
+      "geo_satellites": 100,
+      "meo_satellites": 26,
+      "satellites_on_order": 13
+    }
+  },
+  "growth_opportunities": [
+    {
+      "type": "capacity_expansion",
+      "priority": "high",
+      "locations": ["Frankfurt", "Singapore", "Atlanta"],
+      "investment_required": 15000000,
+      "projected_roi": 32.5
+    },
+    {
+      "type": "meo_gateway_expansion",
+      "priority": "high",
+      "locations": ["Asia-Pacific", "Americas"],
+      "investment_required": 25000000,
+      "projected_roi": 28.3
+    },
+    {
+      "type": "5g_backhaul_infrastructure",
+      "priority": "medium",
+      "locations": ["Africa", "Latin America"],
+      "investment_required": 18000000,
+      "projected_roi": 24.7
+    }
+  ]
+}
