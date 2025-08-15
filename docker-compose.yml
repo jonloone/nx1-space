@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - MAPTILER_KEY=${MAPTILER_KEY}
+        - API_URL=${API_URL:-http://0.0.0.0:3001}
+    ports:
+      - "0.0.0.0:3000:3000"
+    environment:
+      - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
+      - NEXT_PUBLIC_MAPTILER_KEY=${MAPTILER_KEY}
+      - NEXT_PUBLIC_API_URL=${API_URL:-http://0.0.0.0:3001}
+      - NEXT_PUBLIC_WS_URL=${WS_URL:-ws://0.0.0.0:3001}
+    depends_on:
+      - api
+    networks:
+      - geocore-network
+    restart: unless-stopped
+
+  # API Server
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "0.0.0.0:3001:3001"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3001
+      - TRINO_URL=${TRINO_URL:-http://trino:8080}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      - redis
+    networks:
+      - geocore-network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "0.0.0.0:6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - geocore-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - api
+    networks:
+      - geocore-network
+    restart: unless-stopped
+
+networks:
+  geocore-network:
+    driver: bridge
+
+volumes:
+  redis-data:
