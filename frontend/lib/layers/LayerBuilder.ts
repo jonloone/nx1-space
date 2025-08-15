@@ -12,9 +12,9 @@ import {
   ColumnLayer,
   LineLayer,
   ArcLayer,
-  BitmapLayer,
-  HeatmapLayer
+  BitmapLayer
 } from '@deck.gl/layers';
+import { HeatmapLayer } from '@deck.gl/aggregation-layers';
 
 const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY || 't7mqwGtsMHQJRwcP33Bi';
 

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { NavigationBar } from '@/components/Navigation/NavigationBar';
-import { DomainSelector } from '@/components/Controls/DomainSelector';
 import { LayersPanel } from '@/components/Panels/LayersPanel';
 import { AnalyticsPanel } from '@/components/Panels/AnalyticsPanel';
 import { SearchBar } from '@/components/Controls/SearchBar';
@@ -45,11 +44,6 @@ export default function Home() {
       
       {/* Top Navigation */}
       <NavigationBar />
-      
-      {/* Domain Selector */}
-      <div className="absolute top-20 left-4 z-40">
-        <DomainSelector />
-      </div>
       
       {/* Search Bar */}
       <div className="absolute top-20 left-1/2 -translate-x-1/2 z-40">

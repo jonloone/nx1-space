@@ -176,7 +176,7 @@ export default function GeoCoreMap() {
           antialias: true
         }}
       >
-        {viewMode === '2d' && (
+        {(viewMode === '2d' || viewMode === '3d' || viewMode === 'orbit') && (
           <Map
             mapStyle={MAP_STYLE}
             attributionControl={false}
