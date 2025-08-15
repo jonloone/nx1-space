@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { NavigationBar } from '@/components/Navigation/NavigationBar';
 import { LayersPanel } from '@/components/Panels/LayersPanel';
 import { AnalyticsPanel } from '@/components/Panels/AnalyticsPanel';
+import { ContextPanel } from '@/components/Panels/ContextPanel';
 import { SearchBar } from '@/components/Controls/SearchBar';
 import { ViewModeToggle } from '@/components/Controls/ViewModeToggle';
 import { LoadingScreen } from '@/components/UI/LoadingScreen';
@@ -80,19 +81,8 @@ export default function Home() {
         Analytics
       </button>
       
-      {/* Selection Info */}
-      {selectedFeatures.length > 0 && (
-        <div className="absolute bottom-4 right-4 z-40 p-4 glass rounded-lg max-w-sm">
-          <h3 className="font-semibold mb-2">Selected Feature</h3>
-          <div className="text-sm space-y-1">
-            <div>ID: {selectedFeatures[0].id}</div>
-            <div>Type: {selectedFeatures[0].type || domain}</div>
-            {selectedFeatures[0].score && (
-              <div>Score: {(selectedFeatures[0].score * 100).toFixed(1)}%</div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Context Panel - Shows when feature is selected */}
+      <ContextPanel />
       
       {/* Performance Monitor (Dev Only) */}
       {process.env.NODE_ENV === 'development' && (
