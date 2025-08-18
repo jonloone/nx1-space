@@ -381,6 +381,30 @@
   text-align: right;
 }
 
+.chat-message.assistant {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.chat-message.assistant.streaming {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.chat-error-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  color: #ef4444;
+  font-size: 12px;
+}
+
 .chat-message-line {
   margin-bottom: 4px;
 }

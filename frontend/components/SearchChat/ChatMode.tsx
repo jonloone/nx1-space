@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, User, Loader2 } from 'lucide-react';
+import { Bot, User, Loader2, AlertCircle } from 'lucide-react';
 import { useMapStore } from '@/lib/store/mapStore';
 import type { ChatMessage } from './SearchChatBar';
 
@@ -13,6 +13,13 @@ interface ChatModeProps {
   onLoadingChange: (loading: boolean) => void;
 }
 
+// Extend ChatMessage type to include error flag
+declare module './SearchChatBar' {
+  interface ChatMessage {
+    error?: boolean;
+  }
+}
+
 export const ChatMode: React.FC<ChatModeProps> = ({
   messages,
   onMessagesChange,
@@ -20,7 +27,10 @@ export const ChatMode: React.FC<ChatModeProps> = ({
   onLoadingChange,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { domain, dataCache, selectedFeatures } = useMapStore();
+  const { domain, dataCache, selectedFeatures, viewState } = useMapStore();
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [streamingContent, setStreamingContent] = useState<string>('');
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -39,90 +49,167 @@ export const ChatMode: React.FC<ChatModeProps> = ({
     onLoadingChange(true);
     
     try {
-      // Simulate AI response based on the query
-      let response = '';
-      const query = userMessage.content.toLowerCase();
+      // Build context for LLM
+      const context = {
+        domain,
+        viewState,
+        selectedFeatures: selectedFeatures.slice(0, 5), // Limit to 5 features
+        previousMessages: messages.slice(-10).map(m => ({ // Last 10 messages for context
+          role: m.role as 'user' | 'assistant',
+          content: m.content
+        }))
+      };
 
-      if (query.includes('ground station') || query.includes('station')) {
-        const stations = dataCache.get('ground-stations')?.stations || [];
-        if (stations.length > 0) {
-          response = `I found ${stations.length} ground stations in the current view:\n\n`;
-          stations.slice(0, 5).forEach((station: any, idx: number) => {
-            response += `${idx + 1}. **${station.name}**\n`;
-            response += `   - Score: ${(station.score * 100).toFixed(1)}%\n`;
-            response += `   - Utilization: ${(station.utilization * 100).toFixed(1)}%\n`;
-            response += `   - Status: ${station.status}\n\n`;
-          });
-          if (stations.length > 5) {
-            response += `...and ${stations.length - 5} more stations.`;
-          }
-        } else {
-          response = 'No ground stations are currently loaded. Try zooming in or selecting the ground stations layer.';
+      // Check if streaming is supported
+      const useStreaming = true; // Enable streaming by default
+
+      if (useStreaming) {
+        // Create abort controller for cancellation
+        abortControllerRef.current = new AbortController();
+        
+        // Create placeholder message for streaming
+        const aiMessageId = Date.now().toString();
+        setStreamingMessageId(aiMessageId);
+        setStreamingContent('');
+        
+        const placeholderMessage: ChatMessage = {
+          id: aiMessageId,
+          role: 'assistant',
+          content: '',
+          timestamp: new Date(),
+        };
+        onMessagesChange([...messages, placeholderMessage]);
+
+        // Start streaming
+        const response = await fetch('/api/llm/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: userMessage.content,
+            context,
+            options: { stream: true }
+          }),
+          signal: abortControllerRef.current.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
         }
-      } else if (query.includes('coverage') || query.includes('performance')) {
-        response = `Based on the current data:\n\n`;
-        response += `**Coverage Analysis:**\n`;
-        response += `- Continental coverage: 87.3%\n`;
-        response += `- Ocean coverage: 62.1%\n`;
-        response += `- Average signal strength: -82.4 dBm\n\n`;
-        response += `**Performance Metrics:**\n`;
-        response += `- Network utilization: 73.2%\n`;
-        response += `- Average latency: 142ms\n`;
-        response += `- Packet loss rate: 0.03%\n\n`;
-        response += `The network is performing within normal parameters with good continental coverage.`;
-      } else if (query.includes('help') || query.includes('what can')) {
-        response = `I can help you analyze and understand the NexusOne network data. Here are some things you can ask me:\n\n`;
-        response += `**Data Analysis:**\n`;
-        response += `- "Show me ground station performance"\n`;
-        response += `- "What's the network coverage in this area?"\n`;
-        response += `- "Analyze signal strength patterns"\n\n`;
-        response += `**Navigation:**\n`;
-        response += `- "Find stations near Los Angeles"\n`;
-        response += `- "Show me maritime traffic"\n`;
-        response += `- "Focus on high-utilization areas"\n\n`;
-        response += `**Insights:**\n`;
-        response += `- "What are the network bottlenecks?"\n`;
-        response += `- "Compare coverage between regions"\n`;
-        response += `- "Predict future capacity needs"`;
-      } else if (selectedFeatures.length > 0) {
-        const feature = selectedFeatures[0];
-        response = `Looking at the selected ${feature.type || 'feature'}:\n\n`;
-        response += `**${feature.name || 'Unknown'}**\n`;
-        if (feature.score) response += `- Score: ${(feature.score * 100).toFixed(1)}%\n`;
-        if (feature.utilization) response += `- Utilization: ${(feature.utilization * 100).toFixed(1)}%\n`;
-        if (feature.coordinates) response += `- Location: [${feature.coordinates[0].toFixed(4)}, ${feature.coordinates[1].toFixed(4)}]\n`;
-        response += `\nWould you like me to analyze this feature in more detail?`;
+
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedContent = '';
+
+        if (reader) {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') {
+                  // Streaming complete
+                  setStreamingMessageId(null);
+                  setStreamingContent('');
+                } else {
+                  try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.chunk) {
+                      accumulatedContent += parsed.chunk;
+                      setStreamingContent(accumulatedContent);
+                    } else if (parsed.error) {
+                      throw new Error(parsed.error);
+                    }
+                  } catch (e) {
+                    console.error('Failed to parse stream chunk:', e);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Update final message
+        onMessagesChange(messages.map(m => 
+          m.id === aiMessageId ? { ...m, content: accumulatedContent } : m
+        ));
       } else {
-        response = `I can help you analyze the ${domain} data. Try asking about:\n`;
-        response += `- Network performance and coverage\n`;
-        response += `- Ground station utilization\n`;
-        response += `- Signal strength patterns\n`;
-        response += `- Geographic distribution\n\n`;
-        response += `You can also select features on the map for detailed analysis.`;
+        // Non-streaming fallback
+        const response = await fetch('/api/llm/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: userMessage.content,
+            context,
+            options: { stream: false }
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || `API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        const aiMessage: ChatMessage = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: data.response.content,
+          timestamp: new Date(),
+        };
+        
+        onMessagesChange([...messages, aiMessage]);
       }
 
-      // Add AI response
-      const aiMessage: ChatMessage = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: new Date(),
-      };
-      
-      onMessagesChange([...messages, aiMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Chat processing error:', error);
+      
+      // Clean up streaming state
+      if (streamingMessageId) {
+        setStreamingMessageId(null);
+        setStreamingContent('');
+      }
+      
+      let errorContent = 'Sorry, I encountered an error processing your request.';
+      
+      // Provide more specific error messages
+      if (error.name === 'AbortError') {
+        errorContent = 'Request was cancelled.';
+      } else if (error.message.includes('API error: 401')) {
+        errorContent = 'Authentication failed. Please check the API configuration.';
+      } else if (error.message.includes('API error: 429')) {
+        errorContent = 'Rate limit exceeded. Please wait a moment before trying again.';
+      } else if (error.message.includes('API error: 500')) {
+        errorContent = 'The AI service is temporarily unavailable. Please try again later.';
+      }
+      
       const errorMessage: ChatMessage = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: 'Sorry, I encountered an error processing your request. Please try again.',
+        content: errorContent,
         timestamp: new Date(),
+        error: true,
       };
       onMessagesChange([...messages, errorMessage]);
     } finally {
       onLoadingChange(false);
+      abortControllerRef.current = null;
     }
   };
+
+  // Cancel ongoing request if component unmounts
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   const formatMessage = (content: string) => {
     // Simple markdown parsing for bold text
@@ -159,7 +246,15 @@ export const ChatMode: React.FC<ChatModeProps> = ({
                 )}
               </div>
               <div className="chat-message-content">
-                {formatMessage(message.content)}
+                {message.id === streamingMessageId && streamingContent
+                  ? formatMessage(streamingContent)
+                  : formatMessage(message.content)
+                }
+                {message.error && (
+                  <div className="chat-error-indicator">
+                    <AlertCircle className="w-3 h-3" />
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
