@@ -8,6 +8,7 @@ import { ChartWrapper } from '@/components/Charts/ChartWrapper';
 import { LineChart, LineChartSeries } from '@/components/Charts/LineChart';
 import { AreaChart } from '@/components/Charts/AreaChart';
 import { DataTable } from '@/components/Tables/DataTable';
+import { GroundStationPanel } from '@/components/Panels/GroundStationPanel';
 import { toLineChartData, toAreaChartData, toTableData } from '@/utils/dataTransformers';
 import { cn } from '@/lib/utils';
 
@@ -31,8 +32,8 @@ export const ContextPanel: React.FC = () => {
   
   const selectedFeature = selectedFeatures[0];
   const isOpen = !!selectedFeature;
-
-  // Generate sample data for charts
+  
+  // Generate sample data for charts (must be called before conditional returns)
   const chartData = useMemo(() => {
     if (!selectedFeature) return null;
 
@@ -74,6 +75,18 @@ export const ContextPanel: React.FC = () => {
       table: tableData,
     };
   }, [selectedFeature]);
+  
+  // Check if this is a ground station feature
+  const isGroundStation = selectedFeature?.type === 'ground-station' || 
+                         selectedFeature?.operator || 
+                         selectedFeature?.antenna_count ||
+                         selectedFeature?.station_id ||
+                         (selectedFeature?.id && selectedFeature?.id.startsWith('SI'));
+  
+  // Use specialized panel for ground stations
+  if (isGroundStation) {
+    return <GroundStationPanel />;
+  }
 
   const renderContent = () => {
     if (!chartData) return null;

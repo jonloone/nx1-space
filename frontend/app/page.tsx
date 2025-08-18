@@ -2,21 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { NavigationBar } from '@/components/Navigation/NavigationBar';
 import { LayersPanel } from '@/components/Panels/LayersPanel';
 import { AnalyticsPanel } from '@/components/Panels/AnalyticsPanel';
 import { ContextPanel } from '@/components/Panels/ContextPanel';
-import { SearchBar } from '@/components/Controls/SearchBar';
-import { ViewModeToggle } from '@/components/Controls/ViewModeToggle';
+import { SearchChatBar } from '@/components/SearchChat/SearchChatBar';
 import { LoadingScreen } from '@/components/UI/LoadingScreen';
 import { useMapStore } from '@/lib/store/mapStore';
+// import { ConsoleCapture } from '@/components/Debug/ConsoleCapture';
 
-// Dynamically import map component to avoid SSR issues
+// Dynamically import the fixed map component
 const GeoCoreMap = dynamic(
   () => import('@/components/Map/GeoCoreMap'),
   { 
     ssr: false,
-    loading: () => <LoadingScreen />
+    loading: () => (
+      <div style={{ 
+        width: '100%', 
+        height: '100%', 
+        background: '#0a0a0f',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white'
+      }}>
+        Loading map component...
+      </div>
+    )
   }
 );
 
@@ -26,10 +37,12 @@ export default function Home() {
   const { domain, selectedFeatures } = useMapStore();
 
   useEffect(() => {
-    // Initialize app
+    console.log('[HomePage] Initializing app...');
+    // Shorter loading time since map is now working
     const timer = setTimeout(() => {
+      console.log('[HomePage] Setting loading to false');
       setIsLoading(false);
-    }, 1500);
+    }, 800);
     
     return () => clearTimeout(timer);
   }, []);
@@ -43,21 +56,8 @@ export default function Home() {
       {/* Main Map */}
       <GeoCoreMap />
       
-      {/* Top Navigation */}
-      <NavigationBar />
-      
-      {/* Search Bar */}
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 z-40">
-        <SearchBar />
-      </div>
-      
-      {/* View Mode Toggle */}
-      <div className="absolute top-20 right-4 z-40">
-        <ViewModeToggle />
-      </div>
-      
-      {/* Layers Panel */}
-      <div className="absolute top-32 right-4 z-30">
+      {/* Layers Panel - Now at top since no header */}
+      <div className="absolute top-4 right-4 z-30">
         <LayersPanel />
       </div>
       
@@ -84,13 +84,11 @@ export default function Home() {
       {/* Context Panel - Shows when feature is selected */}
       <ContextPanel />
       
-      {/* Performance Monitor (Dev Only) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="absolute top-4 left-4 z-50 p-2 glass rounded text-xs font-mono">
-          <div>Domain: {domain}</div>
-          <div>Features: {selectedFeatures.length}</div>
-        </div>
-      )}
+      {/* Search/Chat Bar - Fixed at bottom center */}
+      <SearchChatBar />
+      
+      {/* Debug Console - Temporarily disabled due to cyclic object error */}
+      {/* <ConsoleCapture /> */}
     </div>
   );
 }

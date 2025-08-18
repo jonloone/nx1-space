@@ -16,32 +16,19 @@ import {
 } from '@deck.gl/layers';
 import { HeatmapLayer } from '@deck.gl/aggregation-layers';
 
-const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY || 't7mqwGtsMHQJRwcP33Bi';
+// MapTiler removed - using Overture Maps instead
 
 export class LayerBuilder {
   static buildBaseLayers(config: any) {
     const layers = [];
     
-    // Satellite tiles for 3D mode
+    // Satellite imagery disabled - using Overture vector tiles instead
+    // This reduces WebGL context usage and improves performance
     if (config.satellite && config.viewMode === '3d') {
-      layers.push(new TileLayer({
-        id: 'satellite-tiles',
-        data: `https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key=${MAPTILER_KEY}`,
-        maxZoom: 19,
-        minZoom: 0,
-        tileSize: 256,
-        renderSubLayers: props => {
-          const {
-            bbox: { west, south, east, north }
-          } = props.tile;
-          
-          return new BitmapLayer(props, {
-            data: null,
-            image: props.data,
-            bounds: [west, south, east, north]
-          });
-        }
-      }));
+      // Satellite layer disabled to avoid API key requirement and reduce WebGL load
+      if (config.debugMode) {
+        console.log('Satellite imagery disabled - using vector basemap only');
+      }
     }
     
     return layers;

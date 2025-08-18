@@ -5,7 +5,14 @@ export class DataService {
     try {
       // Load real SES-Intelsat ground station data
       const response = await fetch('/data/ses_intelsat_ground_stations.json');
+      console.log('[DataService] Fetch response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ground station data: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('[DataService] Loaded ground station data:', data);
       
       // Transform the data to match expected format
       const stations = data.stations.map((station: any) => ({
@@ -26,6 +33,8 @@ export class DataService {
         services: station.technical_specs.services_supported,
         status: station.status
       }));
+      
+      console.log('[DataService] Transformed stations:', stations);
       
       // Generate footprints for each station
       const footprints = stations.map(station => ({
