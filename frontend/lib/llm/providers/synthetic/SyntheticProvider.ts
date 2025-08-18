@@ -36,6 +36,12 @@ export class SyntheticProvider implements LLMProvider {
     this.apiKey = LLM_CONFIG.synthetic.apiKey;
     this.apiUrl = LLM_CONFIG.synthetic.apiUrl;
     console.log('[Synthetic] Constructor - API Key present:', !!this.apiKey);
+    
+    // Detect example/fake API URL and default to mock mode
+    if (this.apiUrl.includes('api.synthetic.ai')) {
+      console.warn('[Synthetic] Using example API URL - switching to mock mode');
+      console.log('[Synthetic] To use a real LLM, configure a valid API endpoint');
+    }
   }
 
   async initialize(): Promise<void> {
@@ -46,10 +52,25 @@ export class SyntheticProvider implements LLMProvider {
       return;
     }
     
+    // Check if this is the example/fake API URL
+    if (this.apiUrl === 'https://api.synthetic.ai/v1') {
+      console.warn('[Synthetic] Using example API URL - switching to mock mode');
+      console.warn('[Synthetic] To use a real LLM, configure a valid API endpoint');
+      this.apiKey = ''; // Force mock mode
+      this.initialized = true;
+      return;
+    }
+    
     // Verify API key is valid
-    const isHealthy = await this.healthCheck();
-    if (!isHealthy) {
-      console.warn('[Synthetic] Health check failed, running in degraded mode');
+    try {
+      const isHealthy = await this.healthCheck();
+      if (!isHealthy) {
+        console.warn('[Synthetic] Health check failed, running in degraded mode');
+      }
+    } catch (error) {
+      console.warn('[Synthetic] Health check error:', error.message);
+      console.warn('[Synthetic] Switching to mock mode');
+      this.apiKey = ''; // Force mock mode
     }
     
     this.initialized = true;
@@ -218,6 +239,17 @@ export class SyntheticProvider implements LLMProvider {
   }
 
   async healthCheck(): Promise<boolean> {
+    // If no API key, we're in mock mode - always healthy
+    if (!this.apiKey) {
+      return true;
+    }
+    
+    // Skip health check for known fake/example URLs
+    if (this.apiUrl.includes('api.synthetic.ai')) {
+      console.warn('[Synthetic] Using example API URL, defaulting to mock mode');
+      return false;
+    }
+    
     try {
       // Test with a minimal completion
       const response = await fetch(`${this.apiUrl}/chat/completions`, {
@@ -237,6 +269,7 @@ export class SyntheticProvider implements LLMProvider {
 
       return response.ok;
     } catch (error) {
+      console.warn('[Synthetic] Health check failed:', error);
       return false;
     }
   }
@@ -325,19 +358,50 @@ export class SyntheticProvider implements LLMProvider {
   private getMockResponse(options: CompletionOptions): CompletionResponse {
     const query = options.messages[options.messages.length - 1].content.toLowerCase();
     
-    let content = 'This is a mock response. To use real AI responses, please configure your Synthetic API key.\n\n';
+    let content = '🤖 **Mock Response Mode**\n\n';
     
     if (query.includes('ground station')) {
-      content += 'Ground stations are facilities equipped with antennas and communication equipment for transmitting and receiving data from satellites and spacecraft. They serve as critical infrastructure for space operations, providing command, control, and data relay capabilities.';
-    } else if (query.includes('help')) {
-      content += 'I can help you with:\n- Ground station analysis\n- Network performance metrics\n- Coverage optimization\n- Predictive maintenance\n- Real-time monitoring';
+      content += 'Ground stations are facilities equipped with antennas and communication equipment for transmitting and receiving data from satellites and spacecraft. They serve as critical infrastructure for space operations.\n\n';
+      content += '**Key Functions:**\n';
+      content += '- Command and control of spacecraft\n';
+      content += '- Data downlink and uplink\n';
+      content += '- Telemetry monitoring\n';
+      content += '- Network coordination\n\n';
+      content += '*Note: In production, I would analyze real-time ground station data, performance metrics, and provide specific insights.*';
+    } else if (query.includes('help') || query.includes('what can you do')) {
+      content += 'I can assist with:\n\n';
+      content += '**Ground Station Operations:**\n';
+      content += '- Station status and health monitoring\n';
+      content += '- Network performance analysis\n';
+      content += '- Coverage optimization\n';
+      content += '- Predictive maintenance insights\n\n';
+      content += '**Geospatial Analysis:**\n';
+      content += '- Location-based queries\n';
+      content += '- Coverage mapping\n';
+      content += '- Route optimization\n';
+      content += '- Real-time tracking\n\n';
+      content += '*Note: This is a mock response. Configure a real LLM API for actual AI-powered analysis.*';
+    } else if (query.includes('hello') || query.includes('hi')) {
+      content += 'Hello! I\'m the GeoCoreMap AI assistant (currently in mock mode).\n\n';
+      content += 'I\'m designed to help with geospatial analysis and ground station operations. Ask me about:\n';
+      content += '- Ground stations and their performance\n';
+      content += '- Network coverage and optimization\n';
+      content += '- Geospatial data analysis\n';
+      content += '- System monitoring and alerts\n\n';
+      content += '*To enable real AI responses, configure a valid LLM API endpoint in your environment.*';
     } else {
-      content += `I understand you're asking about: "${options.messages[options.messages.length - 1].content}"\n\nIn a production environment with a valid API key, I would provide detailed analysis and insights based on your query.`;
+      content += `I understand you're asking about: "${options.messages[options.messages.length - 1].content}"\n\n`;
+      content += 'In mock mode, I can provide basic responses about:\n';
+      content += '- Ground station operations\n';
+      content += '- Geospatial analysis\n';
+      content += '- Network performance\n';
+      content += '- System monitoring\n\n';
+      content += '*For comprehensive AI-powered analysis, please configure a real LLM API endpoint.*';
     }
     
     return {
       id: `mock-${Date.now()}`,
-      model: options.model,
+      model: options.model || 'mock-model',
       content,
       finishReason: 'stop',
       usage: {
@@ -347,7 +411,8 @@ export class SyntheticProvider implements LLMProvider {
       },
       metadata: {
         mock: true,
-        latency: 100
+        latency: 100,
+        note: 'Using mock responses - configure a real LLM API for production use'
       }
     };
   }
