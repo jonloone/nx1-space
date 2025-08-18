@@ -17,6 +17,7 @@ import { getTelemetryGenerator, TelemetryGenerator } from '@/lib/services/Teleme
 import { groundStationScorer } from '@/lib/scoring/GroundStationScorer';
 import { DetailPanel } from '@/components/Panels/DetailPanel';
 import { cn } from '@/lib/utils';
+import { SimpleEmbeddedAssistant } from '@/components/Chat/SimpleEmbeddedAssistant';
 
 export const GroundStationPanel: React.FC = () => {
   const { selectedFeatures, clearSelection } = useMapStore();
@@ -631,6 +632,22 @@ export const GroundStationPanel: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* AI Assistant */}
+        <SimpleEmbeddedAssistant
+          context={{
+            type: 'station',
+            station: selectedFeature,
+            metrics: {
+              telemetry: telemetryData,
+              scoring: chartData.scoringData,
+              signalQuality: telemetryData?.signalMetrics,
+              performance: telemetryData?.performance
+            }
+          }}
+          maxHeight={400}
+          className="mt-6"
+        />
       </div>
     </DetailPanel>
   );
