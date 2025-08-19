@@ -68,3 +68,79 @@ export interface GERSIndexStats {
   lastUpdated: number;
   cacheSize: number;
 }
+
+export interface OvertureBuildingFeature {
+  id: string;
+  geometry: GeoJSON.Geometry;
+  properties: {
+    height?: number;
+    level?: number;
+    numFloors?: number;
+    class?: string;
+    names?: {
+      primary?: string;
+      common?: string[];
+    };
+    addresses?: Array<{
+      freeform?: string;
+      locality?: string;
+      region?: string;
+      country?: string;
+      postcode?: string;
+    }>;
+    sources?: Array<{
+      property?: string;
+      dataset?: string;
+      recordId?: string;
+      confidence?: number;
+    }>;
+    updateTime?: string;
+  };
+}
+
+export interface H3SpatialIndex {
+  resolution: number;
+  index: Map<string, string[]>; // H3 hex -> entity IDs
+}
+
+export interface GERSQueryOptions {
+  center: [number, number];
+  radiusKm: number;
+  category?: string[];
+  minConfidence?: number;
+  limit?: number;
+  includeBuildings?: boolean;
+  includePlaces?: boolean;
+  h3Resolution?: number;
+}
+
+export interface BuildingDensityCell {
+  h3Index: string;
+  buildingCount: number;
+  totalArea: number;
+  averageHeight: number;
+  dominantType: string;
+  confidence: number;
+  center: [number, number];
+}
+
+export interface ChangeDetectionResult {
+  entityId: string;
+  changeType: 'added' | 'modified' | 'removed';
+  timestamp: string;
+  confidence: number;
+  oldValue?: any;
+  newValue?: any;
+  source: string;
+}
+
+export interface DomainAnalysis {
+  domain: 'maritime' | 'telecom' | 'logistics' | 'energy';
+  entityId: string;
+  metrics: Record<string, number>;
+  opportunity: {
+    score: number;
+    factors: string[];
+    recommendation: string;
+  };
+}
