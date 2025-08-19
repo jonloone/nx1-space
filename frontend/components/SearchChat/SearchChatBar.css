@@ -1,13 +1,8 @@
-/* Search/Chat Container - Fixed at bottom center */
+/* Search/Chat Container */
 .search-chat-container {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   z-index: 1000;
   width: 100%;
-  max-width: 600px;
-  padding: 0 16px;
   pointer-events: none;
 }
 
@@ -113,10 +108,10 @@
 /* Results/Response Area */
 .search-chat-results {
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   left: 0;
   right: 0;
-  margin-bottom: 8px;
+  margin-top: 8px;
   max-height: 400px;
   overflow-y: auto;
   background: rgba(10, 10, 15, 0.95);
@@ -125,7 +120,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   box-shadow: 
-    0 -8px 32px rgba(0, 0, 0, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   pointer-events: auto;
 }

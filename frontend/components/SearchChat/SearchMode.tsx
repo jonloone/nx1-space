@@ -26,6 +26,8 @@ export const SearchMode: React.FC<SearchModeProps> = ({
   const gersService = React.useRef(getGERSService());
   const gersDataLoader = React.useRef(getGERSDataLoader());
   const { selectFeature } = useMapStore();
+  
+  console.log('SearchMode mounted with query:', query);
 
   // Common places database
   const commonPlaces = React.useMemo(() => [
@@ -61,6 +63,7 @@ export const SearchMode: React.FC<SearchModeProps> = ({
 
     const performSearch = async () => {
       onLoadingChange(true);
+      console.log('SearchMode: Performing search for:', query);
       try {
         const searchResults: SearchResult[] = [];
         const queryLower = query.toLowerCase();
@@ -73,6 +76,7 @@ export const SearchMode: React.FC<SearchModeProps> = ({
           (place.state && place.state.toLowerCase().includes(queryLower)) ||
           (place.country && place.country.toLowerCase().includes(queryLower))
         );
+        console.log('SearchMode: Found places:', placeResults.length, placeResults);
 
         placeResults.forEach(place => {
           searchResults.push({

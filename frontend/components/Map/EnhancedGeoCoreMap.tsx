@@ -8,7 +8,6 @@ import maplibregl from 'maplibre-gl';
 import { useMapStore } from '@/lib/store/mapStore';
 import { NavigationControl } from '../Controls/NavigationControl';
 import { BuildingAnalysisPanel } from '../Panels/BuildingAnalysisPanel';
-import { SearchChatBar } from '../SearchChat/SearchChatBar';
 import { getGERSBuildingLayerManager } from './layers/GERSBuildingLayer';
 import { OvertureBuildingFeature } from '@/lib/types/gers';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -236,35 +235,22 @@ export function EnhancedGeoCoreMap() {
   useEffect(() => {
     const handleNavigate = (event: CustomEvent) => {
       const { longitude, latitude, zoom } = event.detail;
-      setViewState({
-        ...viewState,
+      setViewState(prev => ({
+        ...prev,
         longitude,
         latitude,
         zoom: zoom || 12
-      });
+      }));
     };
 
     window.addEventListener('navigate-to-location', handleNavigate as any);
     return () => {
       window.removeEventListener('navigate-to-location', handleNavigate as any);
     };
-  }, [viewState]);
+  }, []);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {/* Search Bar */}
-      <div style={{
-        position: 'absolute',
-        top: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 1000,
-        width: '90%',
-        maxWidth: '600px'
-      }}>
-        <SearchChatBar />
-      </div>
-
       <DeckGL
         viewState={viewState}
         onViewStateChange={viewStateHandler}

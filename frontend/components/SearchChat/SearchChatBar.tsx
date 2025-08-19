@@ -106,7 +106,7 @@ export const SearchChatBar: React.FC = () => {
       {/* Main Search/Chat Bar */}
       <div className="search-chat-container">
         <AnimatePresence>
-          {(searchResults.length > 0 || chatMessages.length > 0) && (
+          {(query.trim() || searchResults.length > 0 || chatMessages.length > 0) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
