@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFoundryStore } from '@/lib/store/foundryStore';
+import { TemplateSelector } from '@/components/Templates/TemplateSelector';
 import { 
   Search, 
   Sparkles, 
@@ -193,54 +194,26 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({ className = '' }) => {
           )}
         </div>
 
-        {/* Quick Start Templates */}
+        {/* Template System with Smart Compatibility */}
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-6">
             <Zap className="w-5 h-5 text-yellow-400" />
-            <h2 className="text-2xl font-semibold text-white">Quick Start Templates</h2>
+            <h2 className="text-2xl font-semibold text-white">Intelligent Templates</h2>
+            <span className="px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-400 text-xs">
+              AI-Powered
+            </span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickStartTemplates.map((template) => (
-              <button
-                key={template.id}
-                onClick={() => handleTemplateClick(template)}
-                className="group relative overflow-hidden p-6
-                           bg-black/40 backdrop-blur-md
-                           border border-white/10 rounded-xl
-                           hover:border-white/30 hover:bg-black/60
-                           transition-all duration-300"
-              >
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${template.color} opacity-10`} />
-                </div>
-                
-                <div className="relative">
-                  <div className={`
-                    w-12 h-12 mb-4 rounded-lg
-                    bg-gradient-to-br ${template.color}
-                    flex items-center justify-center
-                    shadow-lg
-                  `}>
-                    {template.icon}
-                  </div>
-                  
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {template.name}
-                  </h3>
-                  
-                  <p className="text-sm text-white/60 mb-4">
-                    {template.description}
-                  </p>
-                  
-                  <div className="flex items-center gap-2 text-white/40">
-                    <ArrowRight className="w-4 h-4" />
-                    <span className="text-xs">Opens in {template.lens} lens</span>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
+          {/* Template Selector with Compatibility Checking */}
+          <TemplateSelector 
+            availableData={{
+              // Mock data for demonstration - replace with real data
+              customer: { id: '1', name: 'Test' },
+              assets: [{ id: '1', location: { lat: 0, lng: 0 } }],
+              metrics: { value: 100 },
+              risks: [{ severity: 5 }]
+            }}
+          />
         </div>
 
         {/* Bottom Section */}
