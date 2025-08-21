@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useMemo } from 'react';
-import { ASSISTANT_CONFIG } from '@/lib/services/llm/synthetic-adapter';
 import { useAssistantRuntime } from './useAssistantRuntime';
 
 interface AssistantContextValue {
@@ -43,8 +42,8 @@ export const SimpleAssistantProvider: React.FC<SimpleAssistantProviderProps> = (
   // Update system message when context changes
   React.useEffect(() => {
     if (context) {
-      const systemPrompt = ASSISTANT_CONFIG.systemPromptTemplate(context);
-      runtime.setSystemMessage(systemPrompt);
+      // System prompt is now handled server-side in the API route
+      // We just pass the context to the API
     }
   }, [context, runtime]);
 

@@ -1,10 +1,64 @@
 /**
  * API Route for Assistant-UI Chat
- * Handles streaming chat completions with Synthetic AI
+ * Handles streaming chat completions with Vultr API
  */
 
 import { NextRequest } from 'next/server';
-import { syntheticClient, DEFAULT_MODEL, ASSISTANT_CONFIG } from '@/lib/services/llm/synthetic-adapter';
+
+// Vultr configuration
+const VULTR_API_KEY = process.env.VULTR_API_KEY || 'NQCHCWXPSWQ3JL6IM5NT5EBD4FNOK5S7AEZA';
+const VULTR_MODEL = 'mistral-nemo-instruct-2407';
+const VULTR_BASE_URL = 'https://api.vultrinference.com/v1';
+
+// Assistant configuration
+const ASSISTANT_CONFIG = {
+  temperature: 0.7,
+  maxTokens: 2048,
+  systemPromptTemplate: (context: any) => {
+    const basePrompt = `You are an intelligent assistant for the GeoCoreMap platform, specializing in geospatial data analysis and ground station operations.
+You have access to real-time data about ground stations, maritime vessels, and other geospatial entities.
+Provide accurate, concise, and actionable information. When referencing locations, be specific with coordinates when available.
+Keep responses focused and under 3-4 sentences unless the user asks for more detail.`;
+
+    if (context?.type === 'station' && context?.station) {
+      return `${basePrompt}
+
+Current context: Ground Station "${context.station.name}"
+- Health Score: ${(context.station.score * 100).toFixed(1)}%
+- Utilization: ${(context.station.utilization * 100).toFixed(1)}%
+- Status: ${context.station.status || 'Operational'}
+- Location: [${context.station.latitude?.toFixed(4)}, ${context.station.longitude?.toFixed(4)}]
+
+Focus on analyzing this specific station's performance and providing actionable insights.`;
+    }
+
+    if (context?.type === 'opportunity' && context?.hexagon) {
+      return `${basePrompt}
+
+Current context: Opportunity Analysis for Hexagon
+- ID: ${context.hexagon.id}
+- Population: ${context.hexagon.population?.toLocaleString() || 'Unknown'}
+- Coverage Score: ${(context.hexagon.coverageScore * 100).toFixed(1)}%
+- Opportunity Score: ${(context.hexagon.opportunityScore * 100).toFixed(1)}%
+
+Focus on evaluating deployment opportunities and ROI potential.`;
+    }
+
+    if (context?.type === 'maritime' && context?.vessel) {
+      return `${basePrompt}
+
+Current context: Maritime Vessel "${context.vessel.name}"
+- Type: ${context.vessel.type}
+- Speed: ${context.vessel.speed?.toFixed(1)} knots
+- Course: ${context.vessel.course}°
+- Location: [${context.vessel.latitude?.toFixed(4)}, ${context.vessel.longitude?.toFixed(4)}]
+
+Focus on maritime coverage and connectivity analysis.`;
+    }
+
+    return basePrompt;
+  }
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,56 +77,49 @@ export async function POST(request: NextRequest) {
     // Combine system message with user messages
     const allMessages = [systemMessage, ...messages];
 
-    console.log('[Assistant API] Processing request', {
+    console.log('[Vultr Assistant API] Processing request', {
       threadId,
       messageCount: messages.length,
       contextType: context?.type,
-      model: DEFAULT_MODEL
+      model: VULTR_MODEL
     });
 
     try {
-      // Use the OpenAI client for streaming
-      const stream = await syntheticClient.chat.completions.create({
-        model: DEFAULT_MODEL,
-        messages: allMessages,
-        temperature: ASSISTANT_CONFIG.temperature,
-        max_tokens: ASSISTANT_CONFIG.maxTokens,
-        stream: true
+      // Make streaming request to Vultr
+      const response = await fetch(`${VULTR_BASE_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${VULTR_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: VULTR_MODEL,
+          messages: allMessages,
+          temperature: ASSISTANT_CONFIG.temperature,
+          max_tokens: ASSISTANT_CONFIG.maxTokens,
+          stream: true
+        }),
       });
 
-      // Create a streaming response
-      const encoder = new TextEncoder();
-      const readable = new ReadableStream({
-        async start(controller) {
-          try {
-            for await (const chunk of stream) {
-              const delta = chunk.choices[0]?.delta?.content;
-              if (delta) {
-                const data = JSON.stringify(chunk);
-                controller.enqueue(encoder.encode(`data: ${data}\n\n`));
-              }
-            }
-            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-          } catch (error) {
-            console.error('[Assistant API] Stream error:', error);
-            controller.error(error);
-          } finally {
-            controller.close();
-          }
-        }
-      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[Vultr Assistant API] Error:', response.status, errorText);
+        throw new Error(`Vultr API error: ${response.status} ${response.statusText}`);
+      }
 
-      return new Response(readable, {
+      // Pass through the SSE stream from Vultr
+      return new Response(response.body, {
         headers: {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive'
         }
       });
+      
     } catch (error: any) {
-      // If Synthetic API fails, use mock response
+      // If Vultr API fails, use mock response
       if (error.code === 'ENOTFOUND' || error.message?.includes('fetch')) {
-        console.log('[Assistant API] Using mock response');
+        console.log('[Vultr Assistant API] Using mock response');
         
         const mockResponse = getMockResponse(messages[messages.length - 1].content);
         const encoder = new TextEncoder();
@@ -83,9 +130,13 @@ export async function POST(request: NextRequest) {
             for (let i = 0; i < words.length; i++) {
               const chunk = {
                 id: 'mock-' + Date.now(),
+                object: 'chat.completion.chunk',
+                created: Math.floor(Date.now() / 1000),
+                model: VULTR_MODEL,
                 choices: [{
                   delta: { content: words[i] + (i < words.length - 1 ? ' ' : '') },
-                  index: 0
+                  index: 0,
+                  finish_reason: null
                 }]
               };
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
@@ -109,7 +160,7 @@ export async function POST(request: NextRequest) {
       throw error;
     }
   } catch (error: any) {
-    console.error('[Assistant API] Error:', error);
+    console.error('[Vultr Assistant API] Error:', error);
 
     // Handle specific error types
     if (error.message?.includes('API key')) {
@@ -164,10 +215,10 @@ export async function GET() {
   return new Response(
     JSON.stringify({
       status: 'healthy',
-      provider: 'synthetic',
-      model: DEFAULT_MODEL,
+      provider: 'vultr',
+      model: VULTR_MODEL,
       streaming: true,
-      tools: ['zoomToLocation', 'highlightStations', 'applyFilter']
+      apiKey: VULTR_API_KEY ? 'configured' : 'missing'
     }),
     {
       status: 200,
