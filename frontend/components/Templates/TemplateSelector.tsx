@@ -46,7 +46,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
 }) => {
   const { setLens, setActiveTemplate } = useFoundryStore();
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [compatibility, setCompatibility] = useState<Map<string, TemplateCompatibility>>(new Map());
+  const [compatibility, setCompatibility] = useState<Record<string, TemplateCompatibility>>({});
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
   
@@ -56,16 +56,16 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
     setTemplates(allTemplates);
     
     // Check compatibility for each template
-    const compatMap = new Map<string, TemplateCompatibility>();
+    const compatMap: Record<string, TemplateCompatibility> = {};
     allTemplates.forEach(template => {
       const compat = templateEngine.checkCompatibility(template, availableData);
-      compatMap.set(template.id, compat);
+      compatMap[template.id] = compat;
     });
     setCompatibility(compatMap);
   }, [availableData]);
   
   const handleTemplateClick = async (template: Template) => {
-    const compat = compatibility.get(template.id);
+    const compat = compatibility[template.id];
     if (!compat || compat.compatibility < 30) {
       console.warn('Insufficient data for template:', template.id);
       return;
@@ -117,8 +117,8 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
     : templates.filter(t => t.category === selectedCategory);
   
   const sortedTemplates = [...filteredTemplates].sort((a, b) => {
-    const compatA = compatibility.get(a.id)?.compatibility || 0;
-    const compatB = compatibility.get(b.id)?.compatibility || 0;
+    const compatA = compatibility[a.id]?.compatibility || 0;
+    const compatB = compatibility[b.id]?.compatibility || 0;
     return compatB - compatA; // Sort by compatibility descending
   });
   
@@ -171,7 +171,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
       {/* Template Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {sortedTemplates.map(template => {
-          const compat = compatibility.get(template.id);
+          const compat = compatibility[template.id];
           const isDisabled = !compat || compat.compatibility < 30;
           
           return (
@@ -282,7 +282,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
       </div>
       
       {/* AI Recommendation */}
-      {sortedTemplates.length > 0 && compatibility.get(sortedTemplates[0].id)?.compatibility >= 80 && (
+      {sortedTemplates.length > 0 && compatibility[sortedTemplates[0].id]?.compatibility >= 80 && (
         <div className="mt-6 p-4 bg-gradient-to-r from-purple-500/20 to-blue-500/20 
                         backdrop-blur-md border border-white/20 rounded-lg">
           <div className="flex items-center gap-3">
@@ -290,7 +290,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
             <div>
               <div className="text-white font-medium">AI Recommendation</div>
               <div className="text-white/60 text-sm">
-                "{sortedTemplates[0].name}" has {Math.round(compatibility.get(sortedTemplates[0].id)?.compatibility || 0)}% compatibility with your data
+                "{sortedTemplates[0].name}" has {Math.round(compatibility[sortedTemplates[0].id]?.compatibility || 0)}% compatibility with your data
               </div>
             </div>
           </div>
