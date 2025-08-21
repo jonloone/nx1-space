@@ -2,33 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { BarChart3, MessageSquare } from 'lucide-react';
-import { CompactToolBar } from '@/components/Tools/CompactToolBar';
-import { ContextPanel } from '@/components/Panels/ContextPanel';
+import { BarChart3, MessageSquare, Sparkles } from 'lucide-react';
 import { EnhancedAnalyticsPanel } from '@/components/Panels/EnhancedAnalyticsPanel';
 import { EnhancedChatPanel } from '@/components/Panels/EnhancedChatPanel';
 import { LoadingScreen } from '@/components/UI/LoadingScreen';
-import { useMapStore } from '@/lib/store/mapStore';
-// import { ConsoleCapture } from '@/components/Debug/ConsoleCapture';
+import { useFoundryStore } from '@/lib/store/foundryStore';
 
-// Dynamically import the fixed map component
-const GeoCoreMap = dynamic(
-  () => import('@/components/Map/GeoCoreMap'),
+// Dynamically import the FoundryWorkstation
+const FoundryWorkstation = dynamic(
+  () => import('@/components/Foundry/FoundryWorkstation').then(mod => ({ default: mod.FoundryWorkstation })),
   { 
     ssr: false,
-    loading: () => (
-      <div style={{ 
-        width: '100%', 
-        height: '100%', 
-        background: '#0a0a0f',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white'
-      }}>
-        Loading map component...
-      </div>
-    )
+    loading: () => <LoadingScreen />
   }
 );
 
@@ -36,7 +21,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const { selectedFeatures } = useMapStore();
+  const [useFoundryMode, setUseFoundryMode] = useState(true); // Toggle for testing
+  const { currentLens } = useFoundryStore();
 
   useEffect(() => {
     console.log('[HomePage] Initializing app...');
@@ -55,44 +41,58 @@ export default function Home() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-black">
-      {/* Main Map */}
-      <GeoCoreMap />
+      {/* Main Foundry Workstation */}
+      <FoundryWorkstation />
       
-      {/* Left Sidebar with Layers and Search */}
-      <CompactToolBar />
+      {/* Floating Action Buttons - Only show when not in welcome view */}
+      {currentLens !== 'welcome' && (
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-[900] flex gap-3">
+          {/* Analytics Dashboard Button */}
+          <button
+            onClick={() => setShowAnalytics(!showAnalytics)}
+            className="px-6 py-3 bg-black/60 backdrop-blur-md
+                       border border-white/20 rounded-full
+                       text-white font-semibold
+                       shadow-xl hover:shadow-2xl 
+                       hover:bg-white/10 hover:border-white/30
+                       transition-all duration-200
+                       flex items-center gap-2"
+          >
+            <BarChart3 className="w-5 h-5" />
+            Analytics Dashboard
+          </button>
+          
+          {/* Chat Button */}
+          <button
+            onClick={() => setShowChat(!showChat)}
+            className="px-6 py-3 bg-black/60 backdrop-blur-md
+                       border border-white/20 rounded-full
+                       text-white font-semibold
+                       shadow-xl hover:shadow-2xl
+                       hover:bg-white/10 hover:border-white/30
+                       transition-all duration-200
+                       flex items-center gap-2"
+          >
+            <MessageSquare className="w-5 h-5" />
+            AI Assistant
+          </button>
+        </div>
+      )}
       
-      
-      {/* Floating Action Buttons - Bottom Center with Glassmorphism */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-[900] flex gap-3">
-        {/* Analytics Dashboard Button */}
-        <button
-          onClick={() => setShowAnalytics(!showAnalytics)}
-          className="px-6 py-3 bg-black/60 backdrop-blur-md
-                     border border-white/20 rounded-full
-                     text-white font-semibold
-                     shadow-xl hover:shadow-2xl 
-                     hover:bg-white/10 hover:border-white/30
-                     transition-all duration-200
-                     flex items-center gap-2"
-        >
-          <BarChart3 className="w-5 h-5" />
-          Analytics Dashboard
-        </button>
-        
-        {/* Chat Button */}
-        <button
-          onClick={() => setShowChat(!showChat)}
-          className="px-6 py-3 bg-black/60 backdrop-blur-md
-                     border border-white/20 rounded-full
-                     text-white font-semibold
-                     shadow-xl hover:shadow-2xl
-                     hover:bg-white/10 hover:border-white/30
-                     transition-all duration-200
-                     flex items-center gap-2"
-        >
-          <MessageSquare className="w-5 h-5" />
-          AI Assistant
-        </button>
+      {/* Foundry Mode Indicator */}
+      <div className="absolute bottom-4 left-4 z-[900]">
+        <div className="px-3 py-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20
+                        backdrop-blur-md border border-white/20 rounded-full
+                        text-white/80 text-xs flex items-center gap-2">
+          <Sparkles className="w-3 h-3 text-yellow-400" />
+          <span>NexusOne Foundry</span>
+          {currentLens !== 'welcome' && (
+            <>
+              <span className="text-white/40">•</span>
+              <span className="capitalize">{currentLens} Lens</span>
+            </>
+          )}
+        </div>
       </div>
       
       {/* Analytics Panel */}
@@ -106,12 +106,6 @@ export default function Home() {
         isOpen={showChat}
         onClose={() => setShowChat(false)}
       />
-      
-      {/* Context Panel - Shows when feature is selected */}
-      <ContextPanel />
-      
-      {/* Debug Console - Temporarily disabled due to cyclic object error */}
-      {/* <ConsoleCapture /> */}
     </div>
   );
 }
