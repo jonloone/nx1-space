@@ -456,11 +456,14 @@ export function EnhancedWorkspaceContainer() {
     ),
   };
 
-  // Custom tab component with close/minimize button
+  // Custom tab component - properly integrated with Dockview's tab system
   const TabComponent = (props: any) => {
-    const panelDef = PANEL_DEFINITIONS[props.api.id];
-    const isCloseable = panelDef?.closeable !== false;
-    const isAIConsole = props.api.id === 'ai-console';
+    const panelId = props.api.id;
+    const isAIConsole = panelId === 'ai-console';
+    const isMainContent = panelId === 'main-content';
+    
+    // Main content cannot be closed, everything else can
+    const isCloseable = !isMainContent;
 
     const getIcon = () => {
       if (props.api.title.includes('Process')) return 'fa-cogs';
@@ -476,30 +479,34 @@ export function EnhancedWorkspaceContainer() {
       return 'fa-layer-group';
     };
 
-    const handleTabAction = (e: React.MouseEvent) => {
+    const handleCloseClick = (e: React.MouseEvent) => {
       e.stopPropagation();
       
-      if (isAIConsole) {
-        // Minimize instead of close for AI Console
-        props.api.setSize({ width: 48 });
-        props.api.updateParameters({ 
-          ...props.api.params, 
-          minimized: true 
-        });
+      if (isAIConsole && api) {
+        // For AI Console, minimize instead of close
+        const consolePanel = api.getPanel('ai-console');
+        if (consolePanel) {
+          consolePanel.api.setSize({ width: 48 });
+          consolePanel.api.updateParameters({ 
+            ...consolePanel.params, 
+            minimized: true 
+          });
+        }
       } else {
-        // Regular close for other panels
+        // For other panels, use Dockview's close method
         props.api.close();
       }
     };
 
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 text-xs group">
+      <div className="flex items-center gap-2 px-3 py-1.5 text-xs group h-full">
         <i className={`fas ${getIcon()} text-gray-400`} />
-        <span className="text-gray-300">{props.api.title}</span>
+        <span className="text-gray-300 flex-1">{props.api.title}</span>
         {isCloseable && (
           <button
-            className="ml-2 opacity-0 group-hover:opacity-50 hover:opacity-100 transition-opacity"
-            onClick={handleTabAction}
+            className="ml-auto opacity-0 group-hover:opacity-50 hover:opacity-100 transition-opacity p-1 hover:bg-gray-800 rounded"
+            onClick={handleCloseClick}
+            onMouseDown={(e) => e.preventDefault()} // Prevent tab selection on close
             title={isAIConsole ? "Minimize (Cmd+K)" : "Close tab"}
           >
             <i className={`fas ${isAIConsole ? 'fa-compress-alt' : 'fa-times'} text-xs`} />

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { SimplifiedNavigation } from '@/components/workspace/SimplifiedNavigation';
-import { EnhancedWorkspaceContainer } from '@/components/workspace/EnhancedWorkspaceContainer';
+import { ProperDockviewWorkspace } from '@/components/workspace/ProperDockviewWorkspace';
 import { cn } from '@/lib/utils/cn';
 
 export function AppLayout() {
@@ -23,7 +23,7 @@ export function AppLayout() {
       
       {/* Workspace Container - Managed by Dockview */}
       <main className="flex-1 relative overflow-hidden">
-        <EnhancedWorkspaceContainer />
+        <ProperDockviewWorkspace />
       </main>
     </div>
   );
