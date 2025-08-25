@@ -1,0 +1,255 @@
+/**
+ * Custom Dockview Styles for NexusOne
+ * Enhanced panel management with glass morphism
+ */
+
+/* Main container styling */
+.nexusone-dockview {
+  --dockview-tab-height: 35px;
+  --dockview-border-color: rgba(255, 255, 255, 0.1);
+  --dockview-tab-background: rgba(0, 0, 0, 0.3);
+  --dockview-tab-active-background: rgba(0, 0, 0, 0.5);
+  --dockview-paneview-background: transparent;
+  --dockview-group-background: rgba(0, 0, 0, 0.2);
+}
+
+/* Tab styling with close button */
+.dockview-tab {
+  background: var(--dockview-tab-background);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.dockview-tab:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.dockview-tab.active {
+  background: var(--dockview-tab-active-background);
+  border-bottom-color: #7c3aed;
+}
+
+/* Close button styling */
+.dockview-tab-action-close {
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-left: 8px;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.dockview-tab:hover .dockview-tab-action-close {
+  opacity: 0.5;
+}
+
+.dockview-tab-action-close:hover {
+  opacity: 1;
+  background: rgba(255, 85, 85, 0.2);
+  color: #ff5555;
+}
+
+/* Panel content area */
+.dockview-content-container {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Splitter styling */
+.dockview-splitview-separator {
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.2s;
+  position: relative;
+}
+
+.dockview-splitview-separator:hover {
+  background: rgba(124, 58, 237, 0.3);
+}
+
+.dockview-splitview-separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.dockview-splitview-separator:hover::after {
+  opacity: 1;
+}
+
+/* Auto-sizing transitions */
+.dockview-panel {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Floating panels */
+.dockview-floating-group {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.dockview-floating-group-title {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px 8px 0 0;
+}
+
+/* Panel actions */
+.dockview-panel-action {
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 4px;
+}
+
+.dockview-panel-action:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+/* Maximize button */
+.dockview-panel-action-maximize:hover {
+  background: rgba(124, 58, 237, 0.2);
+  color: #7c3aed;
+}
+
+/* Float button */
+.dockview-panel-action-float:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+/* Empty state */
+.dockview-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+}
+
+/* Drag overlay */
+.dockview-dnd-overlay {
+  background: rgba(124, 58, 237, 0.1);
+  border: 2px dashed rgba(124, 58, 237, 0.5);
+  border-radius: 4px;
+}
+
+/* Tab dropdown menu */
+.dockview-tab-dropdown {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dockview-tab-dropdown-item {
+  padding: 6px 12px;
+  border-radius: 3px;
+  transition: background 0.2s;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+}
+
+.dockview-tab-dropdown-item:hover {
+  background: rgba(124, 58, 237, 0.2);
+  color: white;
+}
+
+/* Custom scrollbar */
+.dockview-content-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dockview-content-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.dockview-content-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.dockview-content-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes panel-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dockview-panel-added {
+  animation: panel-enter 0.3s ease;
+}
+
+/* Focus indicators */
+.dockview-panel:focus-within {
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .nexusone-dockview {
+    --dockview-tab-height: 30px;
+  }
+  
+  .dockview-tab {
+    font-size: 11px;
+  }
+  
+  .dockview-splitview-separator {
+    width: 6px !important;
+  }
+}
+
+/* Dark theme overrides */
+.dockview-theme-dark .dockview-tab {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dockview-theme-dark .dockview-panel {
+  background: transparent;
+}
+
+/* Layout preset transitions */
+.dockview-layout-transition {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Minimized panel state */
+.dockview-panel-minimized {
+  max-height: var(--dockview-tab-height);
+  overflow: hidden;
+}
+
+.dockview-panel-minimized .dockview-content-container {
+  display: none;
+}
