@@ -8,6 +8,7 @@ import { DataQualityAssessment } from '@/components/workstation/DataQualityAsses
 import { PipelineBuilder } from '@/components/workstation/tasks/PipelineBuilder';
 import { QueryOptimizer } from '@/components/workstation/tasks/QueryOptimizer';
 import { ConnectionWizard } from '@/components/workstation/tasks/ConnectionWizard';
+import { TaskPlaceholder } from '@/components/workstation/TaskPlaceholder';
 
 export function TaskContent() {
   const { currentTask, currentCategory } = useWorkspaceStore();
@@ -118,32 +119,127 @@ function EmptyState() {
 }
 
 function TaskInterface({ taskId }: { taskId: string }) {
+  const task = getTaskById(taskId as any);
+  
   // Map task IDs to their respective components
   switch (taskId) {
-    case 'query_to_product':
-      return <QueryToProductWizard />;
+    // Ingest tasks
+    case 'connect_data':
+      return <ConnectionWizard role="data_engineer" />;
     
-    case 'test_quality':
-      return <DataQualityAssessment tableName="customers" />;
+    case 'stream_processing':
+      return (
+        <TaskPlaceholder 
+          taskName="Stream Processing"
+          taskDescription="Set up real-time data streaming pipelines with Kafka, Kinesis, or other streaming platforms"
+          icon="fas fa-stream"
+          category="ingest"
+        />
+      );
     
+    case 'migrate_data':
+      return (
+        <TaskPlaceholder 
+          taskName="Data Migration"
+          taskDescription="Migrate data between systems, databases, or cloud platforms with validation and rollback capabilities"
+          icon="fas fa-exchange-alt"
+          category="ingest"
+        />
+      );
+    
+    // Process tasks
     case 'build_pipeline':
       return <PipelineBuilder role="data_engineer" />;
     
     case 'optimize_query':
       return <QueryOptimizer role="data_engineer" />;
     
-    case 'connect_data':
-      return <ConnectionWizard role="data_engineer" />;
+    case 'catalog_data':
+      return (
+        <TaskPlaceholder 
+          taskName="Data Catalog"
+          taskDescription="Catalog and document your data assets with metadata, tags, and business context"
+          icon="fas fa-book"
+          category="process"
+        />
+      );
+    
+    case 'query_to_product':
+      return <QueryToProductWizard />;
+    
+    // Analyze tasks
+    case 'trace_lineage':
+      return (
+        <TaskPlaceholder 
+          taskName="Lineage Tracing"
+          taskDescription="Trace data lineage from source to destination, understanding transformations and dependencies"
+          icon="fas fa-project-diagram"
+          category="analyze"
+        />
+      );
+    
+    case 'profile_data':
+      return (
+        <TaskPlaceholder 
+          taskName="Data Profiling"
+          taskDescription="Profile your data to understand distributions, patterns, and quality characteristics"
+          icon="fas fa-microscope"
+          category="analyze"
+        />
+      );
+    
+    case 'create_metrics':
+      return (
+        <TaskPlaceholder 
+          taskName="Metrics Builder"
+          taskDescription="Define and create business metrics with calculations, aggregations, and KPIs"
+          icon="fas fa-chart-line"
+          category="analyze"
+        />
+      );
+    
+    case 'explore_insights':
+      return (
+        <TaskPlaceholder 
+          taskName="Insight Explorer"
+          taskDescription="Explore data using AI-powered insights, anomaly detection, and pattern recognition"
+          icon="fas fa-lightbulb"
+          category="analyze"
+        />
+      );
+    
+    // Monitor tasks
+    case 'test_quality':
+      return <DataQualityAssessment tableName="customers" />;
+    
+    case 'monitor_health':
+      return (
+        <TaskPlaceholder 
+          taskName="Health Monitoring"
+          taskDescription="Monitor system health, performance metrics, and service availability in real-time"
+          icon="fas fa-heartbeat"
+          category="monitor"
+        />
+      );
+    
+    case 'create_dashboard':
+      return (
+        <TaskPlaceholder 
+          taskName="Dashboard Builder"
+          taskDescription="Create interactive dashboards with real-time metrics, alerts, and visualizations"
+          icon="fas fa-tachometer-alt"
+          category="monitor"
+        />
+      );
     
     default:
       return (
-        <div className="p-8 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gray-800/50 flex items-center justify-center">
-            <i className="fas fa-hammer text-2xl text-gray-600" />
-          </div>
-          <h3 className="text-xl font-serif-display text-gray-300 mb-2">Under Construction</h3>
-          <p className="text-gray-500">This task interface is being developed</p>
-        </div>
+        <TaskPlaceholder 
+          taskName={task?.name || 'Unknown Task'}
+          taskDescription={task?.description || 'This task is being developed'}
+          icon={task?.icon || 'fas fa-hammer'}
+          category={task?.category}
+        />
       );
   }
 }

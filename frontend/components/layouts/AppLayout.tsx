@@ -1,30 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
-import { SimplifiedNavigation } from '@/components/workspace/SimplifiedNavigation';
-import { ProperDockviewWorkspace } from '@/components/workspace/ProperDockviewWorkspace';
-import { cn } from '@/lib/utils/cn';
+import React from 'react';
+import { TabWorkspace } from '@/components/workspace/TabWorkspace';
+import { GlobalAIConsole } from '@/components/ai/GlobalAIConsole';
 
 export function AppLayout() {
-  const [sideNavCollapsed, setSideNavCollapsed] = useState(true);
-
   return (
-    <div className="flex h-screen w-screen workspace-background">
-      {/* Navigation Sidebar - Outside Dockview */}
-      <aside className={cn(
-        "flex-shrink-0 transition-all duration-300 border-r border-gray-800 bg-gray-950/50 backdrop-blur-sm",
-        sideNavCollapsed ? "w-16" : "w-64"
-      )}>
-        <SimplifiedNavigation 
-          collapsed={sideNavCollapsed}
-          onToggleCollapse={() => setSideNavCollapsed(!sideNavCollapsed)}
-        />
-      </aside>
+    <div className="h-screen w-screen workspace-background relative">
+      {/* Main Tab Workspace */}
+      <div className="h-full w-full">
+        <TabWorkspace />
+      </div>
       
-      {/* Workspace Container - Managed by Dockview */}
-      <main className="flex-1 relative overflow-hidden">
-        <ProperDockviewWorkspace />
-      </main>
+      {/* Global AI Console - Outside of Dockview */}
+      <GlobalAIConsole />
     </div>
   );
 }
