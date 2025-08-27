@@ -1,19 +1,15 @@
 'use client';
 
 import React from 'react';
-import { TabWorkspace } from '@/components/workspace/TabWorkspace';
-import { GlobalAIConsole } from '@/components/ai/GlobalAIConsole';
+import { SimplePaperWM } from '@/components/workspace/SimplePaperWM';
 
 export function AppLayout() {
   return (
     <div className="h-screen w-screen workspace-background relative">
-      {/* Main Tab Workspace */}
+      {/* PaperWM Scrolling Workspace - now includes AI Terminal Panel */}
       <div className="h-full w-full">
-        <TabWorkspace />
+        <SimplePaperWM />
       </div>
-      
-      {/* Global AI Console - Outside of Dockview */}
-      <GlobalAIConsole />
     </div>
   );
 }

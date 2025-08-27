@@ -224,6 +224,11 @@ export class GERSBridgeService {
    */
   private saveToLocalStorage(): void {
     try {
+      // Check if we're in the browser
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return;
+      }
+      
       const data: CachedData = {
         version: '1.0',
         timestamp: Date.now(),
@@ -242,6 +247,11 @@ export class GERSBridgeService {
    */
   private loadFromLocalStorage(): CachedData | null {
     try {
+      // Check if we're in the browser
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+        return null;
+      }
+      
       const stored = localStorage.getItem('gers_cache');
       if (!stored) return null;
       
@@ -249,7 +259,9 @@ export class GERSBridgeService {
       
       // Check if cache is still fresh (24 hours)
       if (Date.now() - data.timestamp > 24 * 60 * 60 * 1000) {
-        localStorage.removeItem('gers_cache');
+        if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      localStorage.removeItem('gers_cache');
+    }
         return null;
       }
       
@@ -359,7 +371,9 @@ export class GERSBridgeService {
     this.cache.clear();
     this.nameIndex.clear();
     this.entityCache.clear();
-    localStorage.removeItem('gers_cache');
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      localStorage.removeItem('gers_cache');
+    }
     this.isInitialized = false;
   }
   
