@@ -51,8 +51,17 @@ export function EnhancedChatPanel({ isOpen, onClose }: EnhancedChatPanelProps) {
           if (action.coordinates && action.coordinates.length === 2) {
             const [lng, lat] = action.coordinates;
             const zoom = action.zoom || 12;
-            console.log(`Flying to ${action.stationName}: [${lng}, ${lat}] zoom ${zoom}`);
+            // Handle both stationName (ground stations) and locationName (GERS)
+            const locationName = action.stationName || action.locationName || 'location';
+            console.log(`Flying to ${locationName}: [${lng}, ${lat}] zoom ${zoom}`);
             flyTo(lng, lat, zoom);
+            
+            // Add a small delay to ensure the map has time to process the command
+            setTimeout(() => {
+              console.log(`Map should now be centered at ${locationName}`);
+            }, 500);
+          } else {
+            console.error('Invalid flyTo action - missing coordinates:', action);
           }
           break;
           

@@ -10,8 +10,18 @@ import { extent, max } from 'd3-array';
 import { curveMonotoneX } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
 import { motion } from 'framer-motion';
-import { formatters, timeFormatters } from '@/utils/chartHelpers';
-import { colorScales } from '@/utils/colorScales';
+// Simple formatters instead of importing from utils
+const formatters = {
+  decimal: (value: number) => value.toFixed(2),
+  currency: (value: number) => `$${value.toFixed(2)}`,
+  percent: (value: number) => `${value.toFixed(1)}%`,
+};
+
+const timeFormatters = {
+  day: (date: Date) => date.toLocaleDateString('en', { month: 'short', day: 'numeric' }),
+  hour: (date: Date) => date.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' }),
+  full: (date: Date) => date.toLocaleString(),
+};
 
 export interface AreaChartDataPoint {
   x: Date | number;

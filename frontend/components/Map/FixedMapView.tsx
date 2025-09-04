@@ -101,8 +101,24 @@ export const FixedMapView: React.FC = () => {
   const [groundStations, setGroundStations] = useState<any[]>([]);
   const [selectedStation, setSelectedStation] = useState<any>(null);
   
-  // Store usage
-  const { domain, layers, selectFeature } = useMapStore();
+  // Store usage - get viewState and updateViewState from the store
+  const { domain, layers, selectFeature, viewState: storeViewState, updateViewState } = useMapStore();
+  
+  // Sync with store viewState changes (from flyTo commands)
+  useEffect(() => {
+    if (storeViewState && (
+      storeViewState.longitude !== viewState.longitude ||
+      storeViewState.latitude !== viewState.latitude ||
+      storeViewState.zoom !== viewState.zoom
+    )) {
+      console.log('[FixedMapView] Flying to location from store:', storeViewState);
+      setViewState({
+        ...storeViewState,
+        transitionDuration: 2000,
+        transitionInterpolator: new FlyToInterpolator()
+      });
+    }
+  }, [storeViewState.longitude, storeViewState.latitude, storeViewState.zoom]);
   
   // Mount check
   useEffect(() => {
@@ -130,15 +146,22 @@ export const FixedMapView: React.FC = () => {
     
     const loadGroundStations = async () => {
       try {
-        console.log('[FixedMapView] Loading SES/Intelsat ground stations...');
-        const response = await fetch('/data/ses_intelsat_ground_stations.json');
+        console.log('[FixedMapView] Starting to load ground stations...');
+        console.log('[FixedMapView] Current URL:', window.location.href);
+        const url = '/data/ses_intelsat_ground_stations.json';
+        console.log('[FixedMapView] Fetching from:', url);
+        
+        const response = await fetch(url);
+        console.log('[FixedMapView] Response status:', response.status);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('[FixedMapView] Raw data loaded:', data);
+        console.log('[FixedMapView] Data loaded successfully');
+        console.log('[FixedMapView] Data has stations array:', !!data.stations);
+        console.log('[FixedMapView] Number of stations:', data.stations?.length);
         
         if (!data.stations || !Array.isArray(data.stations)) {
           throw new Error('Invalid data format: stations array not found');
@@ -161,11 +184,16 @@ export const FixedMapView: React.FC = () => {
           country: station.location.country
         }));
         
-        console.log('[FixedMapView] Transformed stations:', stationsData);
-        console.log('[FixedMapView] First station example:', stationsData[0]);
+        console.log('[FixedMapView] Transformed stations count:', stationsData.length);
+        console.log('[FixedMapView] First 3 stations:', stationsData.slice(0, 3).map(s => ({
+          name: s.name,
+          lng: s.longitude,
+          lat: s.latitude,
+          util: s.utilization
+        })));
         
         setGroundStations(stationsData);
-        console.log(`[FixedMapView] Successfully loaded ${stationsData.length} ground stations`);
+        console.log(`[FixedMapView] Called setGroundStations with ${stationsData.length} stations`);
       } catch (error) {
         console.error('[FixedMapView] Failed to load ground stations:', error);
         console.log('[FixedMapView] Adding fallback test stations to ensure visibility...');
@@ -204,7 +232,7 @@ export const FixedMapView: React.FC = () => {
         // Still try to load the real data
         try {
           console.log('[FixedMapView] Retrying with absolute path...');
-          const response = await fetch('http://localhost:3001/data/ses_intelsat_ground_stations.json');
+          const response = await fetch('/data/ses_intelsat_ground_stations.json');
           const data = await response.json();
           const stationsData = data.stations.map((station: any) => ({
             ...station,
@@ -256,17 +284,18 @@ export const FixedMapView: React.FC = () => {
     };
     
     setViewState(constrainedViewState);
-  }, []);
+    // Also update the store so other components know the current view
+    updateViewState(constrainedViewState);
+  }, [updateViewState]);
   
-  // Create ground station layers
-  const createLayers = useMemo(() => {
-    const layers = [];
+  // Create ground station layers - simplified to ensure they render
+  const groundStationLayers = useMemo(() => {
+    const layerList = [];
     
-    console.log(`[FixedMapView] Creating layers with ${groundStations.length} stations`);
+    console.log(`[FixedMapView] Creating layers with ${groundStations.length} stations at`, new Date().toISOString());
     
     if (groundStations.length > 0) {
-      // Debug: Log first few stations
-      console.log('[FixedMapView] First 3 stations:', groundStations.slice(0, 3).map(s => ({
+      console.log('[FixedMapView] Sample stations for layer:', groundStations.slice(0, 3).map(s => ({
         name: s.name,
         longitude: s.longitude,
         latitude: s.latitude,
@@ -274,7 +303,7 @@ export const FixedMapView: React.FC = () => {
       })));
       
       // Ground station points layer
-      layers.push(new ScatterplotLayer({
+      layerList.push(new ScatterplotLayer({
         id: 'ground-stations',
         data: groundStations,
         getPosition: (d: any) => {
@@ -284,17 +313,18 @@ export const FixedMapView: React.FC = () => {
           }
           return pos;
         },
-        getRadius: 200000, // Increased radius to 200km for better visibility
+        getRadius: 300000, // Increased radius to 300km for much better visibility
         getFillColor: (d: any) => {
           const util = d.utilization || 0;
-          if (util > 0.85) return [255, 0, 0, 255];     // Red - High utilization
-          if (util > 0.75) return [255, 140, 0, 255];   // Orange
-          if (util > 0.65) return [255, 255, 0, 255];   // Yellow
-          return [0, 255, 0, 255];                       // Green - Low utilization
+          if (util > 0.85) return [255, 59, 48, 200];     // Red - High utilization
+          if (util > 0.75) return [255, 149, 0, 200];     // Orange
+          if (util > 0.65) return [255, 204, 0, 200];     // Yellow
+          if (util > 0.50) return [52, 199, 89, 200];    // Green - Medium
+          return [0, 122, 255, 200];                      // Blue - Low utilization
         },
         stroked: true,
         getLineColor: [255, 255, 255, 255],
-        getLineWidth: 3,
+        getLineWidth: 4,
         lineWidthUnits: 'pixels',
         radiusScale: 1,
         radiusMinPixels: 12, // Increased minimum size
@@ -316,28 +346,30 @@ export const FixedMapView: React.FC = () => {
       }));
       
       // Station labels layer
-      layers.push(new TextLayer({
+      layerList.push(new TextLayer({
         id: 'station-labels',
         data: groundStations,
         getPosition: (d: any) => [d.longitude, d.latitude],
         getText: (d: any) => d.name,
-        getSize: 16,
+        getSize: 18,
         getColor: [255, 255, 255, 255],
-        getPixelOffset: [0, 0],
-        getBackgroundColor: [0, 0, 0, 200],
-        backgroundColor: [0, 0, 0, 200],
-        fontFamily: 'Arial',
-        fontWeight: 'bold',
+        getPixelOffset: [0, -30], // Position above the circle
+        getBackgroundColor: [10, 10, 15, 230],
+        backgroundColor: [10, 10, 15, 230],
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontWeight: '600',
         sizeScale: 1,
-        sizeMinPixels: 12,
-        sizeMaxPixels: 24,
+        sizeMinPixels: 14,
+        sizeMaxPixels: 28,
         billboard: false,
-        pickable: false
+        pickable: false,
+        outlineWidth: 2,
+        outlineColor: [0, 0, 0, 255]
       }));
     }
     
-    console.log(`[FixedMapView] Returning ${layers.length} layers`);
-    return layers;
+    console.log(`[FixedMapView] Returning ${layerList.length} layers`);
+    return layerList;
   }, [groundStations, selectFeature]);
   
   // Handle map loaded event
@@ -394,7 +426,7 @@ export const FixedMapView: React.FC = () => {
         views={mapView}
         viewState={viewState}
         onViewStateChange={handleViewStateChange}
-        layers={createLayers}
+        layers={groundStationLayers}
         getCursor={({ isDragging, isHovering }) => 
           isDragging ? 'grabbing' : isHovering ? 'pointer' : 'grab'
         }
