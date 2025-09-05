@@ -191,11 +191,11 @@ export function EnhancedChatPanel({ isOpen, onClose }: EnhancedChatPanelProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ y: 400, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 400, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-[420px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-10rem)] bg-black/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl z-[1100]"
+          className="fixed bottom-0 left-0 right-0 h-[400px] bg-black/95 backdrop-blur-xl border-t border-white/10 z-[1050]"
         >
           {/* Header */}
           <div className="p-3 border-b border-white/10">
