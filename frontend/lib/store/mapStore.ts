@@ -37,16 +37,16 @@ interface MapState {
 }
 
 export const useMapStore = create<MapState>((set, get) => ({
-  viewMode: '3d',
+  viewMode: '2d',
   viewState: {
-    longitude: -40,
-    latitude: 30,
-    zoom: 3,
+    longitude: 112,  // South China Sea center
+    latitude: 12,    // South China Sea center
+    zoom: 5,
     pitch: 0,
     bearing: 0
   },
   
-  domain: 'ground-stations',
+  domain: 'maritime',
   
   layers: {
     base: {
