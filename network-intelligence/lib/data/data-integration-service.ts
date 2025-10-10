@@ -62,7 +62,7 @@ interface InfrastructureData {
   fiberConnectivity: number
   powerGridReliability: number
   transportationAccess: number
-  dataCenter proximity: number
+  dataCenterProximity: number
   regulatoryScore: number
   totalScore: number
 }
