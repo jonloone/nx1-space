@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 
 /**
- * Root page - redirects to OpIntel demo (Operational Intelligence Platform)
+ * Root page - redirects to Fleet Tracking demo (Template-driven OpIntel)
  */
 export default function HomePage() {
-  redirect('/opintel-demo')
+  redirect('/fleet-demo')
 }
