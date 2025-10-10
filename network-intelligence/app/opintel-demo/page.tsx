@@ -286,7 +286,7 @@ export default function OpIntelDemo() {
       }
     >
       {/* Map Canvas */}
-      <div ref={mapContainer} className="absolute inset-0 bg-slate-900" />
+      <div ref={mapContainer} className="absolute inset-0 w-full h-full bg-slate-900" style={{ minHeight: '100%' }} />
 
       {/* Map Loading Indicator */}
       {!mapLoaded && (
