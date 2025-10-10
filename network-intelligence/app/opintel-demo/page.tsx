@@ -1,16 +1,19 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import MissionControlLayout from '@/components/opintel/layout/MissionControlLayout'
 import LeftSidebar from '@/components/opintel/panels/LeftSidebar'
 import RightPanel from '@/components/opintel/panels/RightPanel'
 import TimelineControl from '@/components/opintel/controls/TimelineControl'
 
+// Set Mapbox access token
+mapboxgl.accessToken = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pMmJ5czk3N2sifQ.gE4F5uP57jtt6ThElLsFBg'
+
 export default function OpIntelDemo() {
   const mapContainer = useRef<HTMLDivElement>(null)
-  const map = useRef<maplibregl.Map | null>(null)
+  const map = useRef<mapboxgl.Map | null>(null)
   const [mapLoaded, setMapLoaded] = useState(false)
 
   // Panel state
@@ -116,12 +119,9 @@ export default function OpIntelDemo() {
   useEffect(() => {
     if (!mapContainer.current || map.current) return
 
-    // Use Mapbox style with your token
-    const MAPBOX_TOKEN = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pMmJ5czk3N2sifQ.gE4F5uP57jtt6ThElLsFBg'
-
-    map.current = new maplibregl.Map({
+    map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: `https://api.mapbox.com/styles/v1/mapbox/dark-v11?access_token=${MAPBOX_TOKEN}`,
+      style: 'mapbox://styles/mapbox/dark-v11',
       center: [-122.4194, 37.7749], // San Francisco
       zoom: 12,
       pitch: 45,
@@ -162,7 +162,7 @@ export default function OpIntelDemo() {
           })
         })
 
-        new maplibregl.Marker({ element: el })
+        new mapboxgl.Marker({ element: el })
           .setLngLat([vehicle.lng, vehicle.lat])
           .addTo(map.current!)
       })
