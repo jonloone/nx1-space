@@ -16,6 +16,8 @@ export type { PanelMode } from './panelStore'
 
 export { useTimelineStore } from './timelineStore'
 
+export { useEntityStore } from './entityStore'
+
 // Domain-Specific Stores
 export { useLayerStore } from './layerStore'
 export type { DataLayer, LayerFilter, LayerGroup } from './layerStore'
