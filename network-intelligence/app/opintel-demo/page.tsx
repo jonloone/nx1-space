@@ -21,9 +21,14 @@ export default function OpIntelDemo() {
 
   // Timeline state
   const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] = useState<Date | null>(null)
   const [playbackSpeed, setPlaybackSpeed] = useState(1)
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false)
+
+  // Initialize time on client side only to avoid hydration mismatch
+  useEffect(() => {
+    setCurrentTime(new Date())
+  }, [])
 
   // Demo data
   const [dataSources] = useState([
@@ -269,18 +274,20 @@ export default function OpIntelDemo() {
         ) : null
       }
       bottomTimeline={
-        <TimelineControl
-          isPlaying={isPlaying}
-          currentTime={currentTime}
-          startTime={new Date(Date.now() - 24 * 60 * 60 * 1000)}
-          endTime={new Date()}
-          playbackSpeed={playbackSpeed}
-          isExpanded={isTimelineExpanded}
-          onPlayPause={handlePlayPause}
-          onTimeChange={handleTimeChange}
-          onSpeedChange={handleSpeedChange}
-          onExpandToggle={handleExpandToggle}
-        />
+        currentTime ? (
+          <TimelineControl
+            isPlaying={isPlaying}
+            currentTime={currentTime}
+            startTime={new Date(currentTime.getTime() - 24 * 60 * 60 * 1000)}
+            endTime={currentTime}
+            playbackSpeed={playbackSpeed}
+            isExpanded={isTimelineExpanded}
+            onPlayPause={handlePlayPause}
+            onTimeChange={handleTimeChange}
+            onSpeedChange={handleSpeedChange}
+            onExpandToggle={handleExpandToggle}
+          />
+        ) : null
       }
     >
       {/* Map Canvas */}
@@ -297,7 +304,7 @@ export default function OpIntelDemo() {
               title: 'Vehicle Delayed',
               severity: 'high',
               type: 'delivery',
-              timestamp: new Date().toISOString(),
+              timestamp: currentTime?.toISOString() || new Date().toISOString(),
               description:
                 'Vehicle Unit-247 is running 25 minutes behind schedule on Route A.',
               affectedEntities: ['Unit-247', 'Route A'],
