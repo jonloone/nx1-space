@@ -119,18 +119,22 @@ export default function OpIntelDemo() {
   useEffect(() => {
     if (!mapContainer.current || map.current) return
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
-      center: [-122.4194, 37.7749], // San Francisco
-      zoom: 12,
-      pitch: 45,
-      bearing: 0,
-      antialias: true
-    })
+    console.log('Initializing Mapbox map...')
 
-    map.current.on('load', () => {
-      setMapLoaded(true)
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/dark-v11',
+        center: [-122.4194, 37.7749], // San Francisco
+        zoom: 12,
+        pitch: 45,
+        bearing: 0,
+        antialias: true
+      })
+
+      map.current.on('load', () => {
+        console.log('Map loaded successfully!')
+        setMapLoaded(true)
 
       // Add some demo markers
       const demoVehicles = [
@@ -167,6 +171,13 @@ export default function OpIntelDemo() {
           .addTo(map.current!)
       })
     })
+
+      map.current.on('error', (e) => {
+        console.error('Map error:', e)
+      })
+    } catch (error) {
+      console.error('Failed to initialize map:', error)
+    }
 
     return () => {
       map.current?.remove()
@@ -276,6 +287,16 @@ export default function OpIntelDemo() {
     >
       {/* Map Canvas */}
       <div ref={mapContainer} className="absolute inset-0 bg-slate-900" />
+
+      {/* Map Loading Indicator */}
+      {!mapLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-900 z-20">
+          <div className="text-white text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <div className="text-sm">Loading map...</div>
+          </div>
+        </div>
+      )}
 
       {/* Demo Alert Badge */}
       {mapLoaded && (
