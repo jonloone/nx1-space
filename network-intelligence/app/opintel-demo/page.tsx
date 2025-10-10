@@ -116,33 +116,17 @@ export default function OpIntelDemo() {
   useEffect(() => {
     if (!mapContainer.current || map.current) return
 
+    // Use Mapbox style with your token
+    const MAPBOX_TOKEN = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pMmJ5czk3N2sifQ.gE4F5uP57jtt6ThElLsFBg'
+
     map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: {
-        version: 8,
-        sources: {
-          osm: {
-            type: 'raster',
-            tiles: ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
-            tileSize: 256,
-            attribution: '&copy; OpenStreetMap Contributors',
-            maxzoom: 19
-          }
-        },
-        layers: [
-          {
-            id: 'osm',
-            type: 'raster',
-            source: 'osm',
-            minzoom: 0,
-            maxzoom: 22
-          }
-        ]
-      },
+      style: `https://api.mapbox.com/styles/v1/mapbox/dark-v11?access_token=${MAPBOX_TOKEN}`,
       center: [-122.4194, 37.7749], // San Francisco
       zoom: 12,
-      pitch: 0,
-      bearing: 0
+      pitch: 45,
+      bearing: 0,
+      antialias: true
     })
 
     map.current.on('load', () => {
