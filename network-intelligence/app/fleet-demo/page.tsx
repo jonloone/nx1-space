@@ -9,7 +9,7 @@ import RightPanel from '@/components/opintel/panels/RightPanel'
 import TimelineControl from '@/components/opintel/controls/TimelineControl'
 import { useMapStore, usePanelStore, useTimelineStore, useEntityStore } from '@/lib/stores'
 import { fleetTrackingTemplate } from '@/lib/templates/fleet-tracking'
-import { generateSanFranciscoFleet, updateVehiclePositions } from '@/lib/generators/fleetDataGenerator'
+import { generateRoadAwareFleet, updateRoadAwarePositions } from '@/lib/generators/roadAwareFleetGenerator'
 import type { SpatialEntity } from '@/lib/models/SpatialEntity'
 
 // Set Mapbox access token
@@ -36,10 +36,17 @@ export default function FleetDemo() {
 
   // Initialize fleet data
   useEffect(() => {
-    console.log('🚚 Generating San Francisco fleet (200 vehicles)...')
-    const fleet = generateSanFranciscoFleet()
+    console.log('🚚 Generating road-aware San Francisco fleet (200 vehicles)...')
+    const fleet = generateRoadAwareFleet(200)
+    console.log('Fleet sample:', fleet.slice(0, 3).map(v => ({
+      id: v.id,
+      name: v.name,
+      road: v.properties.roadName,
+      pos: [v.position.longitude, v.position.latitude]
+    })))
     setEntities(fleet)
-    console.log(`✅ Generated ${fleet.length} vehicles`)
+    console.log(`✅ Generated ${fleet.length} vehicles on actual roads`)
+    console.log(`✅ Entities in store: ${entities.size}`)
   }, [setEntities])
 
   // Initialize map
@@ -89,6 +96,19 @@ export default function FleetDemo() {
 
     const visibleEntities = getVisibleEntities()
     const currentMarkers = markersRef.current
+
+    console.log(`📊 Store has ${entities.size} entities, ${visibleEntities.length} visible`)
+
+    // Log first few entities for debugging
+    if (visibleEntities.length > 0) {
+      console.log('First 3 visible entities:', visibleEntities.slice(0, 3).map(e => ({
+        id: e.id,
+        name: e.name,
+        type: e.type,
+        status: e.status,
+        pos: [e.position.longitude, e.position.latitude]
+      })))
+    }
 
     // Remove markers for entities that no longer exist
     currentMarkers.forEach((marker, entityId) => {
@@ -144,10 +164,10 @@ export default function FleetDemo() {
       }
     })
 
-    console.log(`🎯 Displaying ${visibleEntities.length} vehicles`)
+    console.log(`🎯 Displaying ${visibleEntities.length} vehicles on map`)
   }, [entities, isLoaded, getVisibleEntities, selectEntity, selectFeature, openRightPanel])
 
-  // Simulate vehicle movement
+  // Simulate vehicle movement along roads
   useEffect(() => {
     if (!isPlaying) return
 
@@ -155,8 +175,8 @@ export default function FleetDemo() {
       const currentEntities = Array.from(entities.values())
       if (currentEntities.length === 0) return
 
-      // Update positions (simulate 1 second of movement per tick)
-      const updatedEntities = updateVehiclePositions(currentEntities, 1 * playbackSpeed)
+      // Update positions (simulate 1 second of movement per tick along roads)
+      const updatedEntities = updateRoadAwarePositions(currentEntities, 1 * playbackSpeed)
       setEntities(updatedEntities)
 
       // Update time
@@ -303,10 +323,12 @@ export default function FleetDemo() {
       <div className="absolute bottom-20 left-4 z-10 bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-xs">
         <div className="font-semibold mb-1">🚚 Fleet Tracking Demo</div>
         <div className="text-white/60">
-          • {entities.size} vehicles in San Francisco
+          • {entities.size} vehicles on SF roads
           <br />
           • Click vehicles to view details
-          <br />• Press play to simulate movement
+          <br />
+          • Press play to watch movement
+          <br />• Vehicles follow actual streets
         </div>
       </div>
     </MissionControlLayout>
