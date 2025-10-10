@@ -7,6 +7,8 @@ import MissionControlLayout from '@/components/opintel/layout/MissionControlLayo
 import LeftSidebar from '@/components/opintel/panels/LeftSidebar'
 import RightPanel from '@/components/opintel/panels/RightPanel'
 import TimelineControl from '@/components/opintel/controls/TimelineControl'
+import { useMapStore, usePanelStore, useTimelineStore, useAlertStore } from '@/lib/stores'
+import type { SelectedFeature } from '@/lib/stores'
 
 // Set Mapbox access token
 mapboxgl.accessToken = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pMmJ5czk3N2sifQ.gE4F5uP57jtt6ThElLsFBg'
@@ -14,24 +16,27 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pM
 export default function OpIntelDemo() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
-  const [mapLoaded, setMapLoaded] = useState(false)
 
-  // Panel state
-  const [rightPanelMode, setRightPanelMode] = useState<
-    'feature' | 'alert' | 'layer' | 'analysis' | null
-  >(null)
-  const [rightPanelData, setRightPanelData] = useState<any>(null)
-
-  // Timeline state
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState<Date | null>(null)
-  const [playbackSpeed, setPlaybackSpeed] = useState(1)
-  const [isTimelineExpanded, setIsTimelineExpanded] = useState(false)
-
-  // Initialize time on client side only to avoid hydration mismatch
-  useEffect(() => {
-    setCurrentTime(new Date())
-  }, [])
+  // Zustand stores
+  const { setMap, isLoaded, setLoaded, selectFeature } = useMapStore()
+  const {
+    rightPanelMode,
+    rightPanelData,
+    openRightPanel,
+    closeRightPanel
+  } = usePanelStore()
+  const {
+    isPlaying,
+    currentTime,
+    playbackSpeed,
+    isTimelineExpanded,
+    setPlaying,
+    setCurrentTime,
+    setPlaybackSpeed,
+    setTimelineExpanded,
+    togglePlayback
+  } = useTimelineStore()
+  const { addAlert, getActiveAlertCount } = useAlertStore()
 
   // Demo data
   const [dataSources] = useState([
@@ -122,7 +127,7 @@ export default function OpIntelDemo() {
     console.log('Initializing Mapbox map...')
 
     try {
-      map.current = new mapboxgl.Map({
+      const mapInstance = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/dark-v11',
         center: [-122.4194, 37.7749], // San Francisco
@@ -132,47 +137,52 @@ export default function OpIntelDemo() {
         antialias: true
       })
 
-      map.current.on('load', () => {
+      map.current = mapInstance
+
+      mapInstance.on('load', () => {
         console.log('Map loaded successfully!')
-        setMapLoaded(true)
+        setMap(mapInstance)
+        setLoaded(true)
 
-      // Add some demo markers
-      const demoVehicles = [
-        { lng: -122.4194, lat: 37.7749, name: 'Vehicle 1' },
-        { lng: -122.4094, lat: 37.7849, name: 'Vehicle 2' },
-        { lng: -122.4294, lat: 37.7649, name: 'Vehicle 3' }
-      ]
+        // Add some demo markers
+        const demoVehicles = [
+          { lng: -122.4194, lat: 37.7749, name: 'Vehicle 1' },
+          { lng: -122.4094, lat: 37.7849, name: 'Vehicle 2' },
+          { lng: -122.4294, lat: 37.7649, name: 'Vehicle 3' }
+        ]
 
-      demoVehicles.forEach((vehicle) => {
-        const el = document.createElement('div')
-        el.className = 'w-4 h-4 bg-blue-500 rounded-full border-2 border-white cursor-pointer'
-        el.title = vehicle.name
+        demoVehicles.forEach((vehicle) => {
+          const el = document.createElement('div')
+          el.className = 'w-4 h-4 bg-blue-500 rounded-full border-2 border-white cursor-pointer'
+          el.title = vehicle.name
 
-        el.addEventListener('click', () => {
-          openFeaturePanel({
-            id: vehicle.name.toLowerCase().replace(' ', '-'),
-            type: 'Vehicle',
-            name: vehicle.name,
-            coordinates: [vehicle.lng, vehicle.lat],
-            properties: {
-              status: 'Active',
-              speed: '45 mph',
-              heading: '180°',
-              lastUpdate: '2 minutes ago',
-              driver: 'John Doe',
-              route: 'Route A',
-              eta: '15 minutes'
+          el.addEventListener('click', () => {
+            const feature: SelectedFeature = {
+              id: vehicle.name.toLowerCase().replace(' ', '-'),
+              type: 'Vehicle',
+              name: vehicle.name,
+              coordinates: [vehicle.lng, vehicle.lat],
+              properties: {
+                status: 'Active',
+                speed: '45 mph',
+                heading: '180°',
+                lastUpdate: '2 minutes ago',
+                driver: 'John Doe',
+                route: 'Route A',
+                eta: '15 minutes'
+              }
             }
+            selectFeature(feature)
+            openRightPanel('feature', feature)
           })
+
+          new mapboxgl.Marker({ element: el })
+            .setLngLat([vehicle.lng, vehicle.lat])
+            .addTo(mapInstance)
         })
-
-        new mapboxgl.Marker({ element: el })
-          .setLngLat([vehicle.lng, vehicle.lat])
-          .addTo(map.current!)
       })
-    })
 
-      map.current.on('error', (e) => {
+      mapInstance.on('error', (e) => {
         console.error('Map error:', e)
       })
     } catch (error) {
@@ -181,20 +191,11 @@ export default function OpIntelDemo() {
 
     return () => {
       map.current?.remove()
+      setMap(null)
     }
-  }, [])
+  }, [setMap, setLoaded, selectFeature, openRightPanel])
 
-  // Panel handlers
-  const openFeaturePanel = (feature: any) => {
-    setRightPanelMode('feature')
-    setRightPanelData(feature)
-  }
-
-  const closeRightPanel = () => {
-    setRightPanelMode(null)
-    setRightPanelData(null)
-  }
-
+  // Handlers
   const handleToggleLayer = (layerId: string) => {
     setLayers((prev) =>
       prev.map((layer) =>
@@ -206,8 +207,7 @@ export default function OpIntelDemo() {
   const handleLayerSettings = (layerId: string) => {
     const layer = layers.find((l) => l.id === layerId)
     if (layer) {
-      setRightPanelMode('layer')
-      setRightPanelData(layer)
+      openRightPanel('layer', layer)
     }
   }
 
@@ -215,33 +215,16 @@ export default function OpIntelDemo() {
     console.log('Search:', query)
   }
 
-  // Timeline handlers
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying)
-  }
-
-  const handleTimeChange = (time: Date) => {
-    setCurrentTime(time)
-  }
-
-  const handleSpeedChange = (speed: number) => {
-    setPlaybackSpeed(speed)
-  }
-
-  const handleExpandToggle = () => {
-    setIsTimelineExpanded(!isTimelineExpanded)
-  }
-
   // Playback simulation
   useEffect(() => {
     if (!isPlaying) return
 
     const interval = setInterval(() => {
-      setCurrentTime((prev) => new Date(prev.getTime() + 1000 * playbackSpeed))
+      setCurrentTime(new Date(currentTime.getTime() + 1000 * playbackSpeed))
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [isPlaying, playbackSpeed])
+  }, [isPlaying, playbackSpeed, currentTime, setCurrentTime])
 
   return (
     <MissionControlLayout
@@ -269,27 +252,25 @@ export default function OpIntelDemo() {
         ) : null
       }
       bottomTimeline={
-        currentTime ? (
-          <TimelineControl
-            isPlaying={isPlaying}
-            currentTime={currentTime}
-            startTime={new Date(currentTime.getTime() - 24 * 60 * 60 * 1000)}
-            endTime={currentTime}
-            playbackSpeed={playbackSpeed}
-            isExpanded={isTimelineExpanded}
-            onPlayPause={handlePlayPause}
-            onTimeChange={handleTimeChange}
-            onSpeedChange={handleSpeedChange}
-            onExpandToggle={handleExpandToggle}
-          />
-        ) : null
+        <TimelineControl
+          isPlaying={isPlaying}
+          currentTime={currentTime}
+          startTime={new Date(currentTime.getTime() - 24 * 60 * 60 * 1000)}
+          endTime={currentTime}
+          playbackSpeed={playbackSpeed}
+          isExpanded={isTimelineExpanded}
+          onPlayPause={togglePlayback}
+          onTimeChange={setCurrentTime}
+          onSpeedChange={setPlaybackSpeed}
+          onExpandToggle={() => setTimelineExpanded(!isTimelineExpanded)}
+        />
       }
     >
       {/* Map Canvas */}
       <div ref={mapContainer} className="absolute inset-0 w-full h-full bg-slate-900" style={{ minHeight: '100%' }} />
 
       {/* Map Loading Indicator */}
-      {!mapLoaded && (
+      {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900 z-20">
           <div className="text-white text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
@@ -299,17 +280,16 @@ export default function OpIntelDemo() {
       )}
 
       {/* Demo Alert Badge */}
-      {mapLoaded && (
+      {isLoaded && (
         <div
           className="absolute top-4 right-4 z-10 bg-orange-500/90 backdrop-blur-sm text-white px-3 py-2 rounded-lg cursor-pointer hover:bg-orange-600 transition-colors"
           onClick={() => {
-            setRightPanelMode('alert')
-            setRightPanelData({
+            openRightPanel('alert', {
               id: 'alert-1',
               title: 'Vehicle Delayed',
               severity: 'high',
               type: 'delivery',
-              timestamp: currentTime?.toISOString() || new Date().toISOString(),
+              timestamp: currentTime.toISOString(),
               description:
                 'Vehicle Unit-247 is running 25 minutes behind schedule on Route A.',
               affectedEntities: ['Unit-247', 'Route A'],
