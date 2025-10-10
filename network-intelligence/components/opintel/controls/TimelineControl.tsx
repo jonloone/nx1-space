@@ -64,6 +64,12 @@ export default function TimelineControl({
 }: TimelineControlProps) {
   const [sliderValue, setSliderValue] = useState(50)
   const [hoveredTime, setHoveredTime] = useState<Date | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Prevent hydration mismatch by only rendering times on client
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Calculate position percentage
   const totalDuration = endTime.getTime() - startTime.getTime()
@@ -164,7 +170,7 @@ export default function TimelineControl({
           {/* Timeline Slider */}
           <div className="flex-1 flex items-center gap-3">
             <div className="text-xs text-white/60 font-mono shrink-0">
-              {formatTime(currentTime)}
+              {isMounted ? formatTime(currentTime) : '--:--:--'}
             </div>
 
             <Slider
@@ -176,7 +182,7 @@ export default function TimelineControl({
             />
 
             <div className="text-xs text-white/40 font-mono shrink-0">
-              {formatTime(endTime)}
+              {isMounted ? formatTime(endTime) : '--:--:--'}
             </div>
           </div>
 
@@ -255,7 +261,7 @@ export default function TimelineControl({
 
           {/* Date Range */}
           <div className="flex items-center gap-4 mb-3">
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-xs" suppressHydrationWarning>
               <Calendar className="h-3 w-3 text-white/40" />
               <span className="text-white/60">{formatDate(startTime)}</span>
               <span className="text-white/40">→</span>
@@ -264,7 +270,7 @@ export default function TimelineControl({
 
             <div className="flex-1" />
 
-            <div className="text-xs text-white/40">
+            <div className="text-xs text-white/40" suppressHydrationWarning>
               Duration: {Math.round(totalDuration / (1000 * 60 * 60))}h
             </div>
           </div>
@@ -277,7 +283,7 @@ export default function TimelineControl({
                 {[0, 25, 50, 75, 100].map((percent) => (
                   <div key={percent} className="flex flex-col items-center">
                     <div className="w-px h-2 bg-white/20" />
-                    <div className="text-[10px] text-white/40 mt-1 font-mono">
+                    <div className="text-[10px] text-white/40 mt-1 font-mono" suppressHydrationWarning>
                       {formatTime(
                         new Date(
                           startTime.getTime() + (totalDuration * percent) / 100
@@ -346,10 +352,10 @@ export default function TimelineControl({
 
             {/* Time Display */}
             <div className="flex items-center gap-2">
-              <div className="text-sm text-white font-mono">
+              <div className="text-sm text-white font-mono" suppressHydrationWarning>
                 {formatTime(currentTime)}
               </div>
-              <div className="text-xs text-white/40">
+              <div className="text-xs text-white/40" suppressHydrationWarning>
                 / {formatTime(endTime)}
               </div>
             </div>

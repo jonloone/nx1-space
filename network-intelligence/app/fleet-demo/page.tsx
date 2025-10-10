@@ -11,6 +11,11 @@ import { useMapStore, usePanelStore, useTimelineStore, useEntityStore } from '@/
 import { fleetTrackingTemplate } from '@/lib/templates/fleet-tracking'
 import { generateRoadAwareFleet, updateRoadAwarePositions } from '@/lib/generators/roadAwareFleetGenerator'
 import type { SpatialEntity } from '@/lib/models/SpatialEntity'
+import AIChatPanel, { type ChatMessage } from '@/components/ai/AIChatPanel'
+import { parseFleetQuery, executeFleetQuery } from '@/lib/services/fleetQueryService'
+import { MessageSquare, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // Set Mapbox access token
 mapboxgl.accessToken = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pMmJ5czk3N2sifQ.gE4F5uP57jtt6ThElLsFBg'
@@ -32,7 +37,11 @@ export default function FleetDemo() {
     setTimelineExpanded,
     togglePlayback
   } = useTimelineStore()
-  const { entities, setEntities, getVisibleEntities, selectEntity } = useEntityStore()
+  const { entities, setEntities, getVisibleEntities, selectEntity, setSearchQuery } = useEntityStore()
+
+  // AI Chat state
+  const [isAIChatOpen, setIsAIChatOpen] = React.useState(false)
+  const allEntitiesRef = useRef<SpatialEntity[]>([]) // Store all entities for AI queries
 
   // Initialize fleet data
   useEffect(() => {
@@ -44,6 +53,7 @@ export default function FleetDemo() {
       road: v.properties.roadName,
       pos: [v.position.longitude, v.position.latitude]
     })))
+    allEntitiesRef.current = fleet // Store for AI queries
     setEntities(fleet)
     console.log(`✅ Generated ${fleet.length} vehicles on actual roads`)
     console.log(`✅ Entities in store: ${entities.size}`)
@@ -254,6 +264,45 @@ export default function FleetDemo() {
     console.log('Search:', query)
   }
 
+  // AI Query handler
+  const handleAIQuery = async (query: string): Promise<ChatMessage> => {
+    try {
+      console.log('🤖 Processing query:', query)
+
+      // Parse the natural language query
+      const intent = await parseFleetQuery(query)
+      console.log('Intent:', intent)
+
+      // Execute query on all entities
+      const result = executeFleetQuery(intent, allEntitiesRef.current)
+      console.log('Result:', result)
+
+      // Update entities to show filtered results or all entities
+      if (result.entities.length === allEntitiesRef.current.length) {
+        // Show all entities (reset filter)
+        setEntities(allEntitiesRef.current)
+      } else {
+        // Show filtered results
+        setEntities(result.entities)
+      }
+
+      // Return AI response
+      return {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `✅ ${result.summary}\n\n${result.visualHint ? `Visualization: ${result.visualHint.type}` : ''}`,
+        timestamp: new Date(),
+        metadata: {
+          entitiesFiltered: result.entities.length,
+          analysisType: result.visualHint?.type
+        }
+      }
+    } catch (error) {
+      console.error('AI query error:', error)
+      throw error
+    }
+  }
+
   return (
     <MissionControlLayout
       projectName={fleetTrackingTemplate.ui.projectName}
@@ -331,6 +380,45 @@ export default function FleetDemo() {
           <br />• Vehicles follow actual streets
         </div>
       </div>
+
+      {/* AI Chat Toggle Button */}
+      {!isAIChatOpen && (
+        <Button
+          onClick={() => setIsAIChatOpen(true)}
+          className="absolute bottom-32 right-4 z-10 rounded-full w-14 h-14 bg-purple-500 hover:bg-purple-600 shadow-lg"
+          title="Open AI Assistant"
+        >
+          <MessageSquare className="w-6 h-6" />
+        </Button>
+      )}
+
+      {/* AI Chat Panel */}
+      <AnimatePresence>
+        {isAIChatOpen && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="absolute top-0 right-0 bottom-0 w-[400px] z-50"
+          >
+            <div className="relative h-full">
+              <Button
+                onClick={() => setIsAIChatOpen(false)}
+                className="absolute top-4 right-4 z-10 rounded-full bg-white/10 hover:bg-white/20"
+                size="icon"
+                variant="ghost"
+              >
+                <X className="w-4 h-4 text-white" />
+              </Button>
+              <AIChatPanel
+                onQuery={handleAIQuery}
+                placeholder="Ask about your fleet..."
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MissionControlLayout>
   )
 }

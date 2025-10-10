@@ -28,75 +28,96 @@ export function generateRoadAwareFleet(count: number): SpatialEntity[] {
   vehicleRoutes.clear()
 
   for (let i = 0; i < count; i++) {
-    const vehicleId = `VEH-${String(i + 1).padStart(4, '0')}`
+    try {
+      const vehicleId = `VEH-${String(i + 1).padStart(4, '0')}`
 
-    // Pick a random road
-    const road = getRandomRoad()
-    const roadLine = turf.lineString(road.coordinates)
+      // Pick a random road
+      const road = getRandomRoad()
+      const roadLine = turf.lineString(road.coordinates)
 
-    // Place vehicle at random position along road (0-1)
-    const position = Math.random()
-    const point = turf.along(roadLine, position * turf.length(roadLine), { units: 'kilometers' })
-
-    // Random direction
-    const direction = Math.random() > 0.5 ? 1 : -1
-
-    // Speed based on road type and randomness
-    const baseSpeed = road.speedLimit
-    const speedVariation = baseSpeed * 0.3 // ±30%
-    const targetSpeed = baseSpeed + (Math.random() - 0.5) * speedVariation
-
-    // Random status
-    const status = getRandomStatus()
-
-    // Get vehicle type and properties
-    const vehicleType = getRandomVehicleType()
-    const driver = generateRandomDriver()
-
-    // Create vehicle entity
-    const vehicle = createVehicleEntity(
-      vehicleId,
-      `Vehicle ${i + 1}`,
-      point.geometry.coordinates[0],
-      point.geometry.coordinates[1],
-      {
-        driver,
-        vehicleType,
-        speed: Math.round(targetSpeed),
-        heading: calculateHeading(roadLine, position, direction),
-        route: road.name,
-        odometer: Math.floor(Math.random() * 100000),
-        fuelLevel: Math.floor(Math.random() * 100),
-        capacity: getVehicleCapacity(vehicleType),
-        currentLoad: Math.floor(Math.random() * 100),
-        roadName: road.name,
-        roadType: road.type
+      // Validate road has sufficient length
+      const roadLength = turf.length(roadLine, { units: 'kilometers' })
+      if (roadLength < 0.001) {
+        console.warn(`Road ${road.name} has invalid length, skipping vehicle ${i}`)
+        continue
       }
-    )
 
-    vehicle.status = status
-    vehicle.motion = {
-      speed: Math.round(targetSpeed),
-      heading: calculateHeading(roadLine, position, direction),
-      course: calculateHeading(roadLine, position, direction)
+      // Place vehicle at random position along road (0-1)
+      const position = Math.random()
+      const point = turf.along(roadLine, position * roadLength, { units: 'kilometers' })
+
+      // Validate point coordinates
+      if (!point || !point.geometry || !point.geometry.coordinates || point.geometry.coordinates.length !== 2) {
+        console.warn(`Invalid point generated for vehicle ${i}, skipping`)
+        continue
+      }
+
+      // Random direction
+      const direction = Math.random() > 0.5 ? 1 : -1
+
+      // Speed based on road type and randomness
+      const baseSpeed = road.speedLimit
+      const speedVariation = baseSpeed * 0.3 // ±30%
+      const targetSpeed = baseSpeed + (Math.random() - 0.5) * speedVariation
+
+      // Random status
+      const status = getRandomStatus()
+
+      // Get vehicle type and properties
+      const vehicleType = getRandomVehicleType()
+      const driver = generateRandomDriver()
+
+      // Calculate heading safely
+      const heading = calculateHeading(roadLine, position, direction)
+
+      // Create vehicle entity
+      const vehicle = createVehicleEntity(
+        vehicleId,
+        `Vehicle ${i + 1}`,
+        point.geometry.coordinates[0],
+        point.geometry.coordinates[1],
+        {
+          driver,
+          vehicleType,
+          speed: Math.round(targetSpeed),
+          heading,
+          route: road.name,
+          odometer: Math.floor(Math.random() * 100000),
+          fuelLevel: Math.floor(Math.random() * 100),
+          capacity: getVehicleCapacity(vehicleType),
+          currentLoad: Math.floor(Math.random() * 100),
+          roadName: road.name,
+          roadType: road.type
+        }
+      )
+
+      vehicle.status = status
+      vehicle.motion = {
+        speed: Math.round(targetSpeed),
+        heading,
+        course: heading
+      }
+
+      vehicle.style = {
+        color: getStatusColor(status),
+        size: 8,
+        opacity: 1
+      }
+
+      // Store route info
+      vehicleRoutes.set(vehicleId, {
+        vehicleId,
+        roadSegment: road,
+        currentPosition: position,
+        direction,
+        targetSpeed
+      })
+
+      vehicles.push(vehicle)
+    } catch (error) {
+      console.error(`Error generating vehicle ${i}:`, error)
+      // Continue to next vehicle
     }
-
-    vehicle.style = {
-      color: getStatusColor(status),
-      size: 8,
-      opacity: 1
-    }
-
-    // Store route info
-    vehicleRoutes.set(vehicleId, {
-      vehicleId,
-      roadSegment: road,
-      currentPosition: position,
-      direction,
-      targetSpeed
-    })
-
-    vehicles.push(vehicle)
   }
 
   return vehicles
@@ -175,8 +196,26 @@ function calculateHeading(line: turf.Feature<turf.LineString>, position: number,
 
   // Get a small distance ahead/behind for bearing calculation
   const delta = 0.01 // 10 meters
-  const point1 = turf.along(line, currentDist, { units: 'kilometers' })
-  const point2 = turf.along(line, currentDist + (delta * direction), { units: 'kilometers' })
+
+  // Clamp the distances to valid range [0, length]
+  const dist1 = Math.max(0, Math.min(length, currentDist))
+  const dist2 = Math.max(0, Math.min(length, currentDist + (delta * direction)))
+
+  // If both points are the same, use a slightly different approach
+  if (Math.abs(dist1 - dist2) < 0.001) {
+    // Use the line's first and last point to get general direction
+    const coords = line.geometry.coordinates
+    if (coords.length < 2) return 0
+
+    const bearing = turf.bearing(
+      coords[0],
+      coords[coords.length - 1]
+    )
+    return (bearing + 360) % 360
+  }
+
+  const point1 = turf.along(line, dist1, { units: 'kilometers' })
+  const point2 = turf.along(line, dist2, { units: 'kilometers' })
 
   const bearing = turf.bearing(
     point1.geometry.coordinates,
