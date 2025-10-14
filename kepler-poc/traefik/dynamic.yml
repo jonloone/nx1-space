@@ -1,0 +1,125 @@
+# Traefik Dynamic Configuration
+# Middleware and routing rules for www.nexusone.earth
+
+http:
+  middlewares:
+    # Security Headers Middleware
+    security-headers:
+      headers:
+        # SSL/TLS Headers
+        sslRedirect: true
+        sslForceHost: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+
+        # Security Headers
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        permissionsPolicy: "geolocation=(), microphone=(), camera=()"
+
+        # Content Security Policy for Kepler.gl
+        contentSecurityPolicy: |
+          default-src 'self';
+          script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com;
+          style-src 'self' 'unsafe-inline' https://api.mapbox.com;
+          img-src 'self' data: https: blob:;
+          font-src 'self' data: https:;
+          connect-src 'self' https: wss: ws:;
+          worker-src 'self' blob:;
+          object-src 'none';
+          base-uri 'self';
+          form-action 'self';
+          frame-ancestors 'none';
+
+        # Custom Headers
+        customResponseHeaders:
+          X-Powered-By: ""
+          Server: ""
+          X-Robots-Tag: "noindex, nofollow"
+
+    # Rate Limiting Middleware
+    rate-limit:
+      rateLimit:
+        average: 100
+        period: 1m
+        burst: 50
+        sourceCriterion:
+          requestHost: true
+
+    # API Rate Limiting (more restrictive)
+    api-rate-limit:
+      rateLimit:
+        average: 20
+        period: 1m
+        burst: 10
+        sourceCriterion:
+          requestHost: true
+
+    # Compression Middleware
+    compression:
+      compress:
+        excludedContentTypes:
+          - "text/event-stream"
+
+    # Redirect www to non-www (optional, comment out if you want to keep www)
+    # redirect-to-non-www:
+    #   redirectRegex:
+    #     regex: "^https://www\\.nexusone\\.earth/(.*)"
+    #     replacement: "https://nexusone.earth/$${1}"
+    #     permanent: true
+
+    # CORS Headers (if needed for API endpoints)
+    cors-headers:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - POST
+        accessControlAllowHeaders:
+          - "Accept"
+          - "Content-Type"
+          - "X-Requested-With"
+        accessControlAllowOriginList:
+          - "https://nexusone.earth"
+          - "https://www.nexusone.earth"
+        accessControlMaxAge: 3600
+        addVaryHeader: true
+
+  # Routers
+  routers:
+    # Dashboard router (secure access)
+    traefik-dashboard:
+      rule: "Host(`traefik.nexusone.earth`)"
+      entryPoints:
+        - websecure
+      service: api@internal
+      middlewares:
+        - security-headers
+      tls:
+        certResolver: letsencrypt
+
+# TLS Configuration
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      cipherSuites:
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+      curvePreferences:
+        - CurveP521
+        - CurveP384
+      sniStrict: true
+
+    # Modern TLS for enhanced security (optional, more restrictive)
+    modern:
+      minVersion: VersionTLS13
+      sniStrict: true

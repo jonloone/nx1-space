@@ -181,6 +181,9 @@ export async function POST(request: NextRequest) {
 }
 
 // GET /api/database/[id] - Get specific record by ID
+// NOTE: This functionality should be implemented in app/api/database/[id]/route.ts
+// Commented out to fix production build
+/*
 export async function GET_BY_ID(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { searchParams } = new URL(request.url)
@@ -224,7 +227,7 @@ export async function GET_BY_ID(request: NextRequest, { params }: { params: { id
 
   } catch (error) {
     console.error('Database record fetch failed:', error)
-    
+
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -232,3 +235,4 @@ export async function GET_BY_ID(request: NextRequest, { params }: { params: { id
     }, { status: 500 })
   }
 }
+*/

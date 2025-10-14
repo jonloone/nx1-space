@@ -21,6 +21,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import NexusOneLogo from '@/components/branding/NexusOneLogo'
+import IntegratedSearchBar from '@/components/search/IntegratedSearchBar'
+import { GERSPlace } from '@/lib/services/gersDemoService'
 
 interface MissionControlLayoutProps {
   children: ReactNode
@@ -32,6 +35,7 @@ interface MissionControlLayoutProps {
   isLive?: boolean
   activeUsers?: number
   onSearch?: (query: string) => void
+  onPlaceSelect?: (place: GERSPlace) => void
 }
 
 /**
@@ -51,7 +55,8 @@ export default function MissionControlLayout({
   notificationCount = 0,
   isLive = false,
   activeUsers = 1,
-  onSearch
+  onSearch,
+  onPlaceSelect
 }: MissionControlLayoutProps) {
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true)
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false)
@@ -64,201 +69,149 @@ export default function MissionControlLayout({
   }
 
   return (
-    <div className="h-screen w-full flex flex-col bg-slate-950 overflow-hidden">
-      {/* Top Navigation Bar - 48px */}
-      <header className="h-12 border-b border-white/10 bg-black/40 backdrop-blur-sm flex items-center justify-between px-4 shrink-0 z-50">
-        {/* Left Section */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}
-            className="h-8 w-8"
+    <div className="h-screen w-full relative bg-neutral-50 overflow-hidden">
+      {/* Full-Screen Map Canvas */}
+      <main className="absolute inset-0 w-full h-full">
+        {children}
+      </main>
+
+      {/* Top-Left Logo & Controls - Floating */}
+      <div className="absolute top-6 left-6 z-50 flex items-center gap-3">
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}
+          className="h-10 w-10 bg-white border border-border shadow-lg rounded-lg hover:shadow-xl transition-shadow"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        <div className="bg-white border border-border shadow-lg rounded-lg px-4 py-2">
+          <NexusOneLogo width={130} height={23} className="text-[#080C16]" />
+        </div>
+      </div>
+
+      {/* Top-Right User Controls - Floating */}
+      <div className="absolute top-6 right-6 z-50 flex items-center gap-3">
+        {/* Notifications */}
+        <Button variant="secondary" size="icon" className="h-10 w-10 relative bg-white border border-border shadow-lg rounded-lg hover:shadow-xl transition-shadow">
+          <Bell className="h-4 w-4 text-foreground" />
+          {notificationCount > 0 && (
+            <Badge className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center bg-destructive text-destructive-foreground text-[10px] rounded-full">
+              {notificationCount > 9 ? '9+' : notificationCount}
+            </Badge>
+          )}
+        </Button>
+
+        {/* User Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary" size="icon" className="h-10 w-10 bg-white border border-border shadow-lg rounded-full hover:shadow-xl transition-shadow">
+              <User className="h-4 w-4 text-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="rounded-mundi-lg">
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>Help</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">Sign Out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Left Sidebar - Overlaid on map, not full height */}
+      <AnimatePresence mode="wait">
+        {isLeftSidebarOpen && (
+          <motion.aside
+            initial={{ x: -320, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -320, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute top-20 left-6 z-40 w-80 max-h-[calc(100vh-200px)] bg-white/95 backdrop-blur-sm border border-border rounded-lg shadow-xl overflow-hidden"
           >
-            <Menu className="h-4 w-4" />
-          </Button>
-
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">OI</span>
+            <div className="h-full overflow-y-auto">
+              <div className="p-4 border-b border-border flex items-center justify-between">
+                <h3 className="font-semibold text-[#171717]">{projectName}</h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsLeftSidebarOpen(false)}
+                  className="h-8 w-8 rounded-lg hover:bg-[#F5F5F5]"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </div>
+              {leftSidebar || (
+                <div className="p-6 text-muted-foreground text-sm">
+                  Left Sidebar Content
+                </div>
+              )}
             </div>
-            <span className="text-sm font-semibold text-white hidden sm:inline">
-              OpIntel
-            </span>
-          </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
 
-          <div className="h-4 w-px bg-white/10 hidden md:block" />
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 text-sm text-white/80 hover:text-white hidden md:flex">
-                {projectName}
-                <ChevronRight className="ml-2 h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Switch Project</DropdownMenuItem>
-              <DropdownMenuItem>New Project</DropdownMenuItem>
-              <DropdownMenuItem>Project Settings</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      {/* Bottom Center Search Dock - Overlaid on map */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-3xl px-6">
+        <div className="bg-white/95 backdrop-blur-sm border border-border rounded-xl shadow-2xl p-4">
+          <IntegratedSearchBar
+            onPlaceSelect={onPlaceSelect}
+            placeholder="Search places, facilities, infrastructure..."
+          />
         </div>
+      </div>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-3">
-          {/* Search */}
-          <form onSubmit={handleSearch} className="hidden lg:block">
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-white/40" />
-              <Input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-8 w-48 pl-7 bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-          </form>
-
-          {/* Notifications */}
-          <Button variant="ghost" size="icon" className="h-8 w-8 relative">
-            <Bell className="h-4 w-4" />
-            {notificationCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center bg-red-500 text-[10px]">
-                {notificationCount > 9 ? '9+' : notificationCount}
-              </Badge>
-            )}
-          </Button>
-
-          {/* Live Status */}
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10">
-            <div className={`w-2 h-2 rounded-full ${isLive ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
-            <span className="text-xs text-white/80 hidden sm:inline">
-              {isLive ? 'Live' : 'Offline'}
-            </span>
-          </div>
-
-          {/* Active Users */}
-          <Button variant="ghost" size="icon" className="h-8 w-8 relative hidden md:flex">
-            <Users className="h-4 w-4" />
-            {activeUsers > 1 && (
-              <Badge className="absolute -top-1 -right-1 h-4 min-w-4 p-0 flex items-center justify-center bg-blue-500 text-[10px]">
-                {activeUsers}
-              </Badge>
-            )}
-          </Button>
-
-          {/* User Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                <User className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Help</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-400">Sign Out</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden relative min-h-0">
-        {/* Left Sidebar */}
-        <AnimatePresence mode="wait">
-          {isLeftSidebarOpen && (
-            <motion.aside
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 240, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="border-r border-white/10 bg-black/20 backdrop-blur-sm shrink-0 overflow-hidden z-40"
-            >
-              <div className="w-60 h-full overflow-y-auto">
-                {leftSidebar || (
-                  <div className="p-4 text-white/60 text-sm">
-                    Left Sidebar Content
+      {/* Right Panel - Overlaid on map */}
+      <AnimatePresence mode="wait">
+        {isRightPanelOpen && (
+          <motion.aside
+            initial={{ x: 420, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 420, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute top-20 right-6 z-40 w-[420px] max-h-[calc(100vh-200px)] bg-white/95 backdrop-blur-sm border border-border rounded-lg shadow-xl overflow-hidden"
+          >
+            <div className="h-full overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <h3 className="text-foreground font-semibold text-lg">Details</h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsRightPanelOpen(false)}
+                  className="h-8 w-8 rounded-lg hover:bg-[#F5F5F5]"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="p-4">
+                {rightPanel || (
+                  <div className="text-muted-foreground text-sm">
+                    Right Panel Content
                   </div>
                 )}
               </div>
-            </motion.aside>
-          )}
-        </AnimatePresence>
-
-        {/* Map Canvas (Center) */}
-        <main className="flex-1 relative overflow-hidden">
-          {children}
-
-          {/* Toggle Left Sidebar Button (when closed) */}
-          {!isLeftSidebarOpen && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsLeftSidebarOpen(true)}
-              className="absolute top-4 left-4 z-30 h-8 w-8 bg-black/40 backdrop-blur-sm border border-white/10"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          )}
-        </main>
-
-        {/* Right Panel */}
-        <AnimatePresence mode="wait">
-          {isRightPanelOpen && (
-            <motion.aside
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 400, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="border-l border-white/10 bg-black/20 backdrop-blur-sm shrink-0 overflow-hidden z-40"
-            >
-              <div className="w-[400px] h-full overflow-y-auto">
-                <div className="flex items-center justify-between p-4 border-b border-white/10">
-                  <h3 className="text-white font-semibold">Details</h3>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsRightPanelOpen(false)}
-                    className="h-6 w-6"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="p-4">
-                  {rightPanel || (
-                    <div className="text-white/60 text-sm">
-                      Right Panel Content
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.aside>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Bottom Timeline */}
-      <AnimatePresence mode="wait">
-        {bottomTimeline && (
-          <motion.footer
-            initial={{ height: 0, opacity: 0 }}
-            animate={{
-              height: isTimelineExpanded ? 200 : 60,
-              opacity: 1
-            }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-white/10 bg-black/40 backdrop-blur-sm shrink-0 overflow-hidden"
-          >
-            <div className="p-3">
-              {bottomTimeline}
             </div>
-          </motion.footer>
+          </motion.aside>
         )}
       </AnimatePresence>
+
+      {/* Bottom Timeline - Overlaid on map if needed */}
+      {bottomTimeline && (
+        <AnimatePresence mode="wait">
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute bottom-32 left-6 right-6 z-30 bg-white/95 backdrop-blur-sm border border-border rounded-lg shadow-xl overflow-hidden"
+            style={{ height: isTimelineExpanded ? 220 : 72 }}
+          >
+            <div className="p-4">
+              {bottomTimeline}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      )}
     </div>
   )
 }

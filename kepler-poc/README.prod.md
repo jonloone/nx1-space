@@ -40,11 +40,30 @@ cd ground-station-intelligence
 ./deploy.sh
 ```
 
-### 2. Access the Application
-- **Main App**: http://localhost:80
-- **Grafana**: http://localhost:3000 (admin/admin123!)
-- **Prometheus**: http://localhost:9090
-- **Traefik Dashboard**: http://localhost:8080
+### 2. Configure Domain and SSL
+```bash
+# Copy the environment template
+cp .env.production .env
+
+# Edit .env and update:
+# - ACME_EMAIL with your email address
+# - GRAFANA_PASSWORD with a secure password
+nano .env
+```
+
+### 3. Configure DNS
+Point these DNS records to your server's IP address:
+- `nexusone.earth` (A record)
+- `www.nexusone.earth` (A record)
+- `traefik.nexusone.earth` (A record, optional for dashboard)
+
+### 4. Access the Application
+After deployment with valid DNS:
+- **Main App**: https://www.nexusone.earth
+- **Alternative**: https://nexusone.earth
+- **Grafana**: http://localhost:3000 (admin/[your-password])
+- **Prometheus**: http://localhost:9090 (internal only)
+- **Traefik Dashboard**: https://traefik.nexusone.earth (after DNS setup)
 
 ## 🔒 Security Features
 
@@ -117,25 +136,21 @@ docker system prune -f
 
 ### Environment Variables
 ```bash
-# Create .env file
-cat > .env << EOF
-# Domain configuration
-DOMAIN=ground-station.yourdomain.com
-ACME_EMAIL=admin@yourdomain.com
+# Use the production template
+cp .env.production .env
 
-# Security
-GRAFANA_PASSWORD=your-secure-password
-
-# Application
-NODE_ENV=production
-TZ=UTC
-EOF
+# Edit the .env file with your configuration
+nano .env
 ```
 
 ### SSL/TLS Setup
-1. Update domain in `docker-compose.prod.yml`
-2. Ensure DNS points to your server
-3. Traefik will automatically obtain Let's Encrypt certificates
+1. Ensure DNS records point to your server IP:
+   - `nexusone.earth` → YOUR_SERVER_IP
+   - `www.nexusone.earth` → YOUR_SERVER_IP
+   - `traefik.nexusone.earth` → YOUR_SERVER_IP (optional)
+2. Update `ACME_EMAIL` in `.env` file
+3. Traefik will automatically obtain Let's Encrypt certificates on first request
+4. Certificates will auto-renew before expiration
 
 ### Custom Map Styles
 Edit `src/config/mapStyles.js` to add custom base maps:
@@ -290,7 +305,7 @@ docker-compose exec kepler-app npm test
 ## 📞 Support
 
 ### Health Checks
-- **Application**: http://localhost:80/health
+- **Application**: https://www.nexusone.earth/health (or http://localhost:8080/health locally)
 - **Prometheus**: http://localhost:9090/-/healthy
 - **Grafana**: http://localhost:3000/api/health
 
@@ -298,6 +313,7 @@ docker-compose exec kepler-app npm test
 - **Metrics**: http://localhost:9090/metrics
 - **Dashboards**: http://localhost:3000
 - **Service Discovery**: http://localhost:9090/targets
+- **Traefik Dashboard**: https://traefik.nexusone.earth (requires DNS setup)
 
 ---
 

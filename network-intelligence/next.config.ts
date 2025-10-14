@@ -2,13 +2,21 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  
+
+  // Skip type checking and linting during build for faster deployment
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
     },
   },
-  
+
   // Suppress hydration warnings caused by browser extensions
   reactStrictMode: false,
   

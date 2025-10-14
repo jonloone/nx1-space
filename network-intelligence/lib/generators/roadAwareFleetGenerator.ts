@@ -207,23 +207,44 @@ function calculateHeading(line: turf.Feature<turf.LineString>, position: number,
     const coords = line.geometry.coordinates
     if (coords.length < 2) return 0
 
-    const bearing = turf.bearing(
-      coords[0],
-      coords[coords.length - 1]
-    )
-    return (bearing + 360) % 360
+    // Validate coordinates before calculating bearing
+    const coord1 = coords[0]
+    const coord2 = coords[coords.length - 1]
+
+    if (!Array.isArray(coord1) || coord1.length !== 2 ||
+        !Array.isArray(coord2) || coord2.length !== 2) {
+      console.warn('Invalid coordinates for bearing calculation')
+      return 0
+    }
+
+    try {
+      const bearing = turf.bearing(coord1, coord2)
+      return (bearing + 360) % 360
+    } catch (error) {
+      console.warn('Error calculating bearing:', error)
+      return 0
+    }
   }
 
-  const point1 = turf.along(line, dist1, { units: 'kilometers' })
-  const point2 = turf.along(line, dist2, { units: 'kilometers' })
+  try {
+    const point1 = turf.along(line, dist1, { units: 'kilometers' })
+    const point2 = turf.along(line, dist2, { units: 'kilometers' })
 
-  const bearing = turf.bearing(
-    point1.geometry.coordinates,
-    point2.geometry.coordinates
-  )
+    // Validate points before calculating bearing
+    if (!point1?.geometry?.coordinates || !point2?.geometry?.coordinates) {
+      console.warn('Invalid points generated for bearing')
+      return 0
+    }
 
-  // Convert to 0-360
-  return (bearing + 360) % 360
+    const bearing = turf.bearing(
+      point1.geometry.coordinates,
+      point2.geometry.coordinates
+    )
+    return (bearing + 360) % 360
+  } catch (error) {
+    console.warn('Error in bearing calculation:', error)
+    return 0
+  }
 }
 
 /**

@@ -1,20 +1,57 @@
-# Simple Docker Compose for Kepler.gl POC Demo
-version: '3.8'
+# Simple Docker Compose - Just App + HTTPS
 
 services:
+  # Main application
   kepler-app:
     build:
-      context: .
-      dockerfile: Dockerfile.simple
-    container_name: kepler-ground-station-demo
-    ports:
-      - "8090:80"
-    environment:
-      - NODE_ENV=production
+      context: ../network-intelligence
+      dockerfile: Dockerfile.dev
+    image: network-intelligence:dev
+    container_name: network-intelligence-app
     restart: unless-stopped
+    networks:
+      - app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kepler-app.rule=Host(`www.nexusone.earth`) || Host(`nexusone.earth`)"
+      - "traefik.http.routers.kepler-app.entrypoints=websecure"
+      - "traefik.http.routers.kepler-app.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kepler-app.loadbalancer.server.port=3000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  # Traefik - HTTPS reverse proxy with Let's Encrypt
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - app-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik:/etc/traefik:ro
+      - traefik-certificates:/certificates
+    environment:
+      - ACME_EMAIL=${ACME_EMAIL:-admin@nexusone.earth}
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  traefik-certificates:
+    driver: local

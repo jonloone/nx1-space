@@ -57,25 +57,25 @@ export default function RightPanel({ mode, data, onClose }: RightPanelProps) {
     }
 
     return (
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
+      <div className="flex items-center justify-between p-4 border-b border-[#E5E5E5]">
         <div className="flex items-center gap-2">
-          <div className="text-white/80">{icon}</div>
-          <h3 className="text-sm font-semibold text-white">{title}</h3>
+          <div className="text-[#525252]">{icon}</div>
+          <h3 className="text-sm font-semibold text-[#171717]">{title}</h3>
         </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={onClose}
-          className="h-8 w-8"
+          className="h-8 w-8 hover:bg-[#F5F5F5]"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4 text-[#525252]" />
         </Button>
       </div>
     )
   }
 
   return (
-    <div className="h-full flex flex-col bg-black/20 backdrop-blur-sm">
+    <div className="h-full flex flex-col bg-white border-l border-[#E5E5E5]">
       {renderHeader()}
       <ScrollArea className="flex-1">
         <div className="p-4">
@@ -111,51 +111,51 @@ function FeatureDetailsPanel({ data }: { data: any }) {
     <div className="space-y-4">
       {/* Quick Actions */}
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" className="flex-1 text-xs border-white/10">
+        <Button variant="outline" size="sm" className="flex-1 text-xs border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]">
           <ExternalLink className="h-3 w-3 mr-1" />
           Open
         </Button>
-        <Button variant="outline" size="sm" className="flex-1 text-xs border-white/10">
+        <Button variant="outline" size="sm" className="flex-1 text-xs border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]">
           <Copy className="h-3 w-3 mr-1" />
           Copy
         </Button>
-        <Button variant="outline" size="sm" className="flex-1 text-xs border-white/10">
+        <Button variant="outline" size="sm" className="flex-1 text-xs border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]">
           <Share2 className="h-3 w-3 mr-1" />
           Share
         </Button>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-[#E5E5E5]" />
 
       {/* Feature Info */}
       <div className="space-y-3">
         <div>
-          <h4 className="text-xl font-bold text-white mb-1">{feature.name}</h4>
-          <Badge variant="outline" className="text-xs">
+          <h4 className="text-xl font-bold text-[#171717] mb-1">{feature.name}</h4>
+          <Badge variant="outline" className="text-xs border-[#E5E5E5] text-[#525252]">
             {feature.type}
           </Badge>
         </div>
 
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="text-white/60">ID</div>
-          <div className="text-white font-mono">{feature.id}</div>
+          <div className="text-[#737373]">ID</div>
+          <div className="text-[#171717] font-mono">{feature.id}</div>
 
-          <div className="text-white/60">Coordinates</div>
-          <div className="text-white font-mono">
+          <div className="text-[#737373]">Coordinates</div>
+          <div className="text-[#171717] font-mono">
             {feature.coordinates[1].toFixed(4)}, {feature.coordinates[0].toFixed(4)}
           </div>
         </div>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-[#E5E5E5]" />
 
       {/* Properties */}
       <Tabs defaultValue="properties" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white/5">
-          <TabsTrigger value="properties" className="text-xs">
+        <TabsList className="grid w-full grid-cols-2 bg-[#F5F5F5] border border-[#E5E5E5]">
+          <TabsTrigger value="properties" className="text-xs text-[#525252] data-[state=active]:text-[#171717]">
             Properties
           </TabsTrigger>
-          <TabsTrigger value="history" className="text-xs">
+          <TabsTrigger value="history" className="text-xs text-[#525252] data-[state=active]:text-[#171717]">
             History
           </TabsTrigger>
         </TabsList>
@@ -163,10 +163,10 @@ function FeatureDetailsPanel({ data }: { data: any }) {
         <TabsContent value="properties" className="mt-4 space-y-2">
           {Object.entries(feature.properties).map(([key, value]) => (
             <div key={key} className="flex justify-between items-center py-1.5">
-              <span className="text-xs text-white/60 capitalize">
+              <span className="text-xs text-[#737373] capitalize">
                 {key.replace(/([A-Z])/g, ' $1').trim()}
               </span>
-              <span className="text-xs text-white font-medium">{value as string}</span>
+              <span className="text-xs text-[#171717] font-medium">{value as string}</span>
             </div>
           ))}
         </TabsContent>
@@ -179,10 +179,10 @@ function FeatureDetailsPanel({ data }: { data: any }) {
               { time: '1 hour ago', event: 'Started delivery' }
             ].map((item, i) => (
               <div key={i} className="flex gap-2 items-start">
-                <Clock className="h-3 w-3 text-white/40 mt-0.5" />
+                <Clock className="h-3 w-3 text-[#A3A3A3] mt-0.5" />
                 <div className="flex-1">
-                  <div className="text-xs text-white">{item.event}</div>
-                  <div className="text-[10px] text-white/40">{item.time}</div>
+                  <div className="text-xs text-[#171717]">{item.event}</div>
+                  <div className="text-[10px] text-[#737373]">{item.time}</div>
                 </div>
               </div>
             ))}
@@ -214,15 +214,15 @@ function AlertDetailsPanel({ data }: { data: any }) {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'bg-red-500'
+        return 'bg-[#EF4444]' // Error red (WCAG compliant)
       case 'high':
-        return 'bg-orange-500'
+        return 'bg-[#F59E0B]' // Warning amber (WCAG compliant)
       case 'medium':
-        return 'bg-yellow-500'
+        return 'bg-[#F59E0B]' // Warning amber
       case 'low':
-        return 'bg-blue-500'
+        return 'bg-[#176BF8]' // NexusOne Blue
       default:
-        return 'bg-gray-500'
+        return 'bg-[#A3A3A3]' // Neutral gray
     }
   }
 
@@ -232,36 +232,36 @@ function AlertDetailsPanel({ data }: { data: any }) {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <div className={cn('w-2 h-2 rounded-full', getSeverityColor(alert.severity))} />
-          <h4 className="text-lg font-bold text-white">{alert.title}</h4>
+          <h4 className="text-lg font-bold text-[#171717]">{alert.title}</h4>
         </div>
         <div className="flex gap-2">
-          <Badge variant="outline" className="text-xs capitalize">
+          <Badge variant="outline" className="text-xs capitalize border-[#E5E5E5] text-[#525252]">
             {alert.severity}
           </Badge>
-          <Badge variant="outline" className="text-xs capitalize">
+          <Badge variant="outline" className="text-xs capitalize border-[#E5E5E5] text-[#525252]">
             {alert.type}
           </Badge>
-          <Badge variant="outline" className="text-xs capitalize">
+          <Badge variant="outline" className="text-xs capitalize border-[#E5E5E5] text-[#525252]">
             {alert.status}
           </Badge>
         </div>
-        <div className="text-xs text-white/40">{alert.timestamp}</div>
+        <div className="text-xs text-[#737373]">{alert.timestamp}</div>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-[#E5E5E5]" />
 
       {/* Description */}
       <div>
-        <h5 className="text-xs font-semibold text-white/80 mb-2">Description</h5>
-        <p className="text-xs text-white/60 leading-relaxed">{alert.description}</p>
+        <h5 className="text-xs font-semibold text-[#525252] mb-2">Description</h5>
+        <p className="text-xs text-[#737373] leading-relaxed">{alert.description}</p>
       </div>
 
       {/* Affected Entities */}
       <div>
-        <h5 className="text-xs font-semibold text-white/80 mb-2">Affected Entities</h5>
+        <h5 className="text-xs font-semibold text-[#525252] mb-2">Affected Entities</h5>
         <div className="flex flex-wrap gap-1">
           {alert.affectedEntities.map((entity: string, i: number) => (
-            <Badge key={i} variant="outline" className="text-xs">
+            <Badge key={i} variant="outline" className="text-xs border-[#E5E5E5] text-[#525252]">
               <Tag className="h-3 w-3 mr-1" />
               {entity}
             </Badge>
@@ -271,30 +271,30 @@ function AlertDetailsPanel({ data }: { data: any }) {
 
       {/* Recommendations */}
       <div>
-        <h5 className="text-xs font-semibold text-white/80 mb-2">Recommendations</h5>
+        <h5 className="text-xs font-semibold text-[#525252] mb-2">Recommendations</h5>
         <div className="space-y-2">
           {alert.recommendations.map((rec: string, i: number) => (
-            <div key={i} className="flex items-start gap-2 text-xs text-white/60">
-              <div className="w-1 h-1 rounded-full bg-white/40 mt-1.5" />
+            <div key={i} className="flex items-start gap-2 text-xs text-[#737373]">
+              <div className="w-1 h-1 rounded-full bg-[#A3A3A3] mt-1.5" />
               <span>{rec}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-[#E5E5E5]" />
 
       {/* Actions */}
       <div className="space-y-2">
-        <Button className="w-full" size="sm">
+        <Button className="w-full bg-[#176BF8] hover:bg-[#0D4DB8] text-white" size="sm">
           Acknowledge Alert
         </Button>
-        <Button variant="outline" className="w-full border-white/10" size="sm">
+        <Button variant="outline" className="w-full border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]" size="sm">
           View on Map
         </Button>
         <Button
           variant="outline"
-          className="w-full border-white/10 text-red-400"
+          className="w-full border-[#E5E5E5] text-[#EF4444] hover:bg-[#FEE2E2]"
           size="sm"
         >
           Dismiss
@@ -319,35 +319,35 @@ function LayerStylePanel({ data }: { data: any }) {
     <div className="space-y-4">
       {/* Layer Info */}
       <div>
-        <h4 className="text-lg font-bold text-white mb-1">{layer.name}</h4>
-        <Badge variant="outline" className="text-xs">
+        <h4 className="text-lg font-bold text-[#171717] mb-1">{layer.name}</h4>
+        <Badge variant="outline" className="text-xs border-[#E5E5E5] text-[#525252]">
           {layer.type}
         </Badge>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-[#E5E5E5]" />
 
       {/* Style Controls */}
       <div className="space-y-4">
         <div>
-          <label className="text-xs font-semibold text-white/80 mb-2 block">
+          <label className="text-xs font-semibold text-[#525252] mb-2 block">
             Fill Color
           </label>
           <div className="flex items-center gap-2">
             <div
-              className="w-10 h-10 rounded border border-white/10"
+              className="w-10 h-10 rounded border border-[#E5E5E5]"
               style={{ backgroundColor: layer.color }}
             />
             <input
               type="color"
               value={layer.color}
-              className="flex-1 h-10 rounded border border-white/10 bg-transparent"
+              className="flex-1 h-10 rounded border border-[#E5E5E5] bg-white"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-white/80 mb-2 block">
+          <label className="text-xs font-semibold text-[#525252] mb-2 block">
             Opacity: {Math.round(layer.opacity * 100)}%
           </label>
           <input
@@ -355,12 +355,12 @@ function LayerStylePanel({ data }: { data: any }) {
             min="0"
             max="100"
             value={layer.opacity * 100}
-            className="w-full"
+            className="w-full accent-[#176BF8]"
           />
         </div>
 
         <div>
-          <label className="text-xs font-semibold text-white/80 mb-2 block">
+          <label className="text-xs font-semibold text-[#525252] mb-2 block">
             Point Size: {layer.size}px
           </label>
           <input
@@ -368,19 +368,19 @@ function LayerStylePanel({ data }: { data: any }) {
             min="1"
             max="50"
             value={layer.size}
-            className="w-full"
+            className="w-full accent-[#176BF8]"
           />
         </div>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-[#E5E5E5]" />
 
       {/* Actions */}
       <div className="space-y-2">
-        <Button className="w-full" size="sm">
+        <Button className="w-full bg-[#176BF8] hover:bg-[#0D4DB8] text-white" size="sm">
           Apply Changes
         </Button>
-        <Button variant="outline" className="w-full border-white/10" size="sm">
+        <Button variant="outline" className="w-full border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]" size="sm">
           Reset to Default
         </Button>
       </div>
@@ -406,39 +406,39 @@ function AnalysisResultsPanel({ data }: { data: any }) {
     <div className="space-y-4">
       {/* Analysis Header */}
       <div>
-        <h4 className="text-lg font-bold text-white mb-1">{results.title}</h4>
-        <div className="text-xs text-white/40">{results.timestamp}</div>
+        <h4 className="text-lg font-bold text-[#171717] mb-1">{results.title}</h4>
+        <div className="text-xs text-[#737373]">{results.timestamp}</div>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-[#E5E5E5]" />
 
       {/* Summary */}
       <div>
-        <h5 className="text-xs font-semibold text-white/80 mb-2">Summary</h5>
-        <p className="text-xs text-white/60 leading-relaxed">{results.summary}</p>
+        <h5 className="text-xs font-semibold text-[#525252] mb-2">Summary</h5>
+        <p className="text-xs text-[#737373] leading-relaxed">{results.summary}</p>
       </div>
 
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-3">
         {results.metrics.map((metric: any, i: number) => (
-          <Card key={i} className="bg-white/5 border-white/10">
+          <Card key={i} className="bg-white border border-[#E5E5E5] shadow-sm">
             <CardContent className="p-3">
-              <div className="text-xs text-white/60 mb-1">{metric.label}</div>
-              <div className="text-lg font-bold text-white">{metric.value}</div>
+              <div className="text-xs text-[#737373] mb-1">{metric.label}</div>
+              <div className="text-lg font-bold text-[#171717]">{metric.value}</div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-[#E5E5E5]" />
 
       {/* Actions */}
       <div className="space-y-2">
-        <Button className="w-full" size="sm">
+        <Button className="w-full bg-[#176BF8] hover:bg-[#0D4DB8] text-white" size="sm">
           <Download className="h-3 w-3 mr-2" />
           Export Results
         </Button>
-        <Button variant="outline" className="w-full border-white/10" size="sm">
+        <Button variant="outline" className="w-full border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]" size="sm">
           View Details
         </Button>
       </div>

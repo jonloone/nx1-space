@@ -114,7 +114,7 @@ export default function TimelineControl({
   return (
     <motion.div
       className={cn(
-        'w-full bg-black/40 backdrop-blur-sm border-t border-white/10',
+        'w-full bg-white border-t border-border shadow-mundi-sm',
         isExpanded ? 'h-[200px]' : 'h-[60px]'
       )}
       animate={{ height: isExpanded ? 200 : 60 }}
@@ -128,7 +128,7 @@ export default function TimelineControl({
             variant="ghost"
             size="icon"
             onClick={onExpandToggle}
-            className="h-8 w-8 shrink-0"
+            className="h-8 w-8 shrink-0 hover:bg-muted rounded-mundi-md text-foreground"
           >
             <ChevronUp className="h-4 w-4" />
           </Button>
@@ -139,7 +139,7 @@ export default function TimelineControl({
               variant="ghost"
               size="icon"
               onClick={onSkipBack}
-              className="h-8 w-8"
+              className="h-8 w-8 hover:bg-muted rounded-mundi-md text-foreground"
             >
               <SkipBack className="h-4 w-4" />
             </Button>
@@ -148,7 +148,7 @@ export default function TimelineControl({
               variant="ghost"
               size="icon"
               onClick={onPlayPause}
-              className="h-9 w-9 bg-white/10 hover:bg-white/20"
+              className="h-9 w-9 bg-mundi-300 hover:bg-mundi-400 rounded-mundi-md text-foreground shadow-mundi-sm transition-all"
             >
               {isPlaying ? (
                 <Pause className="h-4 w-4" />
@@ -161,7 +161,7 @@ export default function TimelineControl({
               variant="ghost"
               size="icon"
               onClick={onSkipForward}
-              className="h-8 w-8"
+              className="h-8 w-8 hover:bg-muted rounded-mundi-md text-foreground"
             >
               <SkipForward className="h-4 w-4" />
             </Button>
@@ -169,7 +169,7 @@ export default function TimelineControl({
 
           {/* Timeline Slider */}
           <div className="flex-1 flex items-center gap-3">
-            <div className="text-xs text-white/60 font-mono shrink-0">
+            <div className="text-xs text-muted-foreground font-mono shrink-0">
               {isMounted ? formatTime(currentTime) : '--:--:--'}
             </div>
 
@@ -181,7 +181,7 @@ export default function TimelineControl({
               className="flex-1"
             />
 
-            <div className="text-xs text-white/40 font-mono shrink-0">
+            <div className="text-xs text-muted-foreground font-mono shrink-0">
               {isMounted ? formatTime(endTime) : '--:--:--'}
             </div>
           </div>
@@ -191,10 +191,10 @@ export default function TimelineControl({
             value={playbackSpeed.toString()}
             onValueChange={(value) => onSpeedChange?.(parseFloat(value))}
           >
-            <SelectTrigger className="w-20 h-8 text-xs border-white/10">
+            <SelectTrigger className="w-20 h-8 text-xs border-border bg-white rounded-mundi-md text-foreground">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-mundi-lg">
               <SelectItem value="0.25">0.25x</SelectItem>
               <SelectItem value="0.5">0.5x</SelectItem>
               <SelectItem value="1">1x</SelectItem>
@@ -206,7 +206,7 @@ export default function TimelineControl({
 
           {/* Live Indicator */}
           {Math.abs(currentTime.getTime() - endTime.getTime()) < 5000 && (
-            <Badge variant="outline" className="shrink-0 text-xs">
+            <Badge variant="outline" className="shrink-0 text-xs border-border bg-white text-foreground rounded-mundi-md">
               <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse mr-1.5" />
               LIVE
             </Badge>
@@ -220,8 +220,8 @@ export default function TimelineControl({
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-white/60" />
-              <span className="text-sm font-semibold text-white">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-semibold text-foreground">
                 Timeline Control
               </span>
             </div>
@@ -229,7 +229,7 @@ export default function TimelineControl({
             <div className="flex items-center gap-2">
               {/* Live Indicator */}
               {Math.abs(currentTime.getTime() - endTime.getTime()) < 5000 && (
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs border-border bg-white text-foreground rounded-mundi-md">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse mr-1.5" />
                   LIVE
                 </Badge>
@@ -237,11 +237,11 @@ export default function TimelineControl({
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-muted rounded-mundi-md text-foreground">
                     <Settings className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="rounded-mundi-lg">
                   <DropdownMenuItem>Set Time Range</DropdownMenuItem>
                   <DropdownMenuItem>Export Timeline</DropdownMenuItem>
                   <DropdownMenuItem>Reset View</DropdownMenuItem>
@@ -252,7 +252,7 @@ export default function TimelineControl({
                 variant="ghost"
                 size="icon"
                 onClick={onExpandToggle}
-                className="h-7 w-7"
+                className="h-7 w-7 hover:bg-muted rounded-mundi-md text-foreground"
               >
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -261,34 +261,38 @@ export default function TimelineControl({
 
           {/* Date Range */}
           <div className="flex items-center gap-4 mb-3">
-            <div className="flex items-center gap-2 text-xs" suppressHydrationWarning>
-              <Calendar className="h-3 w-3 text-white/40" />
-              <span className="text-white/60">{formatDate(startTime)}</span>
-              <span className="text-white/40">→</span>
-              <span className="text-white/60">{formatDate(endTime)}</span>
+            <div className="flex items-center gap-2 text-xs">
+              <Calendar className="h-3 w-3 text-muted-foreground" />
+              <span className="text-muted-foreground">
+                {isMounted ? formatDate(startTime) : '---'}
+              </span>
+              <span className="text-muted-foreground">→</span>
+              <span className="text-muted-foreground">
+                {isMounted ? formatDate(endTime) : '---'}
+              </span>
             </div>
 
             <div className="flex-1" />
 
-            <div className="text-xs text-white/40" suppressHydrationWarning>
-              Duration: {Math.round(totalDuration / (1000 * 60 * 60))}h
+            <div className="text-xs text-muted-foreground">
+              Duration: {isMounted ? `${Math.round(totalDuration / (1000 * 60 * 60))}h` : '--h'}
             </div>
           </div>
 
           {/* Timeline Visualization */}
           <div className="flex-1 mb-3 relative">
-            <div className="absolute inset-0 bg-white/5 rounded">
+            <div className="absolute inset-0 bg-muted rounded-mundi-md border border-border">
               {/* Time markers */}
               <div className="absolute inset-0 flex justify-between px-2 py-1">
                 {[0, 25, 50, 75, 100].map((percent) => (
                   <div key={percent} className="flex flex-col items-center">
-                    <div className="w-px h-2 bg-white/20" />
-                    <div className="text-[10px] text-white/40 mt-1 font-mono" suppressHydrationWarning>
-                      {formatTime(
+                    <div className="w-px h-2 bg-border" />
+                    <div className="text-[10px] text-muted-foreground mt-1 font-mono">
+                      {isMounted ? formatTime(
                         new Date(
                           startTime.getTime() + (totalDuration * percent) / 100
                         )
-                      )}
+                      ) : '--:--'}
                     </div>
                   </div>
                 ))}
@@ -296,10 +300,10 @@ export default function TimelineControl({
 
               {/* Current position indicator */}
               <div
-                className="absolute top-0 bottom-0 w-0.5 bg-blue-500"
+                className="absolute top-0 bottom-0 w-0.5 bg-mundi-500"
                 style={{ left: `${sliderValue}%` }}
               >
-                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 bg-blue-500 rounded-full border-2 border-white" />
+                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 bg-mundi-500 rounded-full border-2 border-white shadow-mundi-sm" />
               </div>
 
               {/* Event markers (example) */}
@@ -322,7 +326,7 @@ export default function TimelineControl({
                 variant="ghost"
                 size="icon"
                 onClick={onSkipBack}
-                className="h-8 w-8"
+                className="h-8 w-8 hover:bg-muted rounded-mundi-md text-foreground"
               >
                 <SkipBack className="h-4 w-4" />
               </Button>
@@ -331,7 +335,7 @@ export default function TimelineControl({
                 variant="ghost"
                 size="icon"
                 onClick={onPlayPause}
-                className="h-10 w-10 bg-white/10 hover:bg-white/20"
+                className="h-10 w-10 bg-mundi-300 hover:bg-mundi-400 rounded-mundi-md text-foreground shadow-mundi-sm transition-all"
               >
                 {isPlaying ? (
                   <Pause className="h-5 w-5" />
@@ -344,7 +348,7 @@ export default function TimelineControl({
                 variant="ghost"
                 size="icon"
                 onClick={onSkipForward}
-                className="h-8 w-8"
+                className="h-8 w-8 hover:bg-muted rounded-mundi-md text-foreground"
               >
                 <SkipForward className="h-4 w-4" />
               </Button>
@@ -352,11 +356,11 @@ export default function TimelineControl({
 
             {/* Time Display */}
             <div className="flex items-center gap-2">
-              <div className="text-sm text-white font-mono" suppressHydrationWarning>
-                {formatTime(currentTime)}
+              <div className="text-sm text-foreground font-mono">
+                {isMounted ? formatTime(currentTime) : '--:--:--'}
               </div>
-              <div className="text-xs text-white/40" suppressHydrationWarning>
-                / {formatTime(endTime)}
+              <div className="text-xs text-muted-foreground">
+                / {isMounted ? formatTime(endTime) : '--:--:--'}
               </div>
             </div>
 
@@ -364,15 +368,15 @@ export default function TimelineControl({
 
             {/* Speed Control */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-white/60">Speed:</span>
+              <span className="text-xs text-muted-foreground">Speed:</span>
               <Select
                 value={playbackSpeed.toString()}
                 onValueChange={(value) => onSpeedChange?.(parseFloat(value))}
               >
-                <SelectTrigger className="w-24 h-8 text-xs border-white/10">
+                <SelectTrigger className="w-24 h-8 text-xs border-border bg-white rounded-mundi-md text-foreground">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-mundi-lg">
                   <SelectItem value="0.1">0.1x</SelectItem>
                   <SelectItem value="0.25">0.25x</SelectItem>
                   <SelectItem value="0.5">0.5x</SelectItem>

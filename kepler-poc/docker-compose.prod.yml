@@ -1,15 +1,11 @@
 # Production Docker Compose for Ground Station Intelligence
-version: '3.8'
 
 services:
   # Main application
   kepler-app:
     build:
       context: .
-      dockerfile: Dockerfile.prod
-      args:
-        - BUILD_DATE=${BUILD_DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
-        - VCS_REF=${VCS_REF:-$(git rev-parse --short HEAD)}
+      dockerfile: Dockerfile.minimal-v2
     image: ground-station-intelligence:latest
     container_name: kepler-ground-station-app
     restart: unless-stopped
@@ -17,16 +13,16 @@ services:
       - app-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kepler-app.rule=Host(`ground-station.local`)"
+      - "traefik.http.routers.kepler-app.rule=Host(`www.nexusone.earth`) || Host(`nexusone.earth`)"
       - "traefik.http.routers.kepler-app.entrypoints=websecure"
       - "traefik.http.routers.kepler-app.tls.certresolver=letsencrypt"
-      - "traefik.http.services.kepler-app.loadbalancer.server.port=8080"
-      - "traefik.http.routers.kepler-app.middlewares=security-headers"
+      - "traefik.http.services.kepler-app.loadbalancer.server.port=80"
+      - "traefik.http.routers.kepler-app.middlewares=security-headers@file,compression@file"
     environment:
       - NODE_ENV=production
       - TZ=UTC
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -39,23 +35,14 @@ services:
         reservations:
           cpus: '0.25'
           memory: 128M
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 10s
-        failure_action: rollback
-        monitor: 30s
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
 
   # Reverse proxy and load balancer
   traefik:
     image: traefik:v3.0
     container_name: traefik-proxy
     restart: unless-stopped
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
     ports:
       - "80:80"
       - "443:443"
@@ -66,16 +53,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik:/etc/traefik:ro
       - traefik-certificates:/certificates
+      - traefik-logs:/var/log/traefik
     environment:
-      - TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL=${ACME_EMAIL:-admin@ground-station.local}
+      - ACME_EMAIL=${ACME_EMAIL:-admin@nexusone.earth}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.ground-station.local`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.nexusone.earth`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
       - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.middlewares.security-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.security-headers.headers.customrequestheaders.X-Forwarded-For=$$remote_addr"
+      - "traefik.http.routers.traefik.middlewares=security-headers@file"
 
   # Redis for caching and session storage
   redis:
@@ -157,6 +144,8 @@ networks:
 
 volumes:
   traefik-certificates:
+    driver: local
+  traefik-logs:
     driver: local
   redis-data:
     driver: local

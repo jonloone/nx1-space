@@ -115,11 +115,13 @@ async function generateTileUrl(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { params: string[] } }
+  { params }: { params: Promise<{ params: string[] }> }
 ) {
   try {
+    // Await params in Next.js 15
+    const { params: coordinates } = await params
     // Parse the tile coordinates from the URL
-    const [z, x, y] = params.params.map(Number)
+    const [z, x, y] = coordinates.map(Number)
     
     // Get dataset from query params
     const searchParams = request.nextUrl.searchParams

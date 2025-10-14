@@ -71,7 +71,7 @@ export default function FleetDemo() {
     try {
       const mapInstance = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/dark-v11',
+        style: 'mapbox://styles/mapbox/light-v11', // Mundi-inspired light theme
         center: [viewport.longitude, viewport.latitude],
         zoom: viewport.zoom,
         pitch: viewport.pitch || 45,
@@ -356,11 +356,11 @@ export default function FleetDemo() {
         </div>
       )}
 
-      {/* Fleet Stats Badge */}
+      {/* Fleet Stats Badge - Light Mundi theme */}
       {isLoaded && entities.size > 0 && (
-        <div className="absolute top-4 right-4 z-10 bg-blue-500/90 backdrop-blur-sm text-white px-4 py-3 rounded-lg">
-          <div className="font-semibold text-lg">{entities.size} Vehicles</div>
-          <div className="text-sm text-white/80">
+        <div className="absolute top-6 right-6 z-10 bg-white border border-border shadow-mundi-lg px-5 py-4 rounded-mundi-xl">
+          <div className="font-semibold text-xl text-foreground">{entities.size} Vehicles</div>
+          <div className="text-sm text-muted-foreground mt-1">
             {Array.from(entities.values()).filter((e) => e.status === 'active').length} Active
             {' · '}
             {Array.from(entities.values()).filter((e) => e.status === 'idle').length} Idle
@@ -368,27 +368,28 @@ export default function FleetDemo() {
         </div>
       )}
 
-      {/* Demo Info Badge */}
-      <div className="absolute bottom-20 left-4 z-10 bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-xs">
-        <div className="font-semibold mb-1">🚚 Fleet Tracking Demo</div>
-        <div className="text-white/60">
-          • {entities.size} vehicles on SF roads
-          <br />
-          • Click vehicles to view details
-          <br />
-          • Press play to watch movement
-          <br />• Vehicles follow actual streets
+      {/* Demo Info Badge - Light theme */}
+      <div className="absolute bottom-24 left-6 z-10 bg-white/95 backdrop-blur-sm border border-border shadow-mundi-md px-4 py-3 rounded-mundi-lg text-xs">
+        <div className="font-semibold mb-2 text-foreground flex items-center gap-2">
+          <span className="text-base">🚚</span>
+          Fleet Tracking Demo
+        </div>
+        <div className="text-muted-foreground space-y-0.5">
+          <div>• {entities.size} vehicles on SF roads</div>
+          <div>• Click vehicles to view details</div>
+          <div>• Press play to watch movement</div>
+          <div>• Vehicles follow actual streets</div>
         </div>
       </div>
 
-      {/* AI Chat Toggle Button */}
+      {/* AI Chat Toggle Button - Mundi accent color */}
       {!isAIChatOpen && (
         <Button
           onClick={() => setIsAIChatOpen(true)}
-          className="absolute bottom-32 right-4 z-10 rounded-full w-14 h-14 bg-purple-500 hover:bg-purple-600 shadow-lg"
+          className="absolute bottom-36 right-6 z-[100] rounded-full w-14 h-14 bg-mundi-300 hover:bg-mundi-400 shadow-mundi-lg border border-mundi-500/20 transition-all hover:shadow-mundi-xl"
           title="Open AI Assistant"
         >
-          <MessageSquare className="w-6 h-6" />
+          <MessageSquare className="w-6 h-6 text-foreground" />
         </Button>
       )}
 
@@ -400,7 +401,7 @@ export default function FleetDemo() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="absolute top-0 right-0 bottom-0 w-[400px] z-50"
+            className="absolute top-0 right-0 bottom-0 w-[400px] z-[100]"
           >
             <div className="relative h-full">
               <Button

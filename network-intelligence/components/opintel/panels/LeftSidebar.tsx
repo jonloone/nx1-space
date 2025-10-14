@@ -100,15 +100,15 @@ export default function LeftSidebar({
     switch (status) {
       case 'connected':
       case 'active':
-        return 'bg-green-500'
+        return 'bg-[#22C55E]' // Success green (WCAG compliant)
       case 'disconnected':
       case 'error':
-        return 'bg-red-500'
+        return 'bg-[#EF4444]' // Error red (WCAG compliant)
       case 'loading':
       case 'paused':
-        return 'bg-yellow-500'
+        return 'bg-[#F59E0B]' // Warning amber (WCAG compliant)
       default:
-        return 'bg-gray-500'
+        return 'bg-[#A3A3A3]' // Neutral gray
     }
   }
 
@@ -128,20 +128,20 @@ export default function LeftSidebar({
   }
 
   return (
-    <div className="h-full flex flex-col bg-black/20 backdrop-blur-sm">
+    <div className="h-full flex flex-col">
       <Tabs defaultValue="data" className="flex-1 flex flex-col">
         {/* Tab Navigation */}
-        <div className="px-3 pt-3 pb-2">
-          <TabsList className="grid w-full grid-cols-3 bg-white/5">
-            <TabsTrigger value="data" className="text-xs">
+        <div className="px-4 pt-4 pb-3">
+          <TabsList className="grid w-full grid-cols-3 bg-muted border border-border">
+            <TabsTrigger value="data" className="text-xs text-muted-foreground data-[state=active]:text-foreground">
               <Database className="h-3 w-3 mr-1" />
               Data
             </TabsTrigger>
-            <TabsTrigger value="layers" className="text-xs">
+            <TabsTrigger value="layers" className="text-xs text-muted-foreground data-[state=active]:text-foreground">
               <Layers className="h-3 w-3 mr-1" />
               Layers
             </TabsTrigger>
-            <TabsTrigger value="live" className="text-xs">
+            <TabsTrigger value="live" className="text-xs text-muted-foreground data-[state=active]:text-foreground">
               <Radio className="h-3 w-3 mr-1" />
               Live
             </TabsTrigger>
@@ -151,41 +151,41 @@ export default function LeftSidebar({
         {/* Data Sources Tab */}
         <TabsContent value="data" className="flex-1 m-0 data-[state=inactive]:hidden">
           <ScrollArea className="h-full">
-            <div className="px-3 pb-3 space-y-2">
+            <div className="px-4 pb-4 space-y-3">
               {/* Add Data Source Button */}
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full justify-start text-xs border-white/10 hover:bg-white/5"
+                className="w-full justify-start text-xs border-border bg-white hover:bg-muted text-foreground rounded-mundi-md"
                 onClick={onAddDataSource}
               >
                 <Plus className="h-3 w-3 mr-2" />
                 Add Data Source
               </Button>
 
-              <Separator className="bg-white/10" />
+              <Separator className="bg-border" />
 
               {/* Data Sources List */}
               {dataSources.length === 0 ? (
-                <div className="text-center py-8 text-white/40 text-xs">
+                <div className="text-center py-8 text-muted-foreground text-xs">
                   No data sources connected
                 </div>
               ) : (
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {dataSources.map((source) => (
                     <motion.div
                       key={source.id}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-2 rounded-md hover:bg-white/5 cursor-pointer transition-colors"
+                      className="p-3 rounded-mundi-lg border border-border bg-white hover:shadow-mundi-sm cursor-pointer transition-all"
                     >
-                      <div className="flex items-start gap-2">
-                        <div className="mt-0.5 text-white/60">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5 text-muted-foreground">
                           {getDataSourceIcon(source.type)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-medium text-white truncate">
+                            <span className="text-xs font-medium text-foreground truncate">
                               {source.name}
                             </span>
                             <div
@@ -196,12 +196,12 @@ export default function LeftSidebar({
                             />
                           </div>
                           {source.recordCount !== undefined && (
-                            <div className="text-[10px] text-white/40">
+                            <div className="text-[10px] text-muted-foreground">
                               {source.recordCount.toLocaleString()} records
                             </div>
                           )}
                           {source.lastUpdated && (
-                            <div className="text-[10px] text-white/40">
+                            <div className="text-[10px] text-muted-foreground">
                               Updated {source.lastUpdated}
                             </div>
                           )}
@@ -211,15 +211,15 @@ export default function LeftSidebar({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6 shrink-0"
+                              className="h-6 w-6 shrink-0 hover:bg-muted rounded-mundi-md text-foreground"
                             >
                               <Settings className="h-3 w-3" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="end" className="rounded-mundi-lg">
                             <DropdownMenuItem>Refresh</DropdownMenuItem>
                             <DropdownMenuItem>Configure</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-400">
+                            <DropdownMenuItem className="text-destructive">
                               Remove
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -236,13 +236,13 @@ export default function LeftSidebar({
         {/* Layers Tab */}
         <TabsContent value="layers" className="flex-1 m-0 data-[state=inactive]:hidden">
           <ScrollArea className="h-full">
-            <div className="px-3 pb-3 space-y-2">
+            <div className="px-4 pb-4 space-y-3">
               {/* Layer Controls */}
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 justify-start text-xs border-white/10 hover:bg-white/5"
+                  className="flex-1 justify-start text-xs border-border bg-white hover:bg-muted text-foreground rounded-mundi-md"
                 >
                   <Plus className="h-3 w-3 mr-2" />
                   Add Layer
@@ -250,42 +250,42 @@ export default function LeftSidebar({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
+                  className="h-8 w-8 hover:bg-muted rounded-mundi-md text-foreground"
                 >
                   <Settings className="h-3 w-3" />
                 </Button>
               </div>
 
-              <Separator className="bg-white/10" />
+              <Separator className="bg-border" />
 
               {/* Layers List */}
               {layers.length === 0 ? (
-                <div className="text-center py-8 text-white/40 text-xs">
+                <div className="text-center py-8 text-muted-foreground text-xs">
                   No layers added
                 </div>
               ) : (
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {layers.map((layer) => (
                     <motion.div
                       key={layer.id}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="rounded-md hover:bg-white/5 transition-colors"
+                      className="rounded-mundi-lg border border-border bg-white hover:shadow-mundi-sm transition-all"
                     >
                       {/* Layer Header */}
-                      <div className="flex items-center gap-2 p-2">
+                      <div className="flex items-center gap-2 p-3">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-5 w-5 shrink-0 cursor-grab active:cursor-grabbing"
+                          className="h-5 w-5 shrink-0 cursor-grab active:cursor-grabbing hover:bg-muted rounded-mundi-md text-muted-foreground"
                         >
-                          <GripVertical className="h-3 w-3 text-white/40" />
+                          <GripVertical className="h-3 w-3" />
                         </Button>
 
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-5 w-5 shrink-0"
+                          className="h-5 w-5 shrink-0 hover:bg-muted rounded-mundi-md text-foreground"
                           onClick={() => toggleLayerExpanded(layer.id)}
                         >
                           {expandedLayers.has(layer.id) ? (
@@ -297,12 +297,12 @@ export default function LeftSidebar({
 
                         {layer.color && (
                           <div
-                            className="w-3 h-3 rounded shrink-0"
+                            className="w-3 h-3 rounded shrink-0 border border-border"
                             style={{ backgroundColor: layer.color }}
                           />
                         )}
 
-                        <span className="text-xs font-medium text-white flex-1 truncate">
+                        <span className="text-xs font-medium text-foreground flex-1 truncate">
                           {layer.name}
                         </span>
 
@@ -315,7 +315,7 @@ export default function LeftSidebar({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6 shrink-0"
+                          className="h-6 w-6 shrink-0 hover:bg-muted rounded-mundi-md text-foreground"
                           onClick={() => onLayerSettings?.(layer.id)}
                         >
                           <Settings className="h-3 w-3" />
@@ -328,20 +328,20 @@ export default function LeftSidebar({
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          className="px-4 pb-2 space-y-2"
+                          className="px-4 pb-3 space-y-2 border-t border-border"
                         >
-                          <div className="text-[10px] text-white/40">
+                          <div className="text-[10px] text-muted-foreground pt-2">
                             Type: {layer.type}
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-white/60">Opacity</span>
-                            <div className="flex-1 h-1 bg-white/10 rounded-full">
+                            <span className="text-[10px] text-muted-foreground">Opacity</span>
+                            <div className="flex-1 h-1.5 bg-muted rounded-full border border-border">
                               <div
-                                className="h-full bg-white/60 rounded-full"
+                                className="h-full bg-[#176BF8] rounded-full"
                                 style={{ width: `${layer.opacity * 100}%` }}
                               />
                             </div>
-                            <span className="text-[10px] text-white/40">
+                            <span className="text-[10px] text-muted-foreground">
                               {Math.round(layer.opacity * 100)}%
                             </span>
                           </div>
@@ -358,24 +358,24 @@ export default function LeftSidebar({
         {/* Live Streams Tab */}
         <TabsContent value="live" className="flex-1 m-0 data-[state=inactive]:hidden">
           <ScrollArea className="h-full">
-            <div className="px-3 pb-3 space-y-2">
+            <div className="px-4 pb-4 space-y-3">
               {/* Stream Controls */}
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 justify-start text-xs border-white/10 hover:bg-white/5"
+                  className="flex-1 justify-start text-xs border-border bg-white hover:bg-muted text-foreground rounded-mundi-md"
                 >
                   <Plus className="h-3 w-3 mr-2" />
                   Add Stream
                 </Button>
               </div>
 
-              <Separator className="bg-white/10" />
+              <Separator className="bg-border" />
 
               {/* Live Streams List */}
               {liveStreams.length === 0 ? (
-                <div className="text-center py-8 text-white/40 text-xs">
+                <div className="text-center py-8 text-muted-foreground text-xs">
                   No live streams connected
                 </div>
               ) : (
@@ -385,37 +385,37 @@ export default function LeftSidebar({
                       key={stream.id}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-2 rounded-md bg-white/5 space-y-2"
+                      className="p-3 rounded-mundi-lg border border-border bg-white hover:shadow-mundi-sm transition-all space-y-3"
                     >
                       {/* Stream Header */}
-                      <div className="flex items-start gap-2">
+                      <div className="flex items-start gap-3">
                         <div className="mt-0.5">
                           {stream.status === 'active' ? (
-                            <Wifi className="h-4 w-4 text-green-500" />
+                            <Wifi className="h-4 w-4 text-[#22C55E]" />
                           ) : (
-                            <WifiOff className="h-4 w-4 text-red-500" />
+                            <WifiOff className="h-4 w-4 text-[#EF4444]" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-medium text-white truncate">
+                            <span className="text-xs font-medium text-foreground truncate">
                               {stream.name}
                             </span>
                             <Badge
                               variant={stream.status === 'active' ? 'default' : 'destructive'}
-                              className="text-[10px] h-4"
+                              className="text-[10px] h-4 rounded-mundi-md"
                             >
                               {stream.status}
                             </Badge>
                           </div>
                           <div className="space-y-0.5">
-                            <div className="text-[10px] text-white/60">
+                            <div className="text-[10px] text-muted-foreground">
                               {stream.messagesPerSecond.toFixed(1)} msg/s
                             </div>
-                            <div className="text-[10px] text-white/40">
+                            <div className="text-[10px] text-muted-foreground">
                               {stream.totalMessages.toLocaleString()} total
                             </div>
-                            <div className="text-[10px] text-white/40">
+                            <div className="text-[10px] text-muted-foreground">
                               {stream.latency}ms latency
                             </div>
                           </div>
@@ -423,11 +423,11 @@ export default function LeftSidebar({
                       </div>
 
                       {/* Stream Controls */}
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 pt-2 border-t border-border">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-6 w-6"
+                          className="h-6 w-6 hover:bg-muted rounded-mundi-md text-foreground"
                           onClick={() => onStreamToggle?.(stream.id)}
                         >
                           {stream.status === 'active' ? (
@@ -436,20 +436,20 @@ export default function LeftSidebar({
                             <Play className="h-3 w-3" />
                           )}
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-muted rounded-mundi-md text-foreground">
                           <SkipBack className="h-3 w-3" />
                         </Button>
                         <div className="flex-1" />
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-muted rounded-mundi-md text-foreground">
                               <Settings className="h-3 w-3" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="end" className="rounded-mundi-lg">
                             <DropdownMenuItem>Configure</DropdownMenuItem>
                             <DropdownMenuItem>View Logs</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-400">
+                            <DropdownMenuItem className="text-destructive">
                               Disconnect
                             </DropdownMenuItem>
                           </DropdownMenuContent>

@@ -1,0 +1,89 @@
+# Production Docker Compose for Network Intelligence (Mundi OpIntel Platform)
+
+services:
+  # Next.js Application
+  network-intelligence:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    image: network-intelligence:latest
+    container_name: network-intelligence-app
+    restart: unless-stopped
+    ports:
+      - "80:3000"  # Expose directly on port 80 for testing
+    networks:
+      - app-network
+    labels:
+      - "traefik.enable=true"
+      # HTTP router - accept all traffic on port 80
+      - "traefik.http.routers.network-intelligence-http.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.network-intelligence-http.entrypoints=web"
+      - "traefik.http.routers.network-intelligence-http.service=network-intelligence-svc"
+      # HTTPS router - domain specific
+      - "traefik.http.routers.network-intelligence.rule=Host(`www.nexusone.earth`) || Host(`nexusone.earth`)"
+      - "traefik.http.routers.network-intelligence.entrypoints=websecure"
+      - "traefik.http.routers.network-intelligence.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.network-intelligence.service=network-intelligence-svc"
+      # Service definition
+      - "traefik.http.services.network-intelligence-svc.loadbalancer.server.port=3000"
+    environment:
+      - NODE_ENV=production
+      - TZ=UTC
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # Reverse proxy and load balancer (disabled for direct access)
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik-proxy
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:8081"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-admin@nexusone.earth}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/certificates/acme.json"
+      - "--api.dashboard=true"
+      - "--log.level=INFO"
+      - "--accesslog=true"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+    ports:
+      - "8081:8081"
+      - "443:443"
+      - "8080:8080"  # Dashboard
+    networks:
+      - app-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certificates:/certificates
+      - traefik-logs:/var/log/traefik
+      - ./traefik:/etc/traefik/dynamic:ro
+    environment:
+      - ACME_EMAIL=${ACME_EMAIL:-admin@nexusone.earth}
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  traefik-certificates:
+    driver: local
+  traefik-logs:
+    driver: local
