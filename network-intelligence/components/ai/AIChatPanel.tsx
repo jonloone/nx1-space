@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { ChatArtifact } from '@/lib/types/chatArtifacts'
+import ArtifactRenderer from './artifacts/ArtifactRenderer'
 
 export interface ChatMessage {
   id: string
@@ -133,6 +134,14 @@ export default function AIChatPanel({
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+
+                {/* Render artifact if present */}
+                {message.artifact && (
+                  <div className="mt-3">
+                    <ArtifactRenderer artifact={message.artifact} />
+                  </div>
+                )}
+
                 {message.metadata?.entitiesFiltered !== undefined && (
                   <p className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border">
                     {message.metadata.entitiesFiltered} entities found
