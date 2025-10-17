@@ -6,13 +6,39 @@ services:
     container_name: network-intelligence-platform
     ports:
       - "3001:3000"
+      - "80:3000"
     environment:
       - NODE_ENV=production
+      - VALHALLA_URL=http://valhalla:8002
     restart: unless-stopped
     volumes:
       - ./data:/app/data:ro
     networks:
       - app-network
+    depends_on:
+      - valhalla
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.network-intelligence.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.network-intelligence.entrypoints=web"
+      - "traefik.http.services.network-intelligence.loadbalancer.server.port=3000"
+
+  valhalla:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    container_name: valhalla-routing-engine
+    ports:
+      - "8002:8002"
+    environment:
+      - tile_urls=https://download.geofabrik.de/north-america/us/new-york-latest.osm.pbf
+      - use_tiles_ignore_pbf=False
+      - build_elevation=False
+      - build_admins=False
+      - build_time_zones=False
+    volumes:
+      - ./valhalla_tiles:/custom_files
+    networks:
+      - app-network
+    restart: unless-stopped
 
 networks:
   app-network:

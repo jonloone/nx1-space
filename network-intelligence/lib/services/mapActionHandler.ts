@@ -50,6 +50,8 @@ export class MapActionHandler {
   /**
    * Handle "Show me X near Y" queries
    * Example: "Show me coffee shops near Central Park"
+   *
+   * Strategy: Fly to location first, wait for tiles to load, then search
    */
   async handleSearchNearLocation(
     locationName: string,
@@ -69,24 +71,29 @@ export class MapActionHandler {
         }
       }
 
-      // 2. Search for places
-      const places = await this.gersService.search({
-        categories,
-        near: location.coordinates,
-        radius,
-        limit: 100
-      })
-
-      // 3. Update map
+      // 2. Fly to location FIRST (this loads the tiles)
       const mapStore = useMapStore.getState()
       mapStore.flyTo(
         location.coordinates[0],
         location.coordinates[1],
         location.suggestedZoom
       )
+
+      // 3. Wait for map to finish moving and tiles to load
+      await this.waitForMapMove()
+
+      // 4. NOW search in the loaded viewport using Overture Places
+      const places = await this.overtureService.searchNear({
+        center: location.coordinates,
+        radius,
+        categories,
+        limit: 100
+      })
+
+      // 5. Update visible places in store
       mapStore.setVisiblePlaces(places)
 
-      // 4. Select first place if only one found
+      // 6. Select first place if only one found
       if (places.length === 1) {
         mapStore.selectFeature({
           id: places[0].gersId,
@@ -97,7 +104,7 @@ export class MapActionHandler {
         })
       }
 
-      // 5. Build response message
+      // 7. Build response message
       const categoryStr = categories.length > 0
         ? categories.join(', ')
         : 'places'
@@ -112,6 +119,7 @@ export class MapActionHandler {
         data: {
           location,
           places,
+          categories,
           count: places.length,
           viewport: {
             center: location.coordinates,
@@ -129,6 +137,16 @@ export class MapActionHandler {
         error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
       }
     }
+  }
+
+  /**
+   * Wait for map to finish moving and tiles to load
+   */
+  private async waitForMapMove(): Promise<void> {
+    return new Promise((resolve) => {
+      // Wait for map movement + tile loading (give it 2 seconds)
+      setTimeout(resolve, 2000)
+    })
   }
 
   /**
@@ -196,11 +214,11 @@ export class MapActionHandler {
       const viewport = mapStore.viewport
       const center: [number, number] = [viewport.longitude, viewport.latitude]
 
-      // 2. Search for places
-      const places = await this.gersService.search({
-        categories,
-        near: center,
+      // 2. Search for places using Overture Places (comprehensive real data)
+      const places = await this.overtureService.searchNear({
+        center,
         radius,
+        categories,
         limit: 100
       })
 
@@ -317,11 +335,12 @@ export class MapActionHandler {
         }
       }
 
-      // 2. Get nearby context
-      const context = await this.gersService.getNearbyContext(
-        location.coordinates,
-        radius
-      )
+      // 2. Search for all places using Overture Places
+      const places = await this.overtureService.searchNear({
+        center: location.coordinates,
+        radius,
+        limit: 200 // Get more places for analysis
+      })
 
       // 3. Update map
       const mapStore = useMapStore.getState()
@@ -330,17 +349,29 @@ export class MapActionHandler {
         location.coordinates[1],
         location.suggestedZoom - 1 // Zoom out a bit for analysis view
       )
-      mapStore.setVisiblePlaces(context.all)
+      mapStore.setVisiblePlaces(places)
 
-      // 4. Build analysis summary
+      // 4. Build analysis summary with category breakdown
+      const categoryBreakdown = new Map<string, number>()
+      places.forEach(place => {
+        place.categories.forEach(cat => {
+          categoryBreakdown.set(cat, (categoryBreakdown.get(cat) || 0) + 1)
+        })
+      })
+
+      // Get top categories
+      const topCategories = Array.from(categoryBreakdown.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([cat, count]) => `**${cat}**: ${count}`)
+        .join('\n')
+
       const summary = `
 Analysis of ${location.name} (${radius / 1000}km radius):
 
-**Maritime**: ${context.maritime.length} facilities
-**Logistics**: ${context.logistics.length} facilities
-**Defense/Critical Infrastructure**: ${context.defense.length} facilities
+${topCategories}
 
-**Total Places**: ${context.all.length}
+**Total Places**: ${places.length}
       `.trim()
 
       return {
@@ -348,8 +379,8 @@ Analysis of ${location.name} (${radius / 1000}km radius):
         action: 'analyze',
         data: {
           location,
-          places: context.all,
-          count: context.all.length,
+          places,
+          count: places.length,
           viewport: {
             center: location.coordinates,
             zoom: location.suggestedZoom - 1

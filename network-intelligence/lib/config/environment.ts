@@ -33,6 +33,7 @@ export interface EnvironmentConfig {
     enableAIInsights: boolean
     enableDebugMode: boolean
     enableExperimentalFeatures: boolean
+    enableValhallaRouting: boolean
   }
 
   // Performance Settings
@@ -73,6 +74,10 @@ export interface EnvironmentConfig {
       apiKey: string
       model: string
       baseUrl: string
+    }
+    valhalla: {
+      url: string
+      enabled: boolean
     }
   }
 }
@@ -121,7 +126,8 @@ const developmentConfig: EnvironmentConfig = {
     enablePerformanceMonitoring: true,
     enableAIInsights: true,
     enableDebugMode: true,
-    enableExperimentalFeatures: true
+    enableExperimentalFeatures: true,
+    enableValhallaRouting: true
   },
 
   performance: {
@@ -155,9 +161,13 @@ const developmentConfig: EnvironmentConfig = {
       style: 'mapbox://styles/mapbox/dark-v11'
     },
     vultr: {
-      apiKey: process.env.VULTR_API_KEY || '',
-      model: 'llama2-13b-chat-Q5_K_M',
-      baseUrl: 'https://api.vultrinfer.com/v1'
+      apiKey: process.env.VULTR_API_KEY || process.env.NEXT_PUBLIC_VULTR_API_KEY || '',
+      model: 'qwen2.5-32b-instruct',
+      baseUrl: 'https://api.vultrinference.com/v1'
+    },
+    valhalla: {
+      url: process.env.NEXT_PUBLIC_VALHALLA_URL || 'http://localhost:8002',
+      enabled: true
     }
   }
 }
@@ -179,7 +189,8 @@ const stagingConfig: EnvironmentConfig = {
     enablePerformanceMonitoring: true,
     enableAIInsights: true,
     enableDebugMode: false,
-    enableExperimentalFeatures: true
+    enableExperimentalFeatures: true,
+    enableValhallaRouting: true
   },
 
   logging: {
@@ -214,7 +225,8 @@ const productionConfig: EnvironmentConfig = {
     enablePerformanceMonitoring: true,
     enableAIInsights: true,
     enableDebugMode: false,
-    enableExperimentalFeatures: false
+    enableExperimentalFeatures: false,
+    enableValhallaRouting: true
   },
 
   performance: {
@@ -267,7 +279,8 @@ const testConfig: EnvironmentConfig = {
     enablePerformanceMonitoring: false,
     enableAIInsights: false,
     enableDebugMode: true,
-    enableExperimentalFeatures: true
+    enableExperimentalFeatures: true,
+    enableValhallaRouting: false
   },
 
   performance: {

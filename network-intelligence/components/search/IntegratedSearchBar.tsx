@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Search, X } from 'lucide-react'
+import { Search, X, Eye } from 'lucide-react'
 import { MapPin, Buildings, City, MapTrifold, Globe } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Fuse from 'fuse.js'
 import { getGERSDemoService, GERSPlace, LevelOfDetail, LOD_CONFIG } from '@/lib/services/gersDemoService'
+import { useMapStore } from '@/lib/stores'
 
 interface IntegratedSearchBarProps {
   onPlaceSelect?: (place: GERSPlace) => void
@@ -24,7 +25,7 @@ const LOD_ICONS = {
 
 export default function IntegratedSearchBar({
   onPlaceSelect,
-  placeholder = 'Search places...',
+  placeholder: customPlaceholder,
   className = ''
 }: IntegratedSearchBarProps) {
   const [query, setQuery] = useState('')
@@ -38,29 +39,71 @@ export default function IntegratedSearchBar({
   const inputRef = useRef<HTMLInputElement>(null)
   const gersService = getGERSDemoService()
 
-  // Initialize Fuse.js with all places
-  useEffect(() => {
-    const initializeFuse = async () => {
-      const allPlaces = await gersService.search({ limit: 1000 })
+  // Get places from mapStore (viewport-aware) + GERs demo data
+  const { visiblePlaces, allCachedPlaces, map } = useMapStore()
 
-      const fuseInstance = new Fuse(allPlaces, {
-        keys: [
-          { name: 'name', weight: 0.7 },
-          { name: 'categories', weight: 0.2 },
-          { name: 'address.city', weight: 0.05 },
-          { name: 'address.street', weight: 0.05 }
-        ],
-        threshold: 0.3,
-        includeScore: true,
-        minMatchCharLength: 2,
-        ignoreLocation: true
-      })
+  // Dynamic placeholder based on zoom level
+  const placeholder = React.useMemo(() => {
+    if (customPlaceholder) return customPlaceholder
 
-      setFuse(fuseInstance)
+    if (!map) return 'Search places...'
+
+    const zoom = map.getZoom()
+
+    if (zoom < 6) {
+      return 'Search countries, states, major cities...'
+    } else if (zoom < 9) {
+      return 'Search cities, airports, landmarks...'
+    } else if (zoom < 12) {
+      return 'Search hospitals, universities, parks...'
+    } else if (zoom < 14) {
+      return 'Search hotels, museums, services...'
+    } else {
+      return 'Search restaurants, cafes, shops...'
     }
+  }, [map, customPlaceholder])
 
-    initializeFuse()
-  }, [])
+  // Combine visible, cached, AND GERs demo places for comprehensive search
+  const searchablePlaces = React.useMemo(() => {
+    const visibleIds = new Set(visiblePlaces.map(p => p.gersId))
+    const cachedIds = new Set(allCachedPlaces.map(p => p.gersId))
+
+    // Get ALL demo places from GERs service (includes cities, states, countries)
+    const gersPlaces = gersService.getAllPlaces()
+
+    // Mark visible places and combine with cached + GERs demo data
+    const marked = [
+      ...visiblePlaces.map(p => ({ ...p, isVisible: true })),
+      ...allCachedPlaces
+        .filter(p => !visibleIds.has(p.gersId))
+        .map(p => ({ ...p, isVisible: false })),
+      ...gersPlaces
+        .filter(p => !visibleIds.has(p.gersId) && !cachedIds.has(p.gersId))
+        .map(p => ({ ...p, isVisible: false }))
+    ]
+
+    return marked
+  }, [visiblePlaces, allCachedPlaces, gersService])
+
+  // Initialize Fuse.js with searchable places
+  useEffect(() => {
+    if (searchablePlaces.length === 0) return
+
+    const fuseInstance = new Fuse(searchablePlaces, {
+      keys: [
+        { name: 'name', weight: 0.7 },
+        { name: 'categories', weight: 0.2 },
+        { name: 'address.city', weight: 0.05 },
+        { name: 'address.street', weight: 0.05 }
+      ],
+      threshold: 0.3,
+      includeScore: true,
+      minMatchCharLength: 2,
+      ignoreLocation: true
+    })
+
+    setFuse(fuseInstance)
+  }, [searchablePlaces])
 
   // Handle search with fuzzy matching
   useEffect(() => {
@@ -71,12 +114,17 @@ export default function IntegratedSearchBar({
     }
 
     // Perform fuzzy search
-    let searchResults = fuse.search(query, { limit: 20 })
-    let places = searchResults.map(result => result.item)
+    let searchResults = fuse.search(query, { limit: 30 })
+    let places = searchResults.map(result => result.item as GERSPlace & { isVisible?: boolean })
 
-    // Group and sort by LoD
+    // Sort by: 1) visibility (visible first), 2) LoD (landmark first), 3) score
     const lodOrder: LevelOfDetail[] = ['landmark', 'place', 'city', 'state', 'country']
     places.sort((a, b) => {
+      // Prioritize visible places
+      if (a.isVisible && !b.isVisible) return -1
+      if (!a.isVisible && b.isVisible) return 1
+
+      // Then sort by LoD
       const aIndex = lodOrder.indexOf(a.levelOfDetail)
       const bIndex = lodOrder.indexOf(b.levelOfDetail)
       return aIndex - bIndex
@@ -200,8 +248,16 @@ export default function IntegratedSearchBar({
             <div className="max-h-[500px] overflow-y-auto">
               {/* Results Header */}
               <div className="px-4 py-2 border-b border-[#E5E5E5] bg-[#F5F5F5]">
-                <div className="text-xs font-semibold text-[#525252] uppercase tracking-wide">
-                  {results.length} {results.length === 1 ? 'Result' : 'Results'}
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-semibold text-[#525252] uppercase tracking-wide">
+                    {results.length} {results.length === 1 ? 'Result' : 'Results'}
+                  </div>
+                  <div className="flex items-center gap-1 text-[10px] text-[#737373]">
+                    <Eye size={12} className="text-[#10B981]" />
+                    <span>
+                      {results.filter(r => (r as GERSPlace & { isVisible?: boolean }).isVisible).length} in viewport
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -235,6 +291,8 @@ export default function IntegratedSearchBar({
                         const globalIndex = results.indexOf(place)
                         const isSelected = globalIndex === selectedIndex
                         const icon = gersService.getCategoryIcon(place.categories[0])
+                        const placeWithVisibility = place as GERSPlace & { isVisible?: boolean }
+                        const isVisible = placeWithVisibility.isVisible
 
                         return (
                           <motion.button
@@ -256,9 +314,17 @@ export default function IntegratedSearchBar({
 
                             {/* Content */}
                             <div className="flex-1 min-w-0 text-left">
-                              {/* Name */}
-                              <div className="font-semibold text-sm text-[#171717] truncate">
-                                {place.name}
+                              {/* Name with visibility badge */}
+                              <div className="flex items-center gap-2">
+                                <div className="font-semibold text-sm text-[#171717] truncate">
+                                  {place.name}
+                                </div>
+                                {isVisible && (
+                                  <div className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 bg-[#10B981] bg-opacity-10 rounded text-[10px] font-medium text-[#10B981]">
+                                    <Eye size={10} />
+                                    <span>In View</span>
+                                  </div>
+                                )}
                               </div>
 
                               {/* Category */}

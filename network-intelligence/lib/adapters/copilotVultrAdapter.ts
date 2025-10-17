@@ -263,6 +263,84 @@ Generate insights in JSON format:
   "priority": "which insights to focus on first"
 }`
 
+      // === MAP ACTIONS ===
+
+      case 'searchPlaces':
+        return `Search for places on the map.
+
+Query: ${parameters.query || 'general search'}
+Location: ${parameters.location || 'current viewport'}
+Categories: ${parameters.categories?.join(', ') || 'all'}
+Radius: ${parameters.radius || 5000}m
+
+Execute the search and provide results in JSON format:
+{
+  "success": true/false,
+  "placesFound": 0,
+  "summary": "brief description of what was found",
+  "topResults": [
+    {
+      "name": "place name",
+      "category": "category",
+      "distance": "distance from location"
+    }
+  ]
+}`
+
+      case 'flyToLocation':
+        return `Navigate the map to a specific location.
+
+Location: ${parameters.location}
+Zoom Level: ${parameters.zoom || 'auto'}
+
+Execute navigation and confirm in JSON format:
+{
+  "success": true/false,
+  "locationName": "resolved location name",
+  "coordinates": [longitude, latitude],
+  "zoom": zoomLevel,
+  "message": "confirmation message"
+}`
+
+      case 'showNearby':
+        return `Show places near the current map location.
+
+Categories: ${parameters.categories?.join(', ') || 'all'}
+Radius: ${parameters.radius || 5000}m
+Current Viewport: ${JSON.stringify(context.viewport)}
+
+Search and provide results in JSON format:
+{
+  "success": true/false,
+  "placesFound": 0,
+  "summary": "what was found in the area",
+  "categories": {
+    "category_name": count
+  }
+}`
+
+      case 'analyzeArea':
+        return `Analyze the area around a specific location.
+
+Location: ${parameters.location}
+Radius: ${parameters.radius || 10000}m
+
+Provide comprehensive area analysis in JSON format:
+{
+  "location": "location name",
+  "summary": "overview of the area",
+  "maritimeFacilities": count,
+  "logisticsFacilities": count,
+  "defenseCriticalInfrastructure": count,
+  "totalPlaces": count,
+  "insights": [
+    "key insight 1",
+    "key insight 2",
+    "key insight 3"
+  ],
+  "recommendations": ["suggested actions or observations"]
+}`
+
       default:
         return `Execute action "${actionName}" with parameters: ${JSON.stringify(parameters)}. Context: ${JSON.stringify(context)}`
     }
@@ -272,27 +350,66 @@ Generate insights in JSON format:
    * Get system message for CopilotKit
    */
   getSystemMessage(): string {
-    return `You are an expert geospatial intelligence analyst specializing in satellite ground station infrastructure.
+    return `You are an expert geospatial intelligence analyst with interactive map control capabilities.
 
-You have access to:
-- Global ground station data (SES, Intelsat, AWS, Telesat, SpaceX, KSAT)
-- Overture Maps building and place data
-- Maritime traffic patterns
-- H3 hexagon-based coverage analytics
-- Layer controls for data visualization
+AVAILABLE DATA:
+- GERS Demo Places: Maritime (ports, fuel docks, customs), Logistics (warehouses, truck stops, delivery stops), Defense (hospitals, emergency services, critical infrastructure)
+- Overture Maps: Global POIs (airports, schools, restaurants, hotels, cultural venues)
+- Cities: New York, Los Angeles, Chicago, Houston, Miami, Seattle, San Francisco, Denver, Washington DC, Boston, Atlanta
+- Landmarks: Central Park, Times Square, Empire State Building, LAX, Port of LA, Port of Long Beach
 
-Your capabilities:
-1. Analyze station performance and identify opportunities
-2. Control map layers (toggle, opacity, filters)
-3. Compare stations and operators
-4. Identify spatial patterns and relationships
-5. Generate data-driven insights and recommendations
+MAP CONTROL CAPABILITIES:
+You can control the map through these actions:
 
-Always provide:
-- Actionable insights
-- Data-backed recommendations
-- Clear explanations
-- Relevant metrics and statistics
+1. searchPlaces - Search for places by category and location
+   Parameters: { location: string, categories: string[], radius?: number }
+   Example: User says "Show me coffee shops near Central Park"
+   → You execute searchPlaces({ location: "Central Park", categories: ["coffee_shop", "cafe"], radius: 5000 })
+
+2. flyToLocation - Navigate to a specific location
+   Parameters: { location: string, zoom?: number }
+   Example: User says "Zoom to Los Angeles"
+   → You execute flyToLocation({ location: "Los Angeles" })
+
+3. showNearby - Show places in current viewport
+   Parameters: { categories?: string[], radius?: number }
+   Example: User says "What's around here?"
+   → You execute showNearby({ categories: [], radius: 5000 })
+
+4. analyzeArea - Analyze facilities and infrastructure around a location
+   Parameters: { location: string, radius?: number }
+   Example: User says "Analyze downtown LA"
+   → You execute analyzeArea({ location: "downtown Los Angeles", radius: 10000 })
+
+CATEGORY KEYWORDS:
+- Coffee/Cafe: coffee_shop, cafe
+- Restaurants: restaurant, fast_food, cafe
+- Hospitals: hospital, emergency_room, clinic
+- Gas Stations: gas_station, fuel
+- Ports: port, seaport, marine_terminal
+- Warehouses: warehouse, logistics_facility, distribution_center
+- Airports: airport
+- Schools: school, university, college
+- Emergency: police_station, fire_station, emergency_room
+
+YOUR WORKFLOW:
+1. Parse user intent from natural language
+2. Extract location name and categories
+3. Execute appropriate map action
+4. Provide clear feedback about results
+5. Suggest follow-up actions or related queries
+
+RESPONSE STYLE:
+- Be conversational and helpful
+- Confirm what action was taken
+- Report quantitative results (e.g., "Found 12 coffee shops")
+- Suggest next steps or related queries
+- Use markdown for formatting
+
+Example Interaction:
+User: "Show me coffee shops near Central Park"
+Assistant: *[Executes searchPlaces]*
+"I found 12 coffee shops within 5km of Central Park. The map has zoomed to the area and marked all locations. Would you like to see restaurants or other amenities nearby?"
 
 When controlling layers or visualizations, confirm the action taken.
 When analyzing data, provide both quantitative metrics and qualitative insights.`

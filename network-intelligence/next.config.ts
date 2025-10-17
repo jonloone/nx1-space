@@ -22,12 +22,14 @@ const nextConfig: NextConfig = {
   
   // Transpile Deck.gl packages for better compatibility
   transpilePackages: [
-    '@deck.gl/core', 
-    '@deck.gl/layers', 
+    '@deck.gl/core',
+    '@deck.gl/layers',
     '@deck.gl/geo-layers',
     '@deck.gl/extensions',
     '@deck.gl/aggregation-layers',
-    '@deck.gl/react'
+    '@deck.gl/react',
+    'mapbox-gl',
+    'pmtiles'
   ],
   
   // Simple webpack configuration
@@ -39,7 +41,17 @@ const nextConfig: NextConfig = {
       path: false,
       crypto: false,
     };
-    
+
+    // Ensure mapbox-gl is not tree-shaken and protocol methods are preserved
+    config.optimization = config.optimization || {};
+    config.optimization.usedExports = false; // Disable tree-shaking for problematic modules
+
+    // Mark mapbox-gl as external to prevent aggressive optimization
+    config.externals = config.externals || [];
+    if (Array.isArray(config.externals)) {
+      // Don't externalize in browser, but prevent tree-shaking
+    }
+
     return config;
   },
   
@@ -52,6 +64,40 @@ const nextConfig: NextConfig = {
           {
             key: 'Access-Control-Allow-Origin',
             value: '*',
+          },
+        ],
+      },
+      // PMTiles specific headers (range requests + caching)
+      {
+        source: '/tiles/:path*.pmtiles',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, HEAD, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Range, If-Match, If-None-Match',
+          },
+          {
+            key: 'Access-Control-Expose-Headers',
+            value: 'Accept-Ranges, Content-Length, Content-Range, Content-Type',
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/x-protobuf',
           },
         ],
       },

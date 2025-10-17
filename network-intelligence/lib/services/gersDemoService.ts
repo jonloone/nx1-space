@@ -690,7 +690,14 @@ function calculateBearing(
  * GERs Demo Service
  */
 export class GERSDemoService {
-  private places: GERSPlace[] = DEMO_PLACES
+  public places: GERSPlace[] = DEMO_PLACES // Make public for search access
+
+  /**
+   * Get all demo places (for comprehensive search)
+   */
+  getAllPlaces(): GERSPlace[] {
+    return this.places
+  }
 
   /**
    * Search for places matching query

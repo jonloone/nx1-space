@@ -21,7 +21,8 @@ import {
   Link as LinkIcon,
   Play,
   Pause,
-  SkipBack
+  SkipBack,
+  Trash2
 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -29,6 +30,7 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
+import { Slider } from '@/components/ui/slider'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +38,14 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import PlacesLayerControl from './PlacesLayerControl'
+import { getAvailableLayers, type LayerDefinition } from '@/lib/config/layerCatalog'
+import {
+  LAYER_PRESETS,
+  getAvailablePresets,
+  getComingSoonPresets,
+  type LayerPreset
+} from '@/lib/config/layerPresets'
 
 interface DataSource {
   id: string
@@ -67,12 +77,18 @@ interface LiveStream {
 
 interface LeftSidebarProps {
   dataSources?: DataSource[]
-  layers?: Layer[]
+  layers?: Layer[] // Active layers with visibility state
   liveStreams?: LiveStream[]
   onAddDataSource?: () => void
+  onAddLayer?: (layerId: string) => void // Modified to pass layerId
   onToggleLayer?: (layerId: string) => void
+  onRemoveLayer?: (layerId: string) => void
+  onChangeOpacity?: (layerId: string, opacity: number) => void
   onLayerSettings?: (layerId: string) => void
   onStreamToggle?: (streamId: string) => void
+  onTogglePlaceCategory?: (categoryId: string) => void
+  onTogglePlaceGroup?: (groupId: string, enabled: boolean) => void
+  onLoadPreset?: (presetId: string) => void // New: Load layer preset
 }
 
 export default function LeftSidebar({
@@ -80,11 +96,38 @@ export default function LeftSidebar({
   layers = [],
   liveStreams = [],
   onAddDataSource,
+  onAddLayer,
   onToggleLayer,
+  onRemoveLayer,
+  onChangeOpacity,
   onLayerSettings,
-  onStreamToggle
+  onStreamToggle,
+  onTogglePlaceCategory,
+  onTogglePlaceGroup,
+  onLoadPreset
 }: LeftSidebarProps) {
+  // Track which layers are expanded (user can manually expand/collapse)
   const [expandedLayers, setExpandedLayers] = useState<Set<string>>(new Set())
+
+  // Get all available layers from catalog
+  const availableLayers = getAvailableLayers()
+
+  // Check if a layer is active (added to map)
+  const isLayerActive = (layerId: string) => {
+    return layers.some(l => l.id === layerId)
+  }
+
+  // Get layer visibility state
+  const getLayerVisibility = (layerId: string) => {
+    const layer = layers.find(l => l.id === layerId)
+    return layer?.visible ?? false
+  }
+
+  // Get layer opacity
+  const getLayerOpacity = (layerId: string) => {
+    const layer = layers.find(l => l.id === layerId)
+    return layer?.opacity ?? 1.0
+  }
 
   const toggleLayerExpanded = (layerId: string) => {
     const newExpanded = new Set(expandedLayers)
@@ -129,21 +172,17 @@ export default function LeftSidebar({
 
   return (
     <div className="h-full flex flex-col">
-      <Tabs defaultValue="data" className="flex-1 flex flex-col">
+      <Tabs defaultValue="layers" className="flex-1 flex flex-col">
         {/* Tab Navigation */}
         <div className="px-4 pt-4 pb-3">
-          <TabsList className="grid w-full grid-cols-3 bg-muted border border-border">
-            <TabsTrigger value="data" className="text-xs text-muted-foreground data-[state=active]:text-foreground">
-              <Database className="h-3 w-3 mr-1" />
-              Data
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-muted border border-border">
             <TabsTrigger value="layers" className="text-xs text-muted-foreground data-[state=active]:text-foreground">
               <Layers className="h-3 w-3 mr-1" />
               Layers
             </TabsTrigger>
-            <TabsTrigger value="live" className="text-xs text-muted-foreground data-[state=active]:text-foreground">
-              <Radio className="h-3 w-3 mr-1" />
-              Live
+            <TabsTrigger value="data" className="text-xs text-muted-foreground data-[state=active]:text-foreground">
+              <Database className="h-3 w-3 mr-1" />
+              Data
             </TabsTrigger>
           </TabsList>
         </div>
@@ -234,231 +273,225 @@ export default function LeftSidebar({
         </TabsContent>
 
         {/* Layers Tab */}
-        <TabsContent value="layers" className="flex-1 m-0 data-[state=inactive]:hidden">
-          <ScrollArea className="h-full">
+        <TabsContent value="layers" className="flex-1 m-0 data-[state=inactive]:hidden overflow-hidden">
+          <ScrollArea className="h-full w-full">
             <div className="px-4 pb-4 space-y-3">
-              {/* Layer Controls */}
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 justify-start text-xs border-border bg-white hover:bg-muted text-foreground rounded-mundi-md"
-                >
-                  <Plus className="h-3 w-3 mr-2" />
-                  Add Layer
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 hover:bg-muted rounded-mundi-md text-foreground"
-                >
-                  <Settings className="h-3 w-3" />
-                </Button>
+              {/* Use Case Presets */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                    Use Cases
+                  </span>
+                  <span className="text-[9px] text-muted-foreground">
+                    {getAvailablePresets().length} available
+                  </span>
+                </div>
+
+                {/* Available Presets */}
+                <div className="space-y-1.5">
+                  {getAvailablePresets().map((preset) => (
+                    <button
+                      key={preset.id}
+                      onClick={() => onLoadPreset?.(preset.id)}
+                      className="w-full flex items-start gap-2 p-2.5 rounded-mundi-md hover:bg-muted border border-transparent hover:border-border transition-all group"
+                    >
+                      <span className="text-lg shrink-0 mt-0.5">{preset.icon}</span>
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="text-xs font-medium text-foreground truncate">
+                          {preset.name}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">
+                          {preset.description}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Coming Soon Presets */}
+                {getComingSoonPresets().length > 0 && (
+                  <>
+                    <div className="flex items-center gap-2 pt-2">
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-[9px] text-muted-foreground uppercase tracking-wide">
+                        Coming Soon
+                      </span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      {getComingSoonPresets().map((preset) => (
+                        <div
+                          key={preset.id}
+                          className="w-full flex items-start gap-2 p-2.5 rounded-mundi-md bg-muted/30 opacity-60 cursor-not-allowed"
+                        >
+                          <span className="text-lg shrink-0 mt-0.5 grayscale">{preset.icon}</span>
+                          <div className="flex-1 text-left min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-medium text-foreground truncate">
+                                {preset.name}
+                              </span>
+                              <Badge variant="outline" className="text-[8px] h-4 px-1.5">
+                                {preset.developmentPriority === 'high' ? 'Q1 2025' :
+                                 preset.developmentPriority === 'medium' ? 'Q2 2025' : 'Q3 2025'}
+                              </Badge>
+                            </div>
+                            <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">
+                              {preset.description}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               <Separator className="bg-border" />
 
-              {/* Layers List */}
-              {layers.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground text-xs">
-                  No layers added
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {layers.map((layer) => (
-                    <motion.div
-                      key={layer.id}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="rounded-mundi-lg border border-border bg-white hover:shadow-mundi-sm transition-all"
-                    >
-                      {/* Layer Header */}
-                      <div className="flex items-center gap-2 p-3">
+              {/* Basemaps Section */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                  Basemaps (6)
+                </span>
+                <div className="space-y-1">
+                  {availableLayers
+                    .filter(layer => layer.category === 'basemaps')
+                    .map((layerDef) => (
+                      <div
+                        key={layerDef.id}
+                        className="flex items-center gap-2 px-3 py-2 rounded-mundi-md hover:bg-muted transition-colors"
+                      >
+                        <span className="text-sm">{layerDef.icon}</span>
+                        <span className="text-xs font-medium flex-1">{layerDef.name}</span>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-5 w-5 shrink-0 cursor-grab active:cursor-grabbing hover:bg-muted rounded-mundi-md text-muted-foreground"
+                          size="sm"
+                          className="h-6 px-2 text-[10px]"
+                          onClick={() => {
+                            if (!isLayerActive(layerDef.id)) {
+                              onAddLayer?.(layerDef.id)
+                            }
+                          }}
                         >
-                          <GripVertical className="h-3 w-3" />
-                        </Button>
-
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-5 w-5 shrink-0 hover:bg-muted rounded-mundi-md text-foreground"
-                          onClick={() => toggleLayerExpanded(layer.id)}
-                        >
-                          {expandedLayers.has(layer.id) ? (
-                            <ChevronDown className="h-3 w-3" />
-                          ) : (
-                            <ChevronRight className="h-3 w-3" />
-                          )}
-                        </Button>
-
-                        {layer.color && (
-                          <div
-                            className="w-3 h-3 rounded shrink-0 border border-border"
-                            style={{ backgroundColor: layer.color }}
-                          />
-                        )}
-
-                        <span className="text-xs font-medium text-foreground flex-1 truncate">
-                          {layer.name}
-                        </span>
-
-                        <Switch
-                          checked={layer.visible}
-                          onCheckedChange={() => onToggleLayer?.(layer.id)}
-                          className="shrink-0 scale-75"
-                        />
-
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 shrink-0 hover:bg-muted rounded-mundi-md text-foreground"
-                          onClick={() => onLayerSettings?.(layer.id)}
-                        >
-                          <Settings className="h-3 w-3" />
+                          {isLayerActive(layerDef.id) ? 'Active' : 'Load'}
                         </Button>
                       </div>
+                    ))}
+                </div>
+              </div>
 
-                      {/* Expanded Layer Details */}
-                      {expandedLayers.has(layer.id) && (
+              <Separator className="bg-border" />
+
+              {/* Infrastructure Layers Section */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                  Infrastructure (3)
+                </span>
+                <div className="space-y-2">
+                  {availableLayers
+                    .filter(layer => layer.category === 'infrastructure')
+                    .map((layerDef) => {
+                      const isActive = isLayerActive(layerDef.id)
+                      const isVisible = getLayerVisibility(layerDef.id)
+                      const opacity = getLayerOpacity(layerDef.id)
+
+                      return (
                         <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="px-4 pb-3 space-y-2 border-t border-border"
+                          key={layerDef.id}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="rounded-mundi-lg border border-border bg-white hover:shadow-mundi-sm transition-all"
                         >
-                          <div className="text-[10px] text-muted-foreground pt-2">
-                            Type: {layer.type}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-muted-foreground">Opacity</span>
-                            <div className="flex-1 h-1.5 bg-muted rounded-full border border-border">
-                              <div
-                                className="h-full bg-[#176BF8] rounded-full"
-                                style={{ width: `${layer.opacity * 100}%` }}
-                              />
-                            </div>
-                            <span className="text-[10px] text-muted-foreground">
-                              {Math.round(layer.opacity * 100)}%
-                            </span>
-                          </div>
-                        </motion.div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-        </TabsContent>
-
-        {/* Live Streams Tab */}
-        <TabsContent value="live" className="flex-1 m-0 data-[state=inactive]:hidden">
-          <ScrollArea className="h-full">
-            <div className="px-4 pb-4 space-y-3">
-              {/* Stream Controls */}
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 justify-start text-xs border-border bg-white hover:bg-muted text-foreground rounded-mundi-md"
-                >
-                  <Plus className="h-3 w-3 mr-2" />
-                  Add Stream
-                </Button>
-              </div>
-
-              <Separator className="bg-border" />
-
-              {/* Live Streams List */}
-              {liveStreams.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground text-xs">
-                  No live streams connected
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {liveStreams.map((stream) => (
-                    <motion.div
-                      key={stream.id}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-3 rounded-mundi-lg border border-border bg-white hover:shadow-mundi-sm transition-all space-y-3"
-                    >
-                      {/* Stream Header */}
-                      <div className="flex items-start gap-3">
-                        <div className="mt-0.5">
-                          {stream.status === 'active' ? (
-                            <Wifi className="h-4 w-4 text-[#22C55E]" />
-                          ) : (
-                            <WifiOff className="h-4 w-4 text-[#EF4444]" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-medium text-foreground truncate">
-                              {stream.name}
-                            </span>
-                            <Badge
-                              variant={stream.status === 'active' ? 'default' : 'destructive'}
-                              className="text-[10px] h-4 rounded-mundi-md"
+                          {/* Layer Header */}
+                          <div className="flex items-center gap-2 p-3">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 shrink-0 hover:bg-muted rounded-mundi-md text-foreground"
+                              onClick={() => toggleLayerExpanded(layerDef.id)}
                             >
-                              {stream.status}
-                            </Badge>
-                          </div>
-                          <div className="space-y-0.5">
-                            <div className="text-[10px] text-muted-foreground">
-                              {stream.messagesPerSecond.toFixed(1)} msg/s
-                            </div>
-                            <div className="text-[10px] text-muted-foreground">
-                              {stream.totalMessages.toLocaleString()} total
-                            </div>
-                            <div className="text-[10px] text-muted-foreground">
-                              {stream.latency}ms latency
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Stream Controls */}
-                      <div className="flex items-center gap-1 pt-2 border-t border-border">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 hover:bg-muted rounded-mundi-md text-foreground"
-                          onClick={() => onStreamToggle?.(stream.id)}
-                        >
-                          {stream.status === 'active' ? (
-                            <Pause className="h-3 w-3" />
-                          ) : (
-                            <Play className="h-3 w-3" />
-                          )}
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-muted rounded-mundi-md text-foreground">
-                          <SkipBack className="h-3 w-3" />
-                        </Button>
-                        <div className="flex-1" />
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-muted rounded-mundi-md text-foreground">
-                              <Settings className="h-3 w-3" />
+                              {expandedLayers.has(layerDef.id) ? (
+                                <ChevronDown className="h-3 w-3" />
+                              ) : (
+                                <ChevronRight className="h-3 w-3" />
+                              )}
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-mundi-lg">
-                            <DropdownMenuItem>Configure</DropdownMenuItem>
-                            <DropdownMenuItem>View Logs</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
-                              Disconnect
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </motion.div>
-                  ))}
+
+                            <span className="text-sm">{layerDef.icon}</span>
+
+                            <span className="text-xs font-medium text-foreground flex-1 truncate">
+                              {layerDef.name}
+                            </span>
+
+                            {!isActive ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2 text-[10px]"
+                                onClick={() => onAddLayer?.(layerDef.id)}
+                              >
+                                Load
+                              </Button>
+                            ) : (
+                              <Switch
+                                checked={isVisible}
+                                onCheckedChange={() => onToggleLayer?.(layerDef.id)}
+                                className="shrink-0 scale-75"
+                              />
+                            )}
+                          </div>
+
+                          {/* Expanded Layer Details */}
+                          {expandedLayers.has(layerDef.id) && isActive && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="px-4 pb-3 space-y-3 border-t border-border"
+                            >
+                              {layerDef.id === 'infra-places' ? (
+                                // Simplified category group controls for Places layer
+                                <div className="pt-2">
+                                  <PlacesLayerControl
+                                    onToggleGroup={onTogglePlaceGroup}
+                                    visibleCounts={new Map()}
+                                  />
+                                </div>
+                              ) : (
+                                // Standard layer controls for other layers
+                                <>
+                                  <div className="text-[10px] text-muted-foreground pt-2">
+                                    {layerDef.coverage} • {layerDef.type}
+                                  </div>
+
+                                  {/* Opacity Slider */}
+                                  <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xs text-muted-foreground">Opacity</span>
+                                      <span className="text-xs text-muted-foreground font-medium">
+                                        {Math.round(opacity * 100)}%
+                                      </span>
+                                    </div>
+                                    <Slider
+                                      value={[opacity * 100]}
+                                      onValueChange={(value) => {
+                                        onChangeOpacity?.(layerDef.id, value[0] / 100)
+                                      }}
+                                      max={100}
+                                      step={5}
+                                      className="w-full"
+                                    />
+                                  </div>
+                                </>
+                              )}
+                            </motion.div>
+                          )}
+                        </motion.div>
+                      )
+                    })}
                 </div>
-              )}
+              </div>
             </div>
           </ScrollArea>
         </TabsContent>
