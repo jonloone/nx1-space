@@ -15,6 +15,7 @@ import { GERSPlace, LOD_CONFIG } from '@/lib/services/gersDemoService'
 import { getOverturePlacesService } from '@/lib/services/overturePlacesService'
 import { getOvertureLayersManager, OVERTURE_LAYER_CONFIGS } from '@/lib/services/overtureLayersManager'
 import { getFeatureHighlightService } from '@/lib/services/featureHighlightService'
+import { getBuildingPlaceMapper } from '@/lib/services/buildingPlaceMapper'
 import { debounce } from '@/lib/utils/debounce'
 
 // Set Mapbox access token
@@ -132,6 +133,10 @@ export default function OperationsPage() {
 
     const highlightService = getFeatureHighlightService()
     highlightService.initialize(map.current)
+
+    // Initialize Building-Place Mapper
+    const mapper = getBuildingPlaceMapper()
+    mapper.initialize(map.current)
   }, [isLoaded])
 
   // Add building and places click handlers
@@ -646,10 +651,12 @@ export default function OperationsPage() {
   }
 
   // Handle map actions from AI chat
-  const handleChatAction = (action: string, data: any) => {
+  const handleChatAction = async (action: string, data: any) => {
     console.log('💬 Chat action:', action, data)
 
     if (!data || !map.current) return
+
+    const mapper = getBuildingPlaceMapper()
 
     // Execute map actions based on LLM responses
     switch (action) {
@@ -666,8 +673,14 @@ export default function OperationsPage() {
 
       case 'search':
         if (data.places && data.places.length > 0) {
-          console.log('📍 Showing places:', data.places.length)
+          console.log('🎨 Coloring buildings for', data.places.length, 'places')
+
+          // Color buildings instead of showing place markers
+          await mapper.colorBuildingsByPlaces(data.places, data.categories)
+
+          // Also store places in state for search
           setVisiblePlaces(data.places)
+
           if (data.viewport) {
             map.current.flyTo({
               center: data.viewport.center,
@@ -680,7 +693,8 @@ export default function OperationsPage() {
 
       case 'showNearby':
         if (data.places) {
-          console.log('📍 Showing nearby places:', data.places.length)
+          console.log('🎨 Coloring nearby buildings:', data.places.length)
+          await mapper.colorBuildingsByPlaces(data.places)
           setVisiblePlaces(data.places)
         }
         break
@@ -688,7 +702,9 @@ export default function OperationsPage() {
       case 'analyze':
         if (data.places && data.viewport) {
           console.log('📊 Analyzing area with', data.places.length, 'places')
+          await mapper.colorBuildingsByPlaces(data.places)
           setVisiblePlaces(data.places)
+
           map.current.flyTo({
             center: data.viewport.center,
             zoom: data.viewport.zoom,
