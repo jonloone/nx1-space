@@ -5,12 +5,14 @@ import { Send, Loader2, Bot, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import type { ChatArtifact } from '@/lib/types/chatArtifacts'
 
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  artifact?: ChatArtifact // NEW: Support for rich artifacts
   metadata?: {
     entitiesFiltered?: number
     analysisType?: string
