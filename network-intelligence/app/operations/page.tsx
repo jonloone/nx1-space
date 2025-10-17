@@ -7,8 +7,15 @@ import MissionControlLayout from '@/components/opintel/layout/MissionControlLayo
 import LeftSidebar from '@/components/opintel/panels/LeftSidebar'
 import RightPanel from '@/components/opintel/panels/RightPanel'
 import GERSMapLayer from '@/components/gers/GERSMapLayer'
+import AddLayerDropdown from '@/components/opintel/panels/AddLayerDropdown'
+import { InvestigationMode } from '@/components/investigation'
+import CopilotProvider from '@/components/chat/CopilotProvider'
 import { useMapStore, usePanelStore } from '@/lib/stores'
 import { GERSPlace, LOD_CONFIG } from '@/lib/services/gersDemoService'
+import { getOverturePlacesService } from '@/lib/services/overturePlacesService'
+import { getOvertureLayersManager, OVERTURE_LAYER_CONFIGS } from '@/lib/services/overtureLayersManager'
+import { getFeatureHighlightService } from '@/lib/services/featureHighlightService'
+import { debounce } from '@/lib/utils/debounce'
 
 // Set Mapbox access token
 mapboxgl.accessToken = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pMmJ5czk3N2sifQ.gE4F5uP57jtt6ThElLsFBg'
@@ -18,12 +25,42 @@ export default function OperationsPage() {
   const map = useRef<mapboxgl.Map | null>(null)
 
   // Zustand stores
-  const { setMap, isLoaded, setLoaded, selectFeature } = useMapStore()
+  const {
+    setMap,
+    isLoaded,
+    setLoaded,
+    selectFeature,
+    setVisiblePlaces,
+    addCachedPlaces,
+    visiblePlaces,
+    setViewportBounds,
+    initializeCache,
+    saveToCache
+  } = useMapStore()
   const { rightPanelMode, rightPanelData, openRightPanel, closeRightPanel } = usePanelStore()
 
-  // GERs search state
+  // GERs search state (for custom search features)
   const [gersPlaces, setGersPlaces] = useState<GERSPlace[]>([])
   const [selectedPlace, setSelectedPlace] = useState<GERSPlace | null>(null)
+
+  // Overture Places loading state
+  const [isOverturePlacesLoaded, setIsOverturePlacesLoaded] = useState(false)
+
+  // Layer Management state
+  const [activeLayers, setActiveLayers] = useState<Array<{
+    id: string
+    name: string
+    type: string
+    visible: boolean
+    opacity: number
+    color?: string
+  }>>([]) // Start with empty - user adds layers via catalog
+
+  // Add Layer Dialog state
+  const [isAddLayerDialogOpen, setIsAddLayerDialogOpen] = useState(false)
+
+  // Investigation Mode state
+  const [isInvestigationModeActive, setIsInvestigationModeActive] = useState(false)
 
   // Initialize map
   useEffect(() => {
@@ -34,7 +71,7 @@ export default function OperationsPage() {
     try {
       const mapInstance = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11', // Mundi light theme
+        style: 'mapbox://styles/mapbox/light-v11',
         center: [-98.5795, 39.8283], // Center of USA
         zoom: 4,
         pitch: 0,
@@ -62,6 +99,224 @@ export default function OperationsPage() {
       setMap(null)
     }
   }, [setMap, setLoaded])
+
+  // Initialize cache on mount
+  useEffect(() => {
+    initializeCache()
+  }, [initializeCache])
+
+  // Track if default layers have been loaded
+  const [defaultLayersLoaded, setDefaultLayersLoaded] = useState(false)
+
+  // Initialize Overture Layers Manager
+  useEffect(() => {
+    if (!map.current || !isLoaded) return
+
+    const initializeLayersManager = async () => {
+      try {
+        console.log('🗂️ Initializing Overture Layers Manager...')
+        const layersManager = getOvertureLayersManager()
+        await layersManager.initialize(map.current!)
+        console.log('✅ Overture Layers Manager ready')
+      } catch (error) {
+        console.error('❌ Failed to initialize Layers Manager:', error)
+      }
+    }
+
+    initializeLayersManager()
+  }, [isLoaded])
+
+  // Initialize Feature Highlight Service
+  useEffect(() => {
+    if (!map.current || !isLoaded) return
+
+    const highlightService = getFeatureHighlightService()
+    highlightService.initialize(map.current)
+  }, [isLoaded])
+
+  // Add building and places click handlers
+  useEffect(() => {
+    if (!map.current || !isLoaded) return
+
+    // Define place layer IDs at outer scope so cleanup can access them
+    const placeLayers = [
+      'overture-airports',
+      'overture-hospitals',
+      'overture-education',
+      'overture-cultural',
+      'overture-transport',
+      'overture-general'
+    ]
+
+    const handleMapClick = (e: mapboxgl.MapMouseEvent) => {
+      // Check for places first (POIs have higher priority)
+      const placeFeatures = map.current!.queryRenderedFeatures(e.point, {
+        layers: placeLayers
+      })
+
+      if (placeFeatures.length > 0) {
+        const feature = placeFeatures[0]
+        const properties = feature.properties || {}
+
+        // Get coordinates
+        const coordinates: [number, number] = e.lngLat.toArray() as [number, number]
+
+        // Create SelectedFeature for place
+        const selectedFeature = {
+          id: properties.id || `place-${coordinates.join(',')}`,
+          type: 'place' as const,
+          name: properties.name || 'Place',
+          coordinates,
+          properties: {
+            categories: properties.categories ? JSON.parse(properties.categories) : [],
+            confidence: properties.confidence,
+            ...properties
+          }
+        }
+
+        // Update map store
+        selectFeature(selectedFeature)
+
+        // Highlight the feature visually
+        const highlightService = getFeatureHighlightService()
+        highlightService.highlightFeature(selectedFeature)
+
+        // Open right panel with place details
+        openRightPanel('feature', {
+          id: properties.id || `place-${coordinates.join(',')}`,
+          type: 'place',
+          name: properties.name || 'Place',
+          coordinates,
+          properties: {
+            category: properties.category,
+            categories: properties.categories ? JSON.parse(properties.categories) : [],
+            confidence: properties.confidence,
+            ...properties
+          }
+        })
+        return
+      }
+
+      // Check for buildings
+      const buildingFeatures = map.current!.queryRenderedFeatures(e.point, {
+        layers: ['buildings-2d', 'buildings-3d']
+      })
+
+      if (buildingFeatures.length > 0) {
+        const feature = buildingFeatures[0]
+        const properties = feature.properties || {}
+
+        // Get geometry center for coordinates
+        const coordinates: [number, number] = e.lngLat.toArray() as [number, number]
+
+        // Create SelectedFeature
+        const selectedFeature = {
+          id: properties.id || `building-${coordinates.join(',')}`,
+          type: 'building' as const,
+          name: properties.name || 'Building',
+          coordinates,
+          properties: {
+            class: properties.class || 'building',
+            height: properties.height || 0,
+            floors: properties.floors || 0,
+            ...properties
+          }
+        }
+
+        // Update map store
+        selectFeature(selectedFeature)
+
+        // Highlight the feature visually
+        const highlightService = getFeatureHighlightService()
+        highlightService.highlightFeature(selectedFeature)
+
+        // Open right panel with building details
+        openRightPanel('feature', {
+          id: properties.id || `building-${coordinates.join(',')}`,
+          type: 'building',
+          name: properties.name || 'Building',
+          coordinates,
+          properties: {
+            class: properties.class || 'building',
+            height: properties.height || 0,
+            floors: properties.floors || 0,
+            ...properties
+          }
+        })
+      }
+    }
+
+    // Add click listener
+    map.current.on('click', handleMapClick)
+
+    // Change cursor on hover for buildings
+    const handleMouseEnter = () => {
+      if (map.current) map.current.getCanvas().style.cursor = 'pointer'
+    }
+    const handleMouseLeave = () => {
+      if (map.current) map.current.getCanvas().style.cursor = ''
+    }
+
+    // Buildings
+    map.current.on('mouseenter', 'buildings-2d', handleMouseEnter)
+    map.current.on('mouseleave', 'buildings-2d', handleMouseLeave)
+    map.current.on('mouseenter', 'buildings-3d', handleMouseEnter)
+    map.current.on('mouseleave', 'buildings-3d', handleMouseLeave)
+
+    // Places
+    placeLayers.forEach(layer => {
+      map.current!.on('mouseenter', layer, handleMouseEnter)
+      map.current!.on('mouseleave', layer, handleMouseLeave)
+    })
+
+    return () => {
+      if (map.current) {
+        map.current.off('click', handleMapClick)
+        map.current.off('mouseenter', 'buildings-2d', handleMouseEnter)
+        map.current.off('mouseleave', 'buildings-2d', handleMouseLeave)
+        map.current.off('mouseenter', 'buildings-3d', handleMouseEnter)
+        map.current.off('mouseleave', 'buildings-3d', handleMouseLeave)
+
+        placeLayers.forEach(layer => {
+          map.current!.off('mouseenter', layer, handleMouseEnter)
+          map.current!.off('mouseleave', layer, handleMouseLeave)
+        })
+      }
+    }
+  }, [isLoaded, selectFeature, openRightPanel])
+
+  // Query visible places when viewport changes (for Places layer)
+  useEffect(() => {
+    if (!map.current || !isLoaded) return
+
+    // Check if Places layer is active
+    const hasPlacesLayer = activeLayers.some(l => l.id === 'infra-places' && l.visible)
+    if (!hasPlacesLayer) return
+
+    const updateVisiblePlaces = debounce(() => {
+      if (!map.current) return
+
+      const overturePlacesService = getOverturePlacesService()
+      const places = overturePlacesService.queryVisiblePlaces(map.current)
+
+      // Update mapStore with visible places (for search)
+      setVisiblePlaces(places)
+      console.log(`📍 Updated visible places: ${places.length} in viewport`)
+    }, 500)
+
+    // Query on load and viewport change
+    updateVisiblePlaces()
+
+    map.current.on('moveend', updateVisiblePlaces)
+    map.current.on('zoomend', updateVisiblePlaces)
+
+    return () => {
+      if (map.current) {
+        map.current.off('moveend', updateVisiblePlaces)
+        map.current.off('zoomend', updateVisiblePlaces)
+      }
+    }
+  }, [isLoaded, activeLayers, setVisiblePlaces])
 
   // Demo data for left sidebar
   const dataSources = [
@@ -91,33 +346,6 @@ export default function OperationsPage() {
     }
   ]
 
-  const layers = [
-    {
-      id: 'operations',
-      name: 'Operations Layer',
-      type: 'point',
-      visible: true,
-      opacity: 1,
-      color: '#10b981'
-    },
-    {
-      id: 'network',
-      name: 'Network Layer',
-      type: 'line',
-      visible: true,
-      opacity: 0.8,
-      color: '#3b82f6'
-    },
-    {
-      id: 'coverage',
-      name: 'Coverage Areas',
-      type: 'polygon',
-      visible: false,
-      opacity: 0.4,
-      color: '#93C5FD'
-    }
-  ]
-
   const liveStreams = [
     {
       id: 'ops-stream',
@@ -137,13 +365,248 @@ export default function OperationsPage() {
     }
   ]
 
-  const handleToggleLayer = (layerId: string) => {
-    console.log('Toggle layer:', layerId)
+  const handleAddLayer = async (layerId: string) => {
+    if (!map.current) return
+
+    console.log(`📍 Adding layer: ${layerId}`)
+
+    // Get layer definition from catalog
+    const { getLayerById } = require('@/lib/config/layerCatalog')
+    const layerDef = getLayerById(layerId)
+
+    if (!layerDef) {
+      console.error(`Layer ${layerId} not found in catalog`)
+      return
+    }
+
+    try {
+      // Handle different layer types
+      if (layerDef.category === 'basemaps') {
+        // Change basemap style
+        const style = layerDef.sourceUrl
+        if (style) {
+          map.current!.setStyle(style)
+          console.log(`✅ Changed basemap to: ${layerDef.name}`)
+        }
+      } else if (layerDef.category === 'infrastructure') {
+        // Map catalog layer IDs to Overture Layers Manager IDs
+        const layerIdMap: Record<string, string> = {
+          'infra-places': 'places',
+          'infra-buildings-2d': 'buildings-2d',
+          'infra-buildings-3d': 'buildings-3d',
+          'infra-roads': 'transportation',
+          'infra-ports': 'ports' // Will need custom handling
+        }
+
+        const overtureLayerId = layerIdMap[layerId]
+
+        if (overtureLayerId) {
+          // Use Overture Layers Manager for infrastructure layers
+          const layersManager = getOvertureLayersManager()
+          await layersManager.addLayer(overtureLayerId as any)
+          console.log(`✅ Added infrastructure layer: ${layerDef.name}`)
+        } else {
+          console.log(`⚠️ Infrastructure layer ${layerId} not yet implemented`)
+        }
+      } else {
+        console.log(`⚠️ Layer type ${layerDef.category} not yet implemented`)
+        // TODO: Implement other layer types (weather, EO, maritime, comms)
+      }
+
+      // Add to active layers list
+      setActiveLayers(prev => [
+        ...prev,
+        {
+          id: layerId,
+          name: layerDef.name,
+          type: layerDef.type,
+          visible: true,
+          opacity: layerDef.defaultOpacity,
+          color: layerDef.icon // Use icon as color placeholder
+        }
+      ])
+    } catch (error) {
+      console.error(`Failed to add layer ${layerId}:`, error)
+    }
+  }
+
+  const handleToggleLayer = async (layerId: string) => {
+    if (!map.current) return
+
+    const layer = activeLayers.find(l => l.id === layerId)
+    if (!layer) return
+
+    try {
+      // Toggle visibility based on layer type
+      const { getLayerById } = require('@/lib/config/layerCatalog')
+      const layerDef = getLayerById(layerId)
+
+      if (layerDef?.category === 'infrastructure') {
+        // Map catalog layer IDs to Overture Layers Manager IDs
+        const layerIdMap: Record<string, string> = {
+          'infra-places': 'places',
+          'infra-buildings-2d': 'buildings-2d',
+          'infra-buildings-3d': 'buildings-3d',
+          'infra-roads': 'transportation'
+        }
+
+        const overtureLayerId = layerIdMap[layerId]
+        if (overtureLayerId) {
+          const layersManager = getOvertureLayersManager()
+          layersManager.toggleLayer(overtureLayerId as any, !layer.visible)
+        }
+      }
+
+      // Update state
+      setActiveLayers(prev =>
+        prev.map(l => l.id === layerId ? { ...l, visible: !l.visible } : l)
+      )
+    } catch (error) {
+      console.error(`Failed to toggle layer ${layerId}:`, error)
+    }
+  }
+
+  const handleRemoveLayer = async (layerId: string) => {
+    if (!map.current) return
+
+    console.log(`🗑️ Removing layer: ${layerId}`)
+
+    try {
+      // Get layer definition from catalog
+      const { getLayerById } = require('@/lib/config/layerCatalog')
+      const layerDef = getLayerById(layerId)
+
+      if (layerDef?.category === 'infrastructure') {
+        // Remove infrastructure layer
+        const layersManager = getOvertureLayersManager()
+        const mapLayerIds = layersManager['getMapLayerIds'](layerId as any)
+
+        // Remove each map layer
+        mapLayerIds.forEach((id: string) => {
+          if (map.current!.getLayer(id)) {
+            map.current!.removeLayer(id)
+          }
+        })
+
+        // Remove source if no other layers use it
+        const sourceId = layerId.includes('buildings') ? 'overture-buildings' : `overture-${layerId}`
+        if (map.current!.getSource(sourceId)) {
+          map.current!.removeSource(sourceId)
+        }
+
+        console.log(`✅ Removed infrastructure layer: ${layerDef.name}`)
+      }
+      // TODO: Handle removal of other layer types
+
+      // Remove from active layers list
+      setActiveLayers(prev => prev.filter(l => l.id !== layerId))
+    } catch (error) {
+      console.error(`Failed to remove layer ${layerId}:`, error)
+    }
+  }
+
+  const handleChangeOpacity = async (layerId: string, opacity: number) => {
+    if (!map.current) return
+
+    console.log(`🎨 Changing opacity for ${layerId}: ${opacity}`)
+
+    try {
+      // Get layer definition from catalog
+      const { getLayerById } = require('@/lib/config/layerCatalog')
+      const layerDef = getLayerById(layerId)
+
+      if (layerDef?.category === 'infrastructure') {
+        // Map catalog layer IDs to Overture Layers Manager IDs
+        const layerIdMap: Record<string, string> = {
+          'infra-places': 'places',
+          'infra-buildings-2d': 'buildings-2d',
+          'infra-buildings-3d': 'buildings-3d',
+          'infra-roads': 'transportation'
+        }
+
+        const overtureLayerId = layerIdMap[layerId]
+        if (overtureLayerId) {
+          const layersManager = getOvertureLayersManager()
+          layersManager.setLayerOpacity(overtureLayerId as any, opacity)
+        }
+      }
+      // TODO: Handle opacity for other layer types
+
+      // Update state
+      setActiveLayers(prev =>
+        prev.map(l => l.id === layerId ? { ...l, opacity } : l)
+      )
+    } catch (error) {
+      console.error(`Failed to change opacity for layer ${layerId}:`, error)
+    }
   }
 
   const handleLayerSettings = (layerId: string) => {
     console.log('Layer settings:', layerId)
+    // TODO: Open settings dialog for layer (opacity, filters, etc.)
   }
+
+  const handleTogglePlaceCategory = (categoryId: string) => {
+    const overturePlacesService = getOverturePlacesService()
+    overturePlacesService.toggleCategory(categoryId)
+  }
+
+  const handleTogglePlaceGroup = (groupId: string, enabled: boolean) => {
+    // Import the category group to get all category IDs
+    const { CATEGORY_GROUPS } = require('@/lib/config/placesCategories')
+    const group = CATEGORY_GROUPS.find((g: any) => g.id === groupId)
+
+    if (group) {
+      const overturePlacesService = getOverturePlacesService()
+      overturePlacesService.toggleCategoryGroup(group.categories, enabled)
+    }
+  }
+
+  // Auto-load default layers on startup
+  useEffect(() => {
+    if (!map.current || !isLoaded || defaultLayersLoaded) return
+
+    const loadDefaultLayers = async () => {
+      try {
+        console.log('📍 Auto-loading default layers...')
+        const { DEFAULT_LAYERS } = require('@/lib/config/layerPresets')
+
+        // Load default infrastructure layers
+        for (const layerConfig of DEFAULT_LAYERS.layers) {
+          await handleAddLayer(layerConfig.id)
+
+          // Set visibility based on default
+          if (!layerConfig.visible) {
+            // If default is hidden, toggle it off after adding
+            setTimeout(() => {
+              setActiveLayers(prev =>
+                prev.map(l => l.id === layerConfig.id ? { ...l, visible: false } : l)
+              )
+
+              // Also toggle in the manager
+              const layerIdMap: Record<string, string> = {
+                'infra-places': 'places',
+                'infra-buildings-2d': 'buildings-2d',
+                'infra-buildings-3d': 'buildings-3d'
+              }
+              const overtureLayerId = layerIdMap[layerConfig.id]
+              if (overtureLayerId) {
+                const layersManager = getOvertureLayersManager()
+                layersManager.toggleLayer(overtureLayerId as any, false)
+              }
+            }, 100)
+          }
+        }
+
+        console.log('✅ Default layers loaded')
+        setDefaultLayersLoaded(true)
+      } catch (error) {
+        console.error('❌ Failed to load default layers:', error)
+      }
+    }
+
+    loadDefaultLayers()
+  }, [isLoaded, defaultLayersLoaded])
 
   const handleSearch = (query: string) => {
     console.log('Search:', query)
@@ -158,43 +621,211 @@ export default function OperationsPage() {
     setSelectedPlace(place)
     console.log('Selected place:', place.name, 'LoD:', place.levelOfDetail)
 
-    // Fly to place on map with LoD-appropriate zoom
-    if (map.current) {
-      const zoomLevel = LOD_CONFIG[place.levelOfDetail].zoom
-      map.current.flyTo({
-        center: place.location.coordinates as [number, number],
-        zoom: zoomLevel,
-        duration: 1500
-      })
+    // Create SelectedFeature for the store
+    const selectedFeature = {
+      id: place.gersId,
+      type: 'place',
+      name: place.name,
+      coordinates: place.location.coordinates as [number, number],
+      properties: {
+        ...place,
+        categories: place.categories,
+        levelOfDetail: place.levelOfDetail
+      }
     }
 
+    // Update map store
+    selectFeature(selectedFeature)
+
+    // Highlight the feature visually
+    const highlightService = getFeatureHighlightService()
+    highlightService.highlightFeature(selectedFeature)
+
     // Open right panel with place details
-    openRightPanel('details', {
-      title: place.name,
-      data: place
-    })
+    openRightPanel('feature', place)
+  }
+
+  // Handle map actions from AI chat
+  const handleChatAction = (action: string, data: any) => {
+    console.log('💬 Chat action:', action, data)
+
+    if (!data || !map.current) return
+
+    // Execute map actions based on LLM responses
+    switch (action) {
+      case 'flyTo':
+        if (data.viewport) {
+          console.log('🗺️ Flying to:', data.viewport.center, 'zoom:', data.viewport.zoom)
+          map.current.flyTo({
+            center: data.viewport.center,
+            zoom: data.viewport.zoom,
+            essential: true
+          })
+        }
+        break
+
+      case 'search':
+        if (data.places && data.places.length > 0) {
+          console.log('📍 Showing places:', data.places.length)
+          setVisiblePlaces(data.places)
+          if (data.viewport) {
+            map.current.flyTo({
+              center: data.viewport.center,
+              zoom: data.viewport.zoom,
+              essential: true
+            })
+          }
+        }
+        break
+
+      case 'showNearby':
+        if (data.places) {
+          console.log('📍 Showing nearby places:', data.places.length)
+          setVisiblePlaces(data.places)
+        }
+        break
+
+      case 'analyze':
+        if (data.places && data.viewport) {
+          console.log('📊 Analyzing area with', data.places.length, 'places')
+          setVisiblePlaces(data.places)
+          map.current.flyTo({
+            center: data.viewport.center,
+            zoom: data.viewport.zoom,
+            essential: true
+          })
+        }
+        break
+    }
   }
 
   return (
-    <MissionControlLayout
-      projectName="Operations Intelligence"
-      notificationCount={5}
-      isLive={true}
-      activeUsers={12}
-      onSearch={handleSearch}
-      onPlaceSelect={handleGERSPlaceSelect}
+    <CopilotProvider>
+      <MissionControlLayout
+        projectName="Operations Intelligence"
+        notificationCount={5}
+        isLive={true}
+        activeUsers={12}
+        hideSidebar={isInvestigationModeActive}
+        onSearch={handleSearch}
+        onPlaceSelect={handleGERSPlaceSelect}
+        onChatAction={handleChatAction}
       leftSidebar={
         <LeftSidebar
           dataSources={dataSources}
-          layers={layers}
+          layers={activeLayers}
           liveStreams={liveStreams}
+          onAddLayer={handleAddLayer}
           onToggleLayer={handleToggleLayer}
+          onRemoveLayer={handleRemoveLayer}
+          onChangeOpacity={handleChangeOpacity}
           onLayerSettings={handleLayerSettings}
+          onTogglePlaceCategory={handleTogglePlaceCategory}
+          onTogglePlaceGroup={handleTogglePlaceGroup}
+          onLoadPreset={async (presetId) => {
+            if (!map.current) return
+
+            console.log('📋 Loading preset:', presetId)
+
+            // Check if this is the investigation intelligence preset
+            if (presetId === 'investigation-intelligence') {
+              console.log('🔍 Activating Investigation Intelligence Mode')
+              setIsInvestigationModeActive(true)
+              return
+            }
+
+            try {
+              const { getPreset } = require('@/lib/config/layerPresets')
+              const preset = getPreset(presetId)
+
+              if (!preset) {
+                console.error(`Preset ${presetId} not found`)
+                return
+              }
+
+              // Check if preset is available
+              if (preset.status === 'coming-soon') {
+                console.log('⏳ Preset not yet available:', preset.name)
+                // TODO: Show toast notification to user
+                return
+              }
+
+              console.log(`Loading preset: ${preset.name}`)
+
+              // Step 1: Remove all current layers (except basemap)
+              const layersToRemove = [...activeLayers]
+              for (const layer of layersToRemove) {
+                await handleRemoveLayer(layer.id)
+              }
+
+              // Step 2: Change basemap
+              const { getLayerById } = require('@/lib/config/layerCatalog')
+              const basemapDef = getLayerById(preset.basemap)
+              if (basemapDef?.sourceUrl) {
+                map.current.setStyle(basemapDef.sourceUrl)
+                console.log(`✅ Changed basemap to: ${basemapDef.name}`)
+
+                // Wait for style to load before adding layers
+                await new Promise((resolve) => {
+                  map.current!.once('style.load', resolve)
+                })
+
+                // Reinitialize Overture Layers Manager after style change
+                const layersManager = getOvertureLayersManager()
+                await layersManager.initialize(map.current!)
+              }
+
+              // Step 3: Load preset layers with visibility
+              for (const layerConfig of preset.layers) {
+                const layerDef = getLayerById(layerConfig.id)
+
+                // Only load available layers
+                if (layerDef?.status === 'available') {
+                  await handleAddLayer(layerConfig.id)
+
+                  // Set visibility based on preset
+                  if (!layerConfig.visible) {
+                    setTimeout(() => {
+                      setActiveLayers(prev =>
+                        prev.map(l => l.id === layerConfig.id ? { ...l, visible: false } : l)
+                      )
+
+                      // Also toggle in the manager
+                      const layerIdMap: Record<string, string> = {
+                        'infra-places': 'places',
+                        'infra-buildings-2d': 'buildings-2d',
+                        'infra-buildings-3d': 'buildings-3d'
+                      }
+                      const overtureLayerId = layerIdMap[layerConfig.id]
+                      if (overtureLayerId) {
+                        const layersManager = getOvertureLayersManager()
+                        layersManager.toggleLayer(overtureLayerId as any, false)
+                      }
+                    }, 100)
+                  }
+                }
+              }
+
+              console.log(`✅ Loaded preset: ${preset.name}`)
+            } catch (error) {
+              console.error('❌ Failed to load preset:', error)
+            }
+          }}
         />
       }
       rightPanel={
         rightPanelMode ? (
-          <RightPanel mode={rightPanelMode} data={rightPanelData} onClose={closeRightPanel} />
+          <RightPanel
+            mode={rightPanelMode}
+            data={rightPanelData}
+            onClose={() => {
+              // Clear highlight when closing panel
+              const highlightService = getFeatureHighlightService()
+              highlightService.clearHighlight()
+              selectFeature(null)
+              closeRightPanel()
+            }}
+          />
         ) : null
       }
     >
@@ -223,6 +854,26 @@ export default function OperationsPage() {
           onPlaceClick={handleGERSPlaceSelect}
         />
       )}
+
+      {/* Investigation Mode */}
+      {isInvestigationModeActive && map.current && (
+        <InvestigationMode
+          map={map.current}
+          onExit={() => {
+            console.log('🚪 Exiting Investigation Mode')
+            setIsInvestigationModeActive(false)
+          }}
+        />
+      )}
+
+      {/* Add Layer Dropdown */}
+      <AddLayerDropdown
+        open={isAddLayerDialogOpen}
+        onClose={() => setIsAddLayerDialogOpen(false)}
+        onAddLayer={handleAddLayer}
+        addedLayerIds={activeLayers.map(l => l.id)}
+      />
     </MissionControlLayout>
+    </CopilotProvider>
   )
 }

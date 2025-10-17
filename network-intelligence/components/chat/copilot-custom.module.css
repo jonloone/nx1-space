@@ -1,0 +1,483 @@
+/* Premium CopilotKit Styling - Felt/Mundi Inspired with Project Blue (#1D48E5) */
+
+/* =========================================
+   Chat Sidebar Container
+   ========================================= */
+.copilotSidebar {
+  background: var(--copilot-glass-bg);
+  backdrop-filter: blur(var(--copilot-glass-blur));
+  border-right: 1px solid var(--copilot-border);
+  padding: var(--copilot-spacing-lg) var(--copilot-spacing-md);
+  box-shadow: var(--copilot-shadow-md);
+  height: 100vh;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================
+   Header Area
+   ========================================= */
+.copilotHeader {
+  padding-bottom: var(--copilot-spacing-md);
+  border-bottom: 1px solid var(--copilot-border);
+  margin-bottom: var(--copilot-spacing-lg);
+  flex-shrink: 0;
+}
+
+.copilotTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--copilot-text-primary);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.copilotSubtitle {
+  font-size: 13px;
+  color: var(--copilot-text-secondary);
+  line-height: 1.5;
+}
+
+/* =========================================
+   Messages Container
+   ========================================= */
+.messagesContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 4px;
+  margin: 0 -4px;
+}
+
+/* Custom scrollbar - project blue */
+.messagesContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messagesContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messagesContainer::-webkit-scrollbar-thumb {
+  background: var(--copilot-blue-20);
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.messagesContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--copilot-blue-primary);
+}
+
+/* =========================================
+   Message Bubbles
+   ========================================= */
+.messageUser {
+  background: var(--copilot-blue-primary);
+  color: white;
+  border-radius: var(--copilot-radius-lg);
+  padding: 14px 18px;
+  margin-bottom: var(--copilot-spacing-md);
+  box-shadow: 0 2px 8px rgba(29, 72, 229, 0.15);
+  max-width: 85%;
+  margin-left: auto;
+  word-wrap: break-word;
+  line-height: 1.5;
+}
+
+.messageAssistant {
+  background: var(--copilot-bg-subtle);
+  color: var(--copilot-text-primary);
+  border: 1px solid var(--copilot-border-light);
+  border-radius: var(--copilot-radius-lg);
+  padding: 14px 18px;
+  margin-bottom: var(--copilot-spacing-md);
+  max-width: 90%;
+  box-shadow: var(--copilot-shadow-sm);
+  line-height: 1.6;
+}
+
+.messageAssistant a {
+  color: var(--copilot-blue-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--copilot-blue-20);
+  transition: border-color 0.2s;
+}
+
+.messageAssistant a:hover {
+  border-bottom-color: var(--copilot-blue-primary);
+}
+
+.messageAssistant strong {
+  font-weight: 600;
+  color: var(--copilot-text-primary);
+}
+
+.messageAssistant code {
+  background: rgba(29, 72, 229, 0.05);
+  color: var(--copilot-blue-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'Inconsolata', 'JetBrains Mono', monospace;
+}
+
+/* =========================================
+   Message Meta (Timestamp, etc.)
+   ========================================= */
+.messageMeta {
+  font-size: 11px;
+  color: var(--copilot-text-secondary);
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+.messageWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: var(--copilot-spacing-md);
+}
+
+.messageWrapperUser {
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--copilot-shadow-sm);
+}
+
+.avatarUser {
+  background: linear-gradient(135deg, var(--copilot-blue-primary) 0%, var(--copilot-blue-light) 100%);
+  color: white;
+  font-size: 14px;
+}
+
+.avatarAssistant {
+  background: linear-gradient(135deg, var(--copilot-warm) 0%, var(--copilot-warm-20) 100%);
+  color: white;
+  font-size: 14px;
+}
+
+/* =========================================
+   Input Container
+   ========================================= */
+.inputContainer {
+  padding-top: var(--copilot-spacing-md);
+  border-top: 1px solid var(--copilot-border);
+  flex-shrink: 0;
+}
+
+.inputWrapper {
+  background: var(--copilot-bg-base);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--copilot-radius-lg);
+  padding: var(--copilot-spacing-sm) 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.inputWrapper:focus-within {
+  border-color: var(--copilot-blue-primary);
+  box-shadow: var(--copilot-shadow-blue);
+}
+
+.input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--copilot-text-primary);
+  outline: none;
+  font-family: inherit;
+}
+
+.input::placeholder {
+  color: var(--copilot-text-secondary);
+}
+
+/* =========================================
+   Buttons
+   ========================================= */
+.sendButton {
+  background: var(--copilot-blue-primary);
+  color: white;
+  border: none;
+  border-radius: var(--copilot-radius-md);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(29, 72, 229, 0.2);
+}
+
+.sendButton:hover {
+  background: var(--copilot-blue-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 72, 229, 0.3);
+}
+
+.sendButton:active {
+  transform: translateY(0);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.attachButton {
+  background: transparent;
+  border: none;
+  color: var(--copilot-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--copilot-radius-sm);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attachButton:hover {
+  background: var(--copilot-blue-10);
+  color: var(--copilot-blue-primary);
+}
+
+/* =========================================
+   Loading States
+   ========================================= */
+.loadingDots {
+  display: flex;
+  gap: 6px;
+  padding: 14px 18px;
+}
+
+.loadingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--copilot-blue-primary);
+  opacity: 0.4;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.loadingDot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loadingDot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* =========================================
+   Code Blocks
+   ========================================= */
+.codeBlock {
+  background: var(--copilot-bg-subtle);
+  border: 1px solid var(--copilot-border);
+  border-radius: var(--copilot-radius-md);
+  padding: 16px;
+  margin: 12px 0;
+  overflow-x: auto;
+  font-family: 'Inconsolata', 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.codeBlockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--copilot-border);
+}
+
+.codeLanguage {
+  font-size: 12px;
+  color: var(--copilot-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.copyButton {
+  background: var(--copilot-blue-10);
+  color: var(--copilot-blue-primary);
+  border: none;
+  border-radius: var(--copilot-radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copyButton:hover {
+  background: var(--copilot-blue-20);
+}
+
+.copyButton:active {
+  transform: scale(0.95);
+}
+
+/* =========================================
+   Empty State
+   ========================================= */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--copilot-spacing-3xl) var(--copilot-spacing-md);
+  text-align: center;
+  flex: 1;
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  margin-bottom: var(--copilot-spacing-md);
+  opacity: 0.9;
+}
+
+.emptyStateTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--copilot-text-primary);
+  margin-bottom: var(--copilot-spacing-sm);
+  letter-spacing: -0.01em;
+}
+
+.emptyStateDescription {
+  font-size: 14px;
+  color: var(--copilot-text-secondary);
+  line-height: 1.6;
+  max-width: 360px;
+  margin-bottom: var(--copilot-spacing-xl);
+}
+
+.suggestionsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--copilot-spacing-sm);
+  width: 100%;
+  max-width: 400px;
+}
+
+.suggestionChip {
+  background: var(--copilot-bg-base);
+  border: 1px solid var(--copilot-border);
+  border-radius: var(--copilot-radius-md);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--copilot-text-primary);
+}
+
+.suggestionChip:hover {
+  border-color: var(--copilot-blue-primary);
+  background: var(--copilot-blue-10);
+  transform: translateY(-1px);
+  box-shadow: var(--copilot-shadow-sm);
+}
+
+.suggestionIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   Intent Badge
+   ========================================= */
+.intentBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 8px;
+  background: var(--copilot-blue-10);
+  color: var(--copilot-blue-primary);
+  border: 1px solid var(--copilot-blue-20);
+}
+
+.intentIcon {
+  width: 12px;
+  height: 12px;
+}
+
+/* =========================================
+   Fade-in Animation
+   ========================================= */
+.messageEnter {
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   Responsive Design
+   ========================================= */
+@media (max-width: 1024px) {
+  .copilotSidebar {
+    width: 360px;
+  }
+}
+
+@media (max-width: 768px) {
+  .copilotSidebar {
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .messageUser,
+  .messageAssistant {
+    max-width: 90%;
+  }
+}
