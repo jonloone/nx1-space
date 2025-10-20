@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Large binary tile files (store in cloud storage instead)
+valhalla_tiles/
+public/tiles/*.pmtiles
+*.gph
