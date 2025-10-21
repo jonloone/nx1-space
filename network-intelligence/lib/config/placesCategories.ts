@@ -76,6 +76,24 @@ export const PLACE_CATEGORIES: Record<string, CategoryConfig> = {
     priority: 60,
     enabled: true
   },
+  gas_station: {
+    id: 'gas_station',
+    name: 'Gas Stations',
+    icon: '⛽',
+    color: '#F59E0B',
+    minZoom: 12,
+    priority: 65,
+    enabled: true
+  },
+  fuel: {
+    id: 'fuel',
+    name: 'Fuel Stations',
+    icon: '⛽',
+    color: '#F59E0B',
+    minZoom: 12,
+    priority: 65,
+    enabled: true
+  },
 
   // Healthcare
   hospital: {
@@ -445,7 +463,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     name: 'Transportation',
     icon: '🚗',
     color: '#0EA5E9',
-    categories: ['airport', 'seaport', 'train_station', 'bus_station', 'ferry_terminal'],
+    categories: ['airport', 'seaport', 'train_station', 'bus_station', 'ferry_terminal', 'gas_station', 'fuel'],
     collapsible: true,
     defaultExpanded: true
   },

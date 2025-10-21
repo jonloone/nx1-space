@@ -66,7 +66,7 @@ export class MapActionHandler {
         return {
           success: false,
           action: 'search',
-          message: `I couldn't find the location "${locationName}". Could you be more specific or try a different location?`,
+          message: `Location "${locationName}" not found. Try a different city or address.`,
           error: 'LOCATION_NOT_FOUND'
         }
       }
@@ -106,12 +106,12 @@ export class MapActionHandler {
 
       // 7. Build response message
       const categoryStr = categories.length > 0
-        ? categories.join(', ')
+        ? categories.join(', ').replace(/_/g, ' ')
         : 'places'
 
       const message = places.length > 0
-        ? `Found ${places.length} ${categoryStr} near ${location.name}. The map has zoomed to the area and marked all locations.`
-        : `I couldn't find any ${categoryStr} near ${location.name}. Try expanding the search radius or searching for different categories.`
+        ? `Found ${places.length} ${categoryStr} near ${location.name}.`
+        : `No ${categoryStr} found near ${location.name}. Try a different area or search term.`
 
       return {
         success: places.length > 0,
@@ -133,7 +133,7 @@ export class MapActionHandler {
       return {
         success: false,
         action: 'search',
-        message: 'I encountered an error while searching. Please try again.',
+        message: 'Search error. Please try again.',
         error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
       }
     }
@@ -162,7 +162,7 @@ export class MapActionHandler {
         return {
           success: false,
           action: 'flyTo',
-          message: `I couldn't find "${locationName}". Could you provide more details or try a different location?`,
+          message: `Location "${locationName}" not found. Try a different city or address.`,
           error: 'LOCATION_NOT_FOUND'
         }
       }
@@ -186,14 +186,14 @@ export class MapActionHandler {
             zoom: targetZoom
           }
         },
-        message: `Zooming to ${location.name}...`
+        message: `Viewing ${location.name}`
       }
     } catch (error) {
       console.error('Error in handleFlyTo:', error)
       return {
         success: false,
         action: 'flyTo',
-        message: 'I encountered an error while navigating. Please try again.',
+        message: 'Navigation error. Please try again.',
         error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
       }
     }
@@ -227,12 +227,12 @@ export class MapActionHandler {
 
       // 4. Build response message
       const categoryStr = categories && categories.length > 0
-        ? categories.join(', ')
+        ? categories.join(', ').replace(/_/g, ' ')
         : 'places'
 
       const message = places.length > 0
-        ? `Found ${places.length} ${categoryStr} in this area.`
-        : `I couldn't find any ${categoryStr} in this area. Try zooming out or searching for different categories.`
+        ? `Found ${places.length} ${categoryStr} in view.`
+        : `No ${categoryStr} found. Try zooming out or different search terms.`
 
       return {
         success: places.length > 0,
@@ -252,7 +252,7 @@ export class MapActionHandler {
       return {
         success: false,
         action: 'showNearby',
-        message: 'I encountered an error while searching. Please try again.',
+        message: 'Search error. Please try again.',
         error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
       }
     }
@@ -278,7 +278,7 @@ export class MapActionHandler {
         return {
           success: false,
           action: 'flyTo',
-          message: "I couldn't determine where you want to go. Could you specify a location?",
+          message: "Please specify a location.",
           error: 'MISSING_LOCATION'
         }
       } else if (parsed.nearby || query.toLowerCase().includes('around here')) {
@@ -303,7 +303,7 @@ export class MapActionHandler {
       return {
         success: false,
         action: 'unknown',
-        message: "I couldn't understand your request. Try asking something like 'Show me coffee shops near Central Park' or 'Zoom to Los Angeles'.",
+        message: "Try: 'coffee shops near Central Park' or 'zoom to Los Angeles'",
         error: 'UNPARSEABLE_QUERY'
       }
     } catch (error) {
@@ -311,7 +311,7 @@ export class MapActionHandler {
       return {
         success: false,
         action: 'error',
-        message: 'I encountered an error processing your request. Please try rephrasing.',
+        message: 'Error processing request. Please try again.',
         error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
       }
     }
@@ -330,7 +330,7 @@ export class MapActionHandler {
         return {
           success: false,
           action: 'analyze',
-          message: `I couldn't find "${locationName}". Could you provide more details?`,
+          message: `Location "${locationName}" not found.`,
           error: 'LOCATION_NOT_FOUND'
         }
       }
@@ -393,7 +393,7 @@ ${topCategories}
       return {
         success: false,
         action: 'analyze',
-        message: 'I encountered an error while analyzing. Please try again.',
+        message: 'Analysis error. Please try again.',
         error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
       }
     }

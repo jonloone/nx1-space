@@ -403,14 +403,14 @@ export default function FleetDemo() {
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="absolute top-0 right-0 bottom-0 w-[400px] z-[100]"
           >
-            <div className="relative h-full">
+            <div className="relative h-full bg-background">
               <Button
                 onClick={() => setIsAIChatOpen(false)}
-                className="absolute top-4 right-4 z-10 rounded-full bg-white/10 hover:bg-white/20"
+                className="absolute top-4 right-4 z-10 rounded-full bg-muted hover:bg-muted/80"
                 size="icon"
                 variant="ghost"
               >
-                <X className="w-4 h-4 text-white" />
+                <X className="w-4 h-4 text-foreground" />
               </Button>
               <AIChatPanel
                 onQuery={handleAIQuery}

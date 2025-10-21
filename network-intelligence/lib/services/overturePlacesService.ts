@@ -247,14 +247,13 @@ export class OverturePlacesService {
       source: 'overture-places',
       'source-layer': 'places',
       filter: [
-        '!in',
-        ['get', 'category'],
-        ['literal', [
+        '!',
+        ['in', ['get', 'category'], ['literal', [
           'airport', 'hospital', 'clinic', 'emergency_room',
           'university', 'college', 'school',
           'museum', 'library', 'theater', 'stadium', 'arena',
           'seaport', 'bus_station', 'train_station', 'ferry_terminal'
-        ]]
+        ]]]
       ],
       minzoom: 9,
       paint: {
@@ -589,15 +588,14 @@ export class OverturePlacesService {
             ]
             this.map!.setFilter(layerId, newFilter)
           }
-        } else if (existingFilter && existingFilter[0] === '!in') {
+        } else if (existingFilter && existingFilter[0] === '!' && existingFilter[1] && existingFilter[1][0] === 'in') {
           // General layer - exclude disabled categories
           const allCategories = Object.keys(PLACE_CATEGORIES)
           const disabledCategories = allCategories.filter(cat => !enabledArray.includes(cat))
 
           const newFilter: any = [
-            '!in',
-            ['get', 'category'],
-            ['literal', disabledCategories]
+            '!',
+            ['in', ['get', 'category'], ['literal', disabledCategories]]
           ]
           this.map!.setFilter(layerId, newFilter)
         }
@@ -626,10 +624,18 @@ export class OverturePlacesService {
     try {
       const { center, radius, categories, limit = 100 } = params
 
+      console.log(`🔍 searchNear: center=${center}, radius=${radius}m, categories=${categories?.join(',') || 'all'}, zoom=${this.map.getZoom()}`)
+
       // Query all features from the source
       const features = this.map.querySourceFeatures('overture-places', {
         sourceLayer: 'places'
       })
+
+      console.log(`📊 querySourceFeatures returned ${features.length} total features`)
+
+      // Log categories found
+      const categoriesFound = new Set(features.map(f => f.properties?.category).filter(Boolean))
+      console.log(`📂 Categories in loaded tiles: ${Array.from(categoriesFound).join(', ')}`)
 
       // Filter by distance and categories
       const results: GERSPlace[] = []
@@ -664,7 +670,7 @@ export class OverturePlacesService {
       // Sort by distance
       results.sort((a, b) => (a.distance || 0) - (b.distance || 0))
 
-      console.log(`🔍 searchNear found ${results.length} places within ${radius}m`)
+      console.log(`✅ searchNear found ${results.length} places within ${radius}m matching criteria`)
       return results.slice(0, limit)
     } catch (error) {
       console.error('❌ Error in searchNear:', error)

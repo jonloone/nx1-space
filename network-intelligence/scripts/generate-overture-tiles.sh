@@ -51,12 +51,18 @@ COPY (
   FROM read_parquet('s3://overturemaps-us-west-2/release/2025-09-24.0/theme=places/type=place/*',
     hive_partitioning=true)
   WHERE categories.primary IN (
-    'airport', 'seaport', 'hospital', 'university', 'museum',
-    'stadium', 'park', 'hotel', 'shopping_mall', 'fire_station',
-    'police_station', 'library', 'theater', 'zoo', 'aquarium'
+    'airport', 'seaport', 'hospital', 'clinic', 'emergency_room', 'pharmacy', 'dentist',
+    'university', 'college', 'school', 'library',
+    'museum', 'theater', 'stadium', 'arena', 'park', 'national_park', 'nature_reserve',
+    'zoo', 'aquarium', 'botanical_garden', 'art_gallery',
+    'restaurant', 'cafe', 'bar', 'fast_food',
+    'hotel', 'motel', 'resort', 'hostel', 'campground',
+    'shopping_mall', 'supermarket', 'market',
+    'bank', 'post_office', 'police_station', 'fire_station', 'government',
+    'gas_station', 'fuel', 'train_station', 'bus_station', 'ferry_terminal', 'marina'
   )
   AND confidence >= 0.75
-  LIMIT 50000
+  LIMIT 100000
 ) TO 'places.csv' (HEADER true, DELIMITER ',');
 EOF
 

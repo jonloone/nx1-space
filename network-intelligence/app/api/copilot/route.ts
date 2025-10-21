@@ -29,12 +29,17 @@ You have 4 powerful tools to control the map:
 3. showNearby(categories, radius) - Show places in the current viewport
 4. analyzeArea(location, radius) - Analyze facilities and infrastructure around a location
 
+CRITICAL RESPONSE RULES:
+- DO NOT explain your reasoning or thought process
+- DO NOT say things like "I need to figure out..." or "Let me think..."
+- Output ONLY the final tool call or direct answer
+- Be concise and actionable
+
 RESPONSE STYLE:
-- Be conversational and helpful
+- Brief and professional
 - Confirm what action was taken
 - Report quantitative results (e.g., "Found 12 coffee shops")
-- Suggest follow-up actions
-- Use markdown for formatting
+- Maximum 2 sentences unless providing detailed analysis
 
 CATEGORIES YOU CAN SEARCH:
 - Coffee/Cafes: coffee_shop, cafe
@@ -46,10 +51,10 @@ CATEGORIES YOU CAN SEARCH:
 - Schools: school, university, college
 - Gas Stations: gas_station, fuel
 
-IMPORTANT: When a user asks you to perform a map action, you MUST call the appropriate tool by responding with:
+IMPORTANT: When a user asks you to perform a map action, you MUST respond with ONLY:
 TOOL_CALL: searchPlaces(location="Central Park", categories=["coffee_shop", "cafe"], radius=5000)
 
-Always include the TOOL_CALL: prefix followed by the function call syntax.
+Do not add any explanation before or after the TOOL_CALL.
 
 Example:
 User: "Show me coffee shops near Central Park"
@@ -94,9 +99,20 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await response.json()
-    let assistantMessage = data.choices[0]?.message?.content || 'No response generated'
+    let rawResponse = data.choices[0]?.message?.content || 'No response generated'
 
-    console.log('LLM Response:', assistantMessage.substring(0, 200))
+    // Extract thinking (for logging/routing) and final answer
+    const { thinking, answer } = extractThinkingAndAnswer(rawResponse)
+
+    // Log thinking for debugging/routing (could be used by CrewAI)
+    if (thinking) {
+      console.log('🧠 Model reasoning:', thinking.substring(0, 300) + '...')
+    }
+
+    // Use only the final answer for user display
+    let assistantMessage = answer
+
+    console.log('💬 Final answer:', assistantMessage.substring(0, 200))
 
     // Initialize result variable (will be set if tool is called)
     let result: any = null
@@ -192,6 +208,32 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+/**
+ * Extract thinking/reasoning from DeepSeek R1 response
+ * DeepSeek R1 outputs reasoning in <think> tags, followed by the final answer
+ *
+ * @param response - Raw LLM response
+ * @returns Object with thinking (reasoning) and answer (final output)
+ */
+function extractThinkingAndAnswer(response: string): {
+  thinking: string | null
+  answer: string
+} {
+  // Match <think>...</think> tags
+  const thinkMatch = response.match(/<think>([\s\S]*?)<\/think>/i)
+
+  if (thinkMatch) {
+    const thinking = thinkMatch[1].trim()
+    // Remove the entire <think>...</think> block from the response
+    const answer = response.replace(/<think>[\s\S]*?<\/think>/i, '').trim()
+
+    return { thinking, answer }
+  }
+
+  // No thinking tags found, return full response as answer
+  return { thinking: null, answer: response }
 }
 
 /**

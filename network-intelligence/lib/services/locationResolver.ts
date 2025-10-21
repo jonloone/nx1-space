@@ -136,13 +136,27 @@ const KNOWN_LOCATIONS = new Map<string, Omit<ResolvedLocation, 'source'>>([
     suggestedZoom: 14
   }],
 
-  // Other Major Cities
+  // Major Cities
+  ['chicago', {
+    name: 'Chicago',
+    coordinates: [-87.6298, 41.8781],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 12
+  }],
   ['downtown chicago', {
     name: 'Downtown Chicago',
     coordinates: [-87.6298, 41.8781],
     type: 'neighborhood',
     confidence: 1.0,
     suggestedZoom: 14
+  }],
+  ['houston', {
+    name: 'Houston',
+    coordinates: [-95.3698, 29.7604],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 12
   }],
   ['downtown houston', {
     name: 'Downtown Houston',
