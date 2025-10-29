@@ -156,6 +156,10 @@ export function useG6Graph(options: UseG6GraphOptions) {
       }
     })
 
+    // Load initial data into the graph
+    graph.data(data)
+    graph.render()
+
     graphRef.current = graph
     setIsReady(true)
 
@@ -166,19 +170,14 @@ export function useG6Graph(options: UseG6GraphOptions) {
         graphRef.current = null
       }
     }
-  }, [width, height]) // Only recreate on size changes
+  }, [width, height, data]) // Recreate when size or data changes
 
-  // Update data when it changes
+  // Fit view when requested
   useEffect(() => {
-    if (!graphRef.current || !isReady) return
+    if (!graphRef.current || !isReady || !fitView) return
 
-    // G6 v5 uses read() instead of changeData()
-    graphRef.current.read(data)
-
-    if (fitView) {
-      graphRef.current.fitView(40)
-    }
-  }, [data, isReady, fitView])
+    graphRef.current.fitView(40)
+  }, [isReady, fitView])
 
   // Update layout when it changes
   useEffect(() => {
