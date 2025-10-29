@@ -51,11 +51,12 @@ export function useG6Graph(options: UseG6GraphOptions) {
       graphRef.current.destroy()
     }
 
-    // Create new graph instance
+    // Create new graph instance with initial data
     const graph = new Graph({
       container: containerRef.current,
       width,
       height,
+      data,  // Pass data directly in constructor
       fitView,
       fitViewPadding: [40, 40, 40, 40],
       animate,
@@ -156,10 +157,6 @@ export function useG6Graph(options: UseG6GraphOptions) {
       }
     })
 
-    // Load initial data into the graph
-    graph.data(data)
-    graph.render()
-
     graphRef.current = graph
     setIsReady(true)
 
@@ -168,23 +165,10 @@ export function useG6Graph(options: UseG6GraphOptions) {
       if (graphRef.current) {
         graphRef.current.destroy()
         graphRef.current = null
+        setIsReady(false)
       }
     }
-  }, [width, height, data]) // Recreate when size or data changes
-
-  // Fit view when requested
-  useEffect(() => {
-    if (!graphRef.current || !isReady || !fitView) return
-
-    graphRef.current.fitView(40)
-  }, [isReady, fitView])
-
-  // Update layout when it changes
-  useEffect(() => {
-    if (!graphRef.current || !isReady) return
-
-    graphRef.current.updateLayout(layout)
-  }, [layout, isReady])
+  }, [width, height, data, layout]) // Recreate when any of these change
 
   // Public API
   const api = {
@@ -220,12 +204,11 @@ export function useG6Graph(options: UseG6GraphOptions) {
       graphRef.current?.zoomTo(1, { x: width / 2, y: height / 2 })
     },
 
-    // Data manipulation
+    // Data manipulation (Note: in this implementation, graph recreates when data changes via deps)
     updateData: (newData: GraphData) => {
-      graphRef.current?.changeData(newData)
-      if (fitView) {
-        graphRef.current?.fitView(40)
-      }
+      // Graph will automatically recreate when data prop changes
+      // This method is kept for API compatibility but isn't needed
+      console.warn('updateData called but graph recreates automatically on data change')
     },
 
     addNode: (node: any) => {
