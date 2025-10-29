@@ -77,10 +77,10 @@ function getPMTilesInstance(source: string): PMTiles | null {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { source: string; z: string; x: string; y: string } }
+  { params }: { params: Promise<{ source: string; z: string; x: string; y: string }> }
 ) {
   try {
-    const { source, z, x, y } = params
+    const { source, z, x, y } = await params
 
     // Remove file extension from y parameter (e.g., "24.pbf" -> "24")
     const yCoord = y.split('.')[0]
