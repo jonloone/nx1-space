@@ -30,6 +30,7 @@ import { G6TimelineGraph } from '@/components/g6/G6TimelineGraph'
 export interface TimelineCardProps {
   events: TimelineEvent[]
   subjectName?: string
+  subjectId?: string // Add subjectId for network loading
   onAction?: (action: string, data: any) => void
   onClose?: () => void
   className?: string
@@ -81,6 +82,7 @@ function formatEventDate(date: Date) {
 export function TimelineCard({
   events,
   subjectName,
+  subjectId,
   onAction,
   onClose,
   className
@@ -349,7 +351,10 @@ export function TimelineCard({
           <Button
             variant="outline"
             className="h-8 text-xs border-gray-200 hover:bg-white"
-            onClick={() => onAction?.('show-network', { events: filteredEvents })}
+            onClick={() => onAction?.('show-network', {
+              subjectId: subjectId || events[0]?.associatedSubjects?.[0],
+              subjectName
+            })}
           >
             Show Network
           </Button>

@@ -230,7 +230,9 @@ export default function MissionControlLayout({
                 title: `${subjectName} - Movement Timeline`,
                 period,
                 events: timeline,
-                summary: `${timeline.length} events over ${Math.ceil((period.end.getTime() - period.start.getTime()) / (1000 * 60 * 60 * 24))} days`
+                summary: `${timeline.length} events over ${Math.ceil((period.end.getTime() - period.start.getTime()) / (1000 * 60 * 60 * 24))} days`,
+                subjectId, // Include subjectId for network loading
+                subjectName
               }
             })
           }
@@ -504,6 +506,7 @@ export default function MissionControlLayout({
                     <TimelineCard
                       events={artifact.data.events}
                       subjectName={artifact.data.subjectName}
+                      subjectId={artifact.data.subjectId}
                       onAction={handleInvestigationAction}
                       onClose={() => removeArtifact(artifact.id)}
                     />

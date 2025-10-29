@@ -199,11 +199,20 @@ export function clusterEventsByTime(events: TimelineEvent[]): Record<string, Tim
  * Transform timeline events to G6 GraphData
  */
 export function transformTimelineToG6(events: TimelineEvent[]): GraphData {
+  console.log('🟣 transformTimelineToG6 called with', events.length, 'events')
+
+  if (!events || events.length === 0) {
+    console.warn('⚠️ No events to transform!')
+    return { nodes: [], edges: [] }
+  }
+
   // Transform nodes
   const nodes = events.map((event, index) => transformTimelineEvent(event, index))
+  console.log('🟣 Transformed', nodes.length, 'timeline nodes')
 
   // Detect causal relationships
   const edges = detectCausalRelationships(events)
+  console.log('🟣 Detected', edges.length, 'causal relationships')
 
   return {
     nodes,
