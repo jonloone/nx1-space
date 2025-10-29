@@ -115,16 +115,16 @@ export function G6NetworkGraph({
   }
 
   return (
-    <div className={className}>
+    <div className={`relative ${className || ''}`}>
       {/* Graph Container */}
       <div
         ref={graph.containerRef}
-        className="relative bg-gray-50/30 rounded-lg border border-gray-200 overflow-hidden"
+        className="bg-gray-50/30 rounded-lg border border-gray-200 overflow-hidden"
         style={{ width, height }}
       />
 
       {/* Controls Overlay */}
-      <div className="absolute top-2 right-2 flex items-center gap-2">
+      <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
         {/* Layout Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

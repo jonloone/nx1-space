@@ -46,7 +46,10 @@ export function G6TimelineGraph({
 
   // Transform data to G6 format
   const baseGraphData = useMemo(() => {
-    return transformTimelineToG6(events)
+    console.log('🟣 G6TimelineGraph: Transforming', events.length, 'events')
+    const data = transformTimelineToG6(events)
+    console.log('🟣 G6TimelineGraph: Got graph data with', data.nodes?.length, 'nodes and', data.edges?.length, 'edges')
+    return data
   }, [events])
 
   // Apply filters
@@ -165,16 +168,16 @@ export function G6TimelineGraph({
   const hasFilters = selectedSignificance.length > 0 || selectedTypes.length > 0
 
   return (
-    <div className={className}>
+    <div className={`relative ${className || ''}`}>
       {/* Graph Container */}
       <div
         ref={graph.containerRef}
-        className="relative bg-gray-50/30 rounded-lg border border-gray-200 overflow-hidden"
+        className="bg-gray-50/30 rounded-lg border border-gray-200 overflow-hidden"
         style={{ width, height }}
       />
 
       {/* Controls Overlay */}
-      <div className="absolute top-2 right-2 flex items-center gap-2">
+      <div className="absolute top-2 right-2 flex items-center gap-2 z-10">
         {/* Filter Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
