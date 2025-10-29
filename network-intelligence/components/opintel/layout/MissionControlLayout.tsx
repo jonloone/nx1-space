@@ -32,6 +32,7 @@ import { IntelligenceAlertArtifact } from '@/components/ai/artifacts/Intelligenc
 import { SubjectProfileCard } from '@/components/investigation/SubjectProfileCard'
 import { TimelineCard } from '@/components/investigation/TimelineCard'
 import { NetworkAnalysisCard } from '@/components/investigation/NetworkAnalysisCard'
+import ArtifactRenderer from '@/components/ai/artifacts/ArtifactRenderer'
 import { AIChatPanelRef } from '@/components/ai/AIChatPanel'
 import { getCitizens360DataService } from '@/lib/services/citizens360DataService'
 import BottomSheet from '@/components/panels/BottomSheet'
@@ -247,13 +248,19 @@ export default function MissionControlLayout({
         const subjectId = data.subjectId || data.profile?.subjectId || 'SUBJECT-2547'
         const caseNumber = 'CT-2024-8473'
 
+        console.log('📡 Loading network for subject:', subjectId)
+
         try {
           // Ensure both subject and timeline are loaded
           const subject = await citizens360Service.getSubjectById(caseNumber, subjectId)
+          console.log('📡 Subject loaded:', subject?.name?.full)
+
           await citizens360Service.loadTimeline(caseNumber, subjectId)
+          console.log('📡 Timeline loaded')
 
           // Now get the network (which uses cached data)
           const network = citizens360Service.getSubjectNetwork(subjectId)
+          console.log('📡 Network data:', network ? `${network.nodes.length} nodes, ${network.connections.length} connections` : 'NULL')
 
           if (network) {
             // Transform network data to NetworkGraphData format
@@ -289,13 +296,19 @@ export default function MissionControlLayout({
               }))
             }
 
+            console.log('📡 Pushing network-graph artifact with data:', networkGraphData)
+
             pushArtifact({
               type: 'network-graph',
               data: networkGraphData
             })
+
+            console.log('📡 Network-graph artifact pushed successfully')
+          } else {
+            console.warn('📡 No network data returned from service')
           }
         } catch (error) {
-          console.error('Failed to load network:', error)
+          console.error('📡 Failed to load network:', error)
         }
         break
       }
@@ -519,6 +532,9 @@ export default function MissionControlLayout({
                       onAction={handleInvestigationAction}
                       onClose={() => removeArtifact(artifact.id)}
                     />
+                  )}
+                  {artifact.type === 'network-graph' && (
+                    <ArtifactRenderer artifact={artifact} />
                   )}
                 </motion.div>
               ))}
