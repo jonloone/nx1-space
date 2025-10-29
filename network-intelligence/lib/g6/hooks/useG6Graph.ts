@@ -45,10 +45,17 @@ export function useG6Graph(options: UseG6GraphOptions) {
   // Initialize G6 graph
   useEffect(() => {
     console.log('🔴 useG6Graph effect running with data:', { nodes: data.nodes?.length, edges: data.edges?.length, width, height })
+    console.log('🔴 Container ref:', containerRef.current)
+    console.log('🔴 Container ref dimensions:', containerRef.current?.offsetWidth, 'x', containerRef.current?.offsetHeight)
+    console.log('🔴 Container ref parent:', containerRef.current?.parentElement)
 
     if (!containerRef.current) {
-      console.log('🔴 Container ref not ready yet')
+      console.error('🔴 Container ref not ready yet!')
       return
+    }
+
+    if (containerRef.current.offsetWidth === 0 || containerRef.current.offsetHeight === 0) {
+      console.error('🔴 Container has zero dimensions! Width:', containerRef.current.offsetWidth, 'Height:', containerRef.current.offsetHeight)
     }
 
     // Clean up existing graph
@@ -167,6 +174,16 @@ export function useG6Graph(options: UseG6GraphOptions) {
     graphRef.current = graph
     setIsReady(true)
     console.log('🔴 G6 graph created successfully and ready')
+
+    // Debug: Check if canvas was created
+    const canvas = containerRef.current?.querySelector('canvas')
+    console.log('🔴 Canvas element created:', !!canvas, 'Container:', containerRef.current)
+    if (canvas) {
+      console.log('🔴 Canvas dimensions:', canvas.width, 'x', canvas.height)
+      console.log('🔴 Canvas style:', canvas.style.cssText)
+    } else {
+      console.error('🔴 NO CANVAS ELEMENT FOUND!')
+    }
 
     // Cleanup
     return () => {
