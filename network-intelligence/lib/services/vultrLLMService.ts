@@ -44,7 +44,7 @@ export class VultrLLMService {
 
   constructor(config: VultrLLMConfig) {
     this.apiKey = config.apiKey
-    this.baseURL = config.baseURL || 'https://api.vultrinfer.com/v1'
+    this.baseURL = config.baseURL || 'https://api.vultrinference.com/v1' // Fixed: was 'vultrinfer', correct is 'vultrinference'
     this.model = config.model || 'qwen2.5-32b-instruct' // Updated Vultr model (2025)
   }
 

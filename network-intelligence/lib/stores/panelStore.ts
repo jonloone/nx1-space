@@ -18,6 +18,9 @@ export interface PanelContent {
   subtitle?: string
 }
 
+// Right panel modes for alert visualization
+export type RightPanelMode = 'alert' | 'cluster' | null
+
 export const DETENT_CONFIG = {
   collapsed: 0.20,  // 20% viewport height
   medium: 0.50,     // 50% viewport height
@@ -26,12 +29,14 @@ export const DETENT_CONFIG = {
 }
 
 interface PanelState {
+  // Bottom panel state
   isOpen: boolean
   detent: PanelDetent
   content: PanelContent | null
   isDragging: boolean
   currentHeight: number
 
+  // Bottom panel actions
   openPanel: (content: PanelContent, detent?: PanelDetent) => void
   closePanel: () => void
   setDetent: (detent: PanelDetent) => void
@@ -39,17 +44,29 @@ interface PanelState {
   setCurrentHeight: (height: number) => void
   updateContent: (content: PanelContent) => void
   getDetentHeight: (detent: PanelDetent) => number
+
+  // Right panel state
+  rightPanelMode: RightPanelMode
+  rightPanelData: any
+
+  // Right panel actions
+  setRightPanelMode: (mode: RightPanelMode) => void
+  setRightPanelData: (data: any) => void
+  openRightPanel: (mode: RightPanelMode, data?: any) => void
+  closeRightPanel: () => void
 }
 
 export const usePanelStore = create<PanelState>()(
   devtools(
     (set, get) => ({
+      // Bottom panel state
       isOpen: false,
       detent: 'hidden',
       content: null,
       isDragging: false,
       currentHeight: 0,
 
+      // Bottom panel actions
       openPanel: (content, detent = 'collapsed') => {
         set({
           isOpen: true,
@@ -83,6 +100,27 @@ export const usePanelStore = create<PanelState>()(
         if (typeof window === 'undefined') return 0
         const vh = window.innerHeight
         return vh * DETENT_CONFIG[detent]
+      },
+
+      // Right panel state
+      rightPanelMode: null,
+      rightPanelData: null,
+
+      // Right panel actions
+      setRightPanelMode: (mode) => {
+        set({ rightPanelMode: mode })
+      },
+
+      setRightPanelData: (data) => {
+        set({ rightPanelData: data })
+      },
+
+      openRightPanel: (mode, data) => {
+        set({ rightPanelMode: mode, rightPanelData: data || null })
+      },
+
+      closeRightPanel: () => {
+        set({ rightPanelMode: null, rightPanelData: null })
       }
     }),
     { name: 'PanelStore' }

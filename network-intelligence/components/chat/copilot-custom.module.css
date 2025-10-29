@@ -4,13 +4,12 @@
    Chat Sidebar Container
    ========================================= */
 .copilotSidebar {
-  background: var(--copilot-glass-bg);
-  backdrop-filter: blur(var(--copilot-glass-blur));
-  border-right: 1px solid var(--copilot-border);
-  padding: var(--copilot-spacing-lg) var(--copilot-spacing-md);
-  box-shadow: var(--copilot-shadow-md);
-  height: 100vh;
-  width: 420px;
+  background: transparent;
+  border-right: none;
+  padding: 0;
+  box-shadow: none;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }

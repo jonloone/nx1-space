@@ -137,6 +137,30 @@ const KNOWN_LOCATIONS = new Map<string, Omit<ResolvedLocation, 'source'>>([
   }],
 
   // Major Cities
+  ['new york city', {
+    name: 'New York City',
+    coordinates: [-73.9712, 40.7831], // Manhattan center
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 11,
+    bbox: [-74.0479, 40.6829, -73.9067, 40.8820]
+  }],
+  ['new york', {
+    name: 'New York City',
+    coordinates: [-73.9712, 40.7831],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 11,
+    bbox: [-74.0479, 40.6829, -73.9067, 40.8820]
+  }],
+  ['nyc', {
+    name: 'New York City',
+    coordinates: [-73.9712, 40.7831],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 11,
+    bbox: [-74.0479, 40.6829, -73.9067, 40.8820]
+  }],
   ['chicago', {
     name: 'Chicago',
     coordinates: [-87.6298, 41.8781],
@@ -165,6 +189,27 @@ const KNOWN_LOCATIONS = new Map<string, Omit<ResolvedLocation, 'source'>>([
     confidence: 1.0,
     suggestedZoom: 14
   }],
+  ['los angeles', {
+    name: 'Los Angeles',
+    coordinates: [-118.2437, 34.0522],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 11
+  }],
+  ['la', {
+    name: 'Los Angeles',
+    coordinates: [-118.2437, 34.0522],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 11
+  }],
+  ['miami', {
+    name: 'Miami',
+    coordinates: [-80.1918, 25.7617],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 12
+  }],
   ['downtown miami', {
     name: 'Downtown Miami',
     coordinates: [-80.1918, 25.7617],
@@ -172,12 +217,26 @@ const KNOWN_LOCATIONS = new Map<string, Omit<ResolvedLocation, 'source'>>([
     confidence: 1.0,
     suggestedZoom: 14
   }],
+  ['seattle', {
+    name: 'Seattle',
+    coordinates: [-122.3321, 47.6062],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 12
+  }],
   ['downtown seattle', {
     name: 'Downtown Seattle',
     coordinates: [-122.3321, 47.6062],
     type: 'neighborhood',
     confidence: 1.0,
     suggestedZoom: 14
+  }],
+  ['san francisco', {
+    name: 'San Francisco',
+    coordinates: [-122.4194, 37.7749],
+    type: 'city',
+    confidence: 1.0,
+    suggestedZoom: 12
   }],
   ['downtown san francisco', {
     name: 'Downtown San Francisco',

@@ -1,24 +1,40 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { ArrowUp, Loader2, Bot, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { ChatArtifact } from '@/lib/types/chatArtifacts'
-import ArtifactRenderer from './artifacts/ArtifactRenderer'
 
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
-  artifact?: ChatArtifact // NEW: Support for rich artifacts
+  artifact?: ChatArtifact // Support for rich artifacts
+  mapAction?: MapAction // Support for map interactions
   metadata?: {
     entitiesFiltered?: number
     analysisType?: string
     error?: string
   }
+}
+
+export interface MapAction {
+  type: 'flyTo' | 'addMarkers' | 'addLayer' | 'clearMarkers'
+  coordinates?: [number, number]
+  zoom?: number
+  pitch?: number
+  bearing?: number
+  markers?: Array<{
+    id: string
+    coordinates: [number, number]
+    properties?: Record<string, any>
+  }>
+  markerStyle?: string
+  layerId?: string
+  layerData?: any
 }
 
 interface AIChatPanelProps {
@@ -27,24 +43,38 @@ interface AIChatPanelProps {
   placeholder?: string
 }
 
+// Exposed ref API for programmatic control
+export interface AIChatPanelRef {
+  injectMessage: (message: ChatMessage) => void
+  collapse: () => void
+  expand: () => void
+}
+
 const exampleQueries = [
-  "Show all active vehicles",
-  "Find vehicles on Market Street",
-  "Create 5km buffer around alerts",
-  "Show vehicles within 10km of downtown",
-  "Highlight all delayed deliveries",
-  "What's the average vehicle speed?"
+  "Show me active alerts for Marcus Rahman",
+  "What are the critical alerts in the past 24 hours?",
+  "Analyze patterns for subject ID 1138",
+  "Show me all behavioral anomalies in Manhattan",
+  "Review timeline for Operation Nightfall",
+  "Find related alerts near LaGuardia Airport"
 ]
 
-export default function AIChatPanel({
+const AIChatPanel = forwardRef<AIChatPanelRef, AIChatPanelProps>(function AIChatPanel({
   onQuery,
   isLoading = false,
-  placeholder = "Ask about your fleet..."
-}: AIChatPanelProps) {
+  placeholder = "Ask about investigations, search locations, or analyze patterns..."
+}, ref) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [processing, setProcessing] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Expose injectMessage method via ref
+  useImperativeHandle(ref, () => ({
+    injectMessage: (message: ChatMessage) => {
+      setMessages((prev) => [...prev, message])
+    }
+  }), [])
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -115,13 +145,6 @@ export default function AIChatPanel({
               >
                 <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
 
-                {/* Render artifact if present */}
-                {message.artifact && (
-                  <div className="mt-3">
-                    <ArtifactRenderer artifact={message.artifact} />
-                  </div>
-                )}
-
                 {message.metadata?.entitiesFiltered !== undefined && (
                   <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
                     {message.metadata.entitiesFiltered} entities found
@@ -151,26 +174,8 @@ export default function AIChatPanel({
         </div>
       </ScrollArea>
 
-      {/* Example Queries */}
-      {messages.length === 0 && (
-        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50/50">
-          <p className="text-xs text-gray-600 mb-2 font-medium">Try these examples:</p>
-          <div className="flex flex-wrap gap-2">
-            {exampleQueries.slice(0, 3).map((query, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleExampleClick(query)}
-                className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-mundi-50 text-gray-700 border border-gray-200 hover:border-mundi-500 transition-all hover:shadow-sm"
-              >
-                {query}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 bg-white">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 bg-white shrink-0">
         <div className="flex gap-2 items-center">
           <Input
             value={input}
@@ -195,4 +200,6 @@ export default function AIChatPanel({
       </form>
     </div>
   )
-}
+})
+
+export default AIChatPanel

@@ -10,6 +10,7 @@ import IntelligenceAnalysisCard from './IntelligenceAnalysisCard'
 import HeatmapSummaryCard from './HeatmapSummaryCard'
 import NetworkGraphCard from './NetworkGraphCard'
 import LocationDetailsCard from './LocationDetailsCard'
+import { IntelligenceAlertArtifact } from './IntelligenceAlertArtifact'
 
 interface ArtifactRendererProps {
   artifact: ChatArtifact
@@ -44,6 +45,9 @@ export default function ArtifactRenderer({ artifact }: ArtifactRendererProps) {
 
     case 'location-details':
       return <LocationDetailsCard artifact={artifact} />
+
+    case 'intelligence-alert':
+      return <IntelligenceAlertArtifact alert={artifact.data} />
 
     default:
       // Unknown artifact type

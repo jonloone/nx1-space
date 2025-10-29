@@ -274,8 +274,10 @@ export const LAYER_PRESETS: Record<string, LayerPreset> = {
 export const DEFAULT_LAYERS = {
   basemap: 'basemap-light',
   layers: [
-    { id: 'infra-places', visible: false }, // Hidden by default - buildings get colored instead
-    { id: 'infra-buildings-2d', visible: true } // Show buildings - they'll be colored on demand
+    { id: 'infra-places', visible: true } // Show places by default
+    // Buildings disabled - requires large PMTiles file to be generated
+    // Run: npm run generate-buildings-tiles to create /tiles/buildings-usa.pmtiles
+    // { id: 'infra-buildings-2d', visible: true }
   ]
 }
 

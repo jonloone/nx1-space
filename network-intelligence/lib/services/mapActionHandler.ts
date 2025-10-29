@@ -16,6 +16,7 @@ import {
   getLocationResolverService,
   type ResolvedLocation
 } from './locationResolver'
+import { PLACE_CATEGORIES } from '../config/placesCategories'
 
 export interface MapAction {
   type: 'search' | 'flyTo' | 'showNearby' | 'filter' | 'analyze'
@@ -48,6 +49,25 @@ export class MapActionHandler {
   private overtureService = getOverturePlacesService()
 
   /**
+   * Calculate appropriate zoom level for given categories
+   * Returns the maximum minZoom required to display all categories
+   */
+  private getZoomForCategories(categories: string[]): number {
+    if (!categories || categories.length === 0) return 13 // Default city zoom
+
+    let maxMinZoom = 0
+    categories.forEach(cat => {
+      const category = PLACE_CATEGORIES[cat]
+      if (category && category.minZoom) {
+        maxMinZoom = Math.max(maxMinZoom, category.minZoom)
+      }
+    })
+
+    // Add 1 zoom level buffer to ensure visibility
+    return maxMinZoom > 0 ? maxMinZoom + 1 : 13
+  }
+
+  /**
    * Handle "Show me X near Y" queries
    * Example: "Show me coffee shops near Central Park"
    *
@@ -71,18 +91,24 @@ export class MapActionHandler {
         }
       }
 
-      // 2. Fly to location FIRST (this loads the tiles)
+      // 2. Calculate appropriate zoom for categories being searched
+      const categoryZoom = this.getZoomForCategories(categories)
+      const finalZoom = Math.max(location.suggestedZoom, categoryZoom)
+
+      console.log(`📍 Zoom calculation: location=${location.suggestedZoom}, categories=${categoryZoom}, final=${finalZoom}`)
+
+      // 3. Fly to location FIRST at appropriate zoom (this loads the tiles)
       const mapStore = useMapStore.getState()
       mapStore.flyTo(
         location.coordinates[0],
         location.coordinates[1],
-        location.suggestedZoom
+        finalZoom
       )
 
-      // 3. Wait for map to finish moving and tiles to load
+      // 4. Wait for map to finish moving and tiles to load
       await this.waitForMapMove()
 
-      // 4. NOW search in the loaded viewport using Overture Places
+      // 5. NOW search in the loaded viewport using Overture Places
       const places = await this.overtureService.searchNear({
         center: location.coordinates,
         radius,
@@ -90,10 +116,10 @@ export class MapActionHandler {
         limit: 100
       })
 
-      // 5. Update visible places in store
+      // 6. Update visible places in store
       mapStore.setVisiblePlaces(places)
 
-      // 6. Select first place if only one found
+      // 7. Select first place if only one found
       if (places.length === 1) {
         mapStore.selectFeature({
           id: places[0].gersId,
@@ -214,7 +240,17 @@ export class MapActionHandler {
       const viewport = mapStore.viewport
       const center: [number, number] = [viewport.longitude, viewport.latitude]
 
-      // 2. Search for places using Overture Places (comprehensive real data)
+      // 2. Check if current zoom is sufficient for categories
+      if (categories && categories.length > 0) {
+        const requiredZoom = this.getZoomForCategories(categories)
+        if (viewport.zoom < requiredZoom) {
+          console.log(`📍 Auto-zoom: current=${viewport.zoom}, required=${requiredZoom}`)
+          mapStore.flyTo(center[0], center[1], requiredZoom)
+          await this.waitForMapMove()
+        }
+      }
+
+      // 3. Search for places using Overture Places (comprehensive real data)
       const places = await this.overtureService.searchNear({
         center,
         radius,
@@ -222,10 +258,10 @@ export class MapActionHandler {
         limit: 100
       })
 
-      // 3. Update visible places
+      // 4. Update visible places
       mapStore.setVisiblePlaces(places)
 
-      // 4. Build response message
+      // 5. Build response message
       const categoryStr = categories && categories.length > 0
         ? categories.join(', ').replace(/_/g, ' ')
         : 'places'
@@ -394,6 +430,170 @@ ${topCategories}
         success: false,
         action: 'analyze',
         message: 'Analysis error. Please try again.',
+        error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
+      }
+    }
+  }
+
+  /**
+   * Handle "Show buildings" queries
+   * Toggle buildings layer (2D or 3D)
+   */
+  async handleShowBuildings(enable3D: boolean = false): Promise<ActionResult> {
+    try {
+      const { getOvertureLayersManager } = await import('./overtureLayersManager')
+      const layersManager = getOvertureLayersManager()
+
+      // Toggle appropriate buildings layer
+      const layerId = enable3D ? 'buildings-3d' : 'buildings-2d'
+      const otherLayerId = enable3D ? 'buildings-2d' : 'buildings-3d'
+
+      // Enable requested layer, disable the other
+      layersManager.setLayerVisibility(layerId, true)
+      layersManager.setLayerVisibility(otherLayerId, false)
+
+      const mode = enable3D ? '3D' : '2D'
+
+      return {
+        success: true,
+        action: 'toggleLayer',
+        data: {
+          layerId,
+          enabled: true,
+          mode
+        },
+        message: `Buildings layer enabled in ${mode} mode.`
+      }
+    } catch (error) {
+      console.error('Error in handleShowBuildings:', error)
+      return {
+        success: false,
+        action: 'toggleLayer',
+        message: 'Error toggling buildings layer. Please try again.',
+        error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
+      }
+    }
+  }
+
+  /**
+   * Handle generic layer toggle requests
+   * Example: "Show roads", "Hide boundaries"
+   */
+  async handleToggleLayer(layerName: string, visible: boolean): Promise<ActionResult> {
+    try {
+      const { getOvertureLayersManager } = await import('./overtureLayersManager')
+      const layersManager = getOvertureLayersManager()
+
+      // Map friendly names to layer IDs
+      const layerMap: Record<string, string> = {
+        'buildings': 'buildings-2d',
+        'roads': 'transportation',
+        'water': 'water',
+        'boundaries': 'boundaries'
+      }
+
+      const layerId = layerMap[layerName.toLowerCase()]
+
+      if (!layerId) {
+        return {
+          success: false,
+          action: 'toggleLayer',
+          message: `Layer "${layerName}" not found. Available layers: buildings, roads, water, boundaries.`,
+          error: 'LAYER_NOT_FOUND'
+        }
+      }
+
+      layersManager.setLayerVisibility(layerId, visible)
+
+      const action = visible ? 'enabled' : 'disabled'
+
+      return {
+        success: true,
+        action: 'toggleLayer',
+        data: {
+          layerId,
+          enabled: visible
+        },
+        message: `${layerName.charAt(0).toUpperCase() + layerName.slice(1)} layer ${action}.`
+      }
+    } catch (error) {
+      console.error('Error in handleToggleLayer:', error)
+      return {
+        success: false,
+        action: 'toggleLayer',
+        message: 'Error toggling layer. Please try again.',
+        error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
+      }
+    }
+  }
+
+  /**
+   * Handle "Show weather" queries
+   * Example: "Show precipitation", "Show temperature"
+   */
+  async handleShowWeather(weatherType: string): Promise<ActionResult> {
+    try {
+      const { getWeatherLayersService } = await import('./weatherLayersService')
+      const weatherService = getWeatherLayersService()
+
+      // Map friendly names to weather types
+      const typeMap: Record<string, string> = {
+        'precipitation': 'precipitation',
+        'rain': 'precipitation',
+        'radar': 'precipitation',
+        'temperature': 'temperature',
+        'temp': 'temperature',
+        'wind': 'wind',
+        'clouds': 'clouds',
+        'cloud': 'clouds',
+        'pressure': 'pressure'
+      }
+
+      const layerType = typeMap[weatherType.toLowerCase()]
+
+      if (!layerType) {
+        return {
+          success: false,
+          action: 'showWeather',
+          message: `Weather layer "${weatherType}" not found. Available: precipitation, temperature, wind, clouds, pressure.`,
+          error: 'WEATHER_LAYER_NOT_FOUND'
+        }
+      }
+
+      // Get map instance from store
+      const mapStore = useMapStore.getState()
+      const mapInstance = mapStore.map
+
+      if (!mapInstance) {
+        return {
+          success: false,
+          action: 'showWeather',
+          message: 'Map not initialized. Please try again.',
+          error: 'MAP_NOT_INITIALIZED'
+        }
+      }
+
+      const result = await weatherService.showWeatherLayer(
+        layerType as any,
+        mapInstance
+      )
+
+      return {
+        success: result.success,
+        action: 'showWeather',
+        data: {
+          weatherType: layerType,
+          enabled: result.success
+        },
+        message: result.message,
+        error: result.success ? undefined : 'WEATHER_LAYER_ERROR'
+      }
+    } catch (error) {
+      console.error('Error in handleShowWeather:', error)
+      return {
+        success: false,
+        action: 'showWeather',
+        message: 'Error loading weather layer. Please try again.',
         error: error instanceof Error ? error.message : 'UNKNOWN_ERROR'
       }
     }

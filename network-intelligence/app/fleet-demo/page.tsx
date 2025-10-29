@@ -13,6 +13,7 @@ import { generateRoadAwareFleet, updateRoadAwarePositions } from '@/lib/generato
 import type { SpatialEntity } from '@/lib/models/SpatialEntity'
 import AIChatPanel, { type ChatMessage } from '@/components/ai/AIChatPanel'
 import { parseFleetQuery, executeFleetQuery } from '@/lib/services/fleetQueryService'
+import { getOverturePlacesService } from '@/lib/services/overturePlacesService'
 import { MessageSquare, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -81,10 +82,15 @@ export default function FleetDemo() {
 
       map.current = mapInstance
 
-      mapInstance.on('load', () => {
+      mapInstance.on('load', async () => {
         console.log('✅ Map loaded successfully!')
         setMap(mapInstance)
         setLoaded(true)
+
+        // Initialize Overture Places Service for POI searches
+        const overtureService = getOverturePlacesService()
+        await overtureService.addToMap(mapInstance)
+        console.log('✅ Overture Places Service initialized')
       })
 
       mapInstance.on('error', (e) => {

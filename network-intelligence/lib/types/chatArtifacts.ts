@@ -16,6 +16,8 @@ export type ArtifactType =
   | 'heatmap-summary'
   | 'network-graph'
   | 'location-details'
+  | 'intelligence-alerts'
+  | 'intelligence-alert' // Single alert card (inline expandable)
 
 export interface ChatArtifact {
   type: ArtifactType
@@ -43,25 +45,154 @@ export interface SubjectProfileArtifact extends ChatArtifact {
 export interface SubjectProfileData {
   subjectId: string
   caseNumber: string
-  classification: 'person-of-interest' | 'suspect' | 'associate' | 'witness'
-  riskScore: number // 0-100
-  status: 'active' | 'inactive' | 'archived'
-  investigation: string
-  period: {
-    start: Date
-    end: Date
+  classification: string // 'Person of Interest', 'Suspect', 'Associate - High Risk', etc.
+  status: string // 'Under Surveillance', 'Monitoring', 'Active', etc.
+
+  // Biographical Information
+  name: {
+    full: string
+    aliases: string[]
   }
-  stats: {
-    totalLocations: number
-    anomalies: number
-    suspicious: number
-    routine: number
-    estimatedAssociates: number
+
+  demographics: {
+    dateOfBirth: string
+    age: number
+    nationality: string[]
+    languages: string[]
+    occupation: string
+    employer: string
   }
-  lastSeen?: {
-    location: string
-    coordinates: [number, number]
-    timestamp: Date
+
+  // Identity Documents & Contact
+  identifiers: {
+    ssn: string
+    passports: string[]
+    driversLicense: string
+    phoneNumbers: string[]
+    emailAddresses: string[]
+    socialMedia?: Record<string, string>
+  }
+
+  // Physical Description
+  physical: {
+    height: string
+    weight: string
+    build: string
+    eyeColor: string
+    hairColor: string
+    distinctiveFeatures: string[]
+  }
+
+  // Residential Information
+  addresses: {
+    current: {
+      address: string
+      city: string
+      state: string
+      zip: string
+      type: string
+      since: string
+      ownership: string
+    }
+    previous: Array<{
+      address: string
+      city: string
+      state: string
+      zip: string
+      type: string
+      duration: string
+    }>
+  }
+
+  // Employment History
+  employment?: {
+    current: {
+      employer: string
+      position: string
+      since: string
+      salary: string
+      location: string
+    }
+    previous: Array<{
+      employer: string
+      position: string
+      duration: string
+      location: string
+    }>
+  }
+
+  // Associates & Networks
+  associates: Array<{
+    id: string
+    name: string
+    relationship: string
+    riskLevel: 'low' | 'medium' | 'high'
+    notes: string
+  }>
+
+  // Financial Profile
+  financial?: {
+    bankAccounts: Array<{
+      institution: string
+      type: string
+      balance: string
+      activity: string
+    }>
+    creditCards: number
+    creditScore: number
+    unusualActivity: string[]
+  }
+
+  // Travel History
+  travel?: {
+    recentTrips: Array<{
+      destination: string
+      dates: string
+      purpose: string
+      flagged: boolean
+      notes?: string
+    }>
+    frequentDestinations: string[]
+  }
+
+  // Behavioral Patterns
+  behavior: {
+    routines: string[]
+    deviations: string[]
+    riskIndicators: string[]
+  }
+
+  // Intelligence Assessment
+  intelligence: {
+    threatLevel: string // 'LOW', 'MEDIUM', 'MEDIUM-HIGH', 'HIGH', 'CRITICAL'
+    confidence: string // 'LOW', 'MODERATE', 'HIGH', 'VERY HIGH'
+    assessmentDate: Date
+    keyFindings: string[]
+    recommendations: string[]
+  }
+
+  // Legal Authorization
+  legalAuth: {
+    warrant: string
+    issuedBy: string
+    issuedDate: Date
+    expirationDate: Date
+    scope: string
+    leadInvestigator: string
+  }
+
+  // Timeline Reference
+  timeline: {
+    totalEvents: number
+    dateRange: {
+      start: Date
+      end: Date
+    }
+    keyEvents: Array<{
+      timestamp: Date
+      type: string
+      description: string
+    }>
   }
 }
 
@@ -87,14 +218,20 @@ export interface TimelineData {
 export interface TimelineEvent {
   id: string
   timestamp: Date
-  location: {
+  type: 'movement' | 'communication' | 'meeting' | 'financial' | 'digital' | 'location' | 'status'
+  title: string
+  description: string
+  location?: {
     name: string
     coordinates: [number, number]
+    address?: string
   }
-  type: 'arrival' | 'departure' | 'stop' | 'meeting' | 'alert'
-  significance: 'routine' | 'suspicious' | 'anomaly'
-  dwellTime?: number // minutes
-  notes?: string
+  significance: 'routine' | 'suspicious' | 'anomaly' | 'critical'
+  confidence: 'confirmed' | 'high-confidence' | 'medium-confidence' | 'low-confidence'
+  source: string
+  participants?: string[]
+  mediaAttached?: boolean
+  relatedEvents?: string[]
 }
 
 // ============================================================================
@@ -303,6 +440,55 @@ export interface LocationDetailsData {
 }
 
 // ============================================================================
+// Intelligence Alerts Artifact
+// ============================================================================
+
+export interface IntelligenceAlertsArtifact extends ChatArtifact {
+  type: 'intelligence-alerts'
+  data: IntelligenceAlertsData
+}
+
+export interface IntelligenceAlertsData {
+  title: string
+  timestamp: Date
+  alerts: IntelligenceAlert[]
+  summary: string
+  totalCritical: number
+  totalAnomalies: number
+}
+
+export interface IntelligenceAlert {
+  id: string
+  timestamp: Date
+  priority: 'critical' | 'high' | 'medium' | 'low'
+  category: 'behavioral-anomaly' | 'network-activity' | 'financial-activity' | 'location-anomaly' | 'communication-pattern' | 'threat-indicator'
+  title: string
+  description: string
+  caseNumber: string
+  caseName: string
+  subjectId: string
+  subjectName: string
+  location?: {
+    name: string
+    coordinates: [number, number]
+    address?: string
+  }
+  confidence: 'confirmed' | 'high' | 'medium' | 'low'
+  actionRequired: boolean
+  relatedEventId?: string
+  tags: string[]
+}
+
+// ============================================================================
+// Intelligence Alert Artifact (Single Alert Card)
+// ============================================================================
+
+export interface IntelligenceAlertArtifact extends ChatArtifact {
+  type: 'intelligence-alert'
+  data: IntelligenceAlert
+}
+
+// ============================================================================
 // Type Guards
 // ============================================================================
 
@@ -348,4 +534,16 @@ export function isLocationDetailsArtifact(
   artifact: ChatArtifact
 ): artifact is LocationDetailsArtifact {
   return artifact.type === 'location-details'
+}
+
+export function isIntelligenceAlertsArtifact(
+  artifact: ChatArtifact
+): artifact is IntelligenceAlertsArtifact {
+  return artifact.type === 'intelligence-alerts'
+}
+
+export function isIntelligenceAlertArtifact(
+  artifact: ChatArtifact
+): artifact is IntelligenceAlertArtifact {
+  return artifact.type === 'intelligence-alert'
 }

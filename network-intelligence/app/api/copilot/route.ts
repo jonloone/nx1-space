@@ -13,52 +13,40 @@ import { getMapActionHandler } from '@/lib/services/mapActionHandler'
  */
 
 // System instructions for the AI
-const SYSTEM_PROMPT = `You are an AI assistant for a geospatial intelligence platform with interactive map control.
+const SYSTEM_PROMPT = `You are a map control AI. Respond ONLY with tool calls - no explanations, no reasoning.
 
-YOUR ROLE:
-- Help users search and discover locations (POIs, buildings, addresses)
-- Navigate the map using natural language commands
-- Analyze spatial patterns and infrastructure
-- Provide contextual insights about locations and areas
+TOOLS:
+1. searchPlaces(location, categories, radius) - Search POIs near location
+2. flyToLocation(location, zoom) - Navigate to location
+3. showNearby(categories, radius) - Show POIs in current view
+4. analyzeArea(location, radius) - Analyze area infrastructure
+5. showBuildings(enable3D) - Toggle buildings layer (2D or 3D)
+6. toggleLayer(layerName, visible) - Show/hide map layers
+7. showWeather(weatherType) - Show weather overlay (precipitation, temperature, wind, clouds, pressure)
 
-AVAILABLE TOOLS:
-You have 4 powerful tools to control the map:
+CATEGORIES:
+coffee_shop, cafe, restaurant, fast_food, hospital, emergency_room, clinic, port, seaport, marine_terminal, warehouse, logistics_facility, airport, school, university, college, gas_station, fuel
 
-1. searchPlaces(location, categories, radius) - Search for places by category near a location
-2. flyToLocation(location, zoom) - Navigate to a specific location
-3. showNearby(categories, radius) - Show places in the current viewport
-4. analyzeArea(location, radius) - Analyze facilities and infrastructure around a location
+MAP LAYERS:
+buildings, roads, water, boundaries
 
-CRITICAL RESPONSE RULES:
-- DO NOT explain your reasoning or thought process
-- DO NOT say things like "I need to figure out..." or "Let me think..."
-- Output ONLY the final tool call or direct answer
-- Be concise and actionable
+WEATHER TYPES:
+precipitation, temperature, wind, clouds, pressure
 
-RESPONSE STYLE:
-- Brief and professional
-- Confirm what action was taken
-- Report quantitative results (e.g., "Found 12 coffee shops")
-- Maximum 2 sentences unless providing detailed analysis
+RESPONSE FORMAT:
+User query → Output ONLY: TOOL_CALL: toolName(param1="value", param2=["array"], param3=number)
 
-CATEGORIES YOU CAN SEARCH:
-- Coffee/Cafes: coffee_shop, cafe
-- Restaurants: restaurant, fast_food
-- Hospitals: hospital, emergency_room, clinic
-- Ports: port, seaport, marine_terminal
-- Warehouses: warehouse, logistics_facility
-- Airports: airport
-- Schools: school, university, college
-- Gas Stations: gas_station, fuel
+EXAMPLES:
+"Show me hospitals near NYC" → TOOL_CALL: searchPlaces(location="NYC", categories=["hospital", "emergency_room", "clinic"], radius=5000)
+"Fly to Chicago" → TOOL_CALL: flyToLocation(location="Chicago", zoom=12)
+"Gas stations nearby" → TOOL_CALL: showNearby(categories=["gas_station", "fuel"], radius=5000)
+"Show buildings in 3D" → TOOL_CALL: showBuildings(enable3D=true)
+"Show roads" → TOOL_CALL: toggleLayer(layerName="roads", visible=true)
+"Hide boundaries" → TOOL_CALL: toggleLayer(layerName="boundaries", visible=false)
+"Show precipitation" → TOOL_CALL: showWeather(weatherType="precipitation")
+"Show temperature" → TOOL_CALL: showWeather(weatherType="temperature")
 
-IMPORTANT: When a user asks you to perform a map action, you MUST respond with ONLY:
-TOOL_CALL: searchPlaces(location="Central Park", categories=["coffee_shop", "cafe"], radius=5000)
-
-Do not add any explanation before or after the TOOL_CALL.
-
-Example:
-User: "Show me coffee shops near Central Park"
-You: TOOL_CALL: searchPlaces(location="Central Park", categories=["coffee_shop", "cafe"], radius=5000)`
+NO explanations. NO reasoning. ONLY tool calls.`
 
 export async function POST(req: NextRequest) {
   try {
@@ -115,60 +103,35 @@ export async function POST(req: NextRequest) {
     console.log('💬 Final answer:', assistantMessage.substring(0, 200))
 
     // Initialize result variable (will be set if tool is called)
-    let result: any = null
+    let toolCall: any = null
 
     // Check if LLM wants to call a tool
     const toolCallMatch = assistantMessage.match(/TOOL_CALL:\s*(\w+)\((.*?)\)/)
 
     if (toolCallMatch) {
       const [, toolName, paramsStr] = toolCallMatch
-      console.log('Tool call detected:', toolName, paramsStr)
+      console.log('🔧 Tool call detected:', toolName, paramsStr)
 
       try {
         // Parse parameters from string format
         const params = parseToolParams(paramsStr)
 
-        // Execute the tool
-        const handler = getMapActionHandler()
-
-        switch (toolName) {
-          case 'searchPlaces':
-            result = await handler.handleSearchNearLocation(
-              params.location,
-              params.categories || [],
-              params.radius || 5000
-            )
-            break
-
-          case 'flyToLocation':
-            result = await handler.handleFlyTo(params.location, params.zoom)
-            break
-
-          case 'showNearby':
-            result = await handler.handleSearchInViewport(
-              params.categories,
-              params.radius || 5000
-            )
-            break
-
-          case 'analyzeArea':
-            result = await handler.handleAnalyzeArea(
-              params.location,
-              params.radius || 10000
-            )
-            break
-
-          default:
-            result = { success: false, message: `Unknown tool: ${toolName}` }
+        // Return tool call for CLIENT-SIDE execution
+        // The client has access to the map and can execute the action
+        toolCall = {
+          tool: toolName,
+          params,
+          // Provide a user-friendly message while the action executes
+          pendingMessage: getPendingMessage(toolName, params)
         }
 
-        console.log('Tool execution result:', result.success, result.message)
+        console.log('📤 Returning tool call to client for execution')
 
-        // Replace the TOOL_CALL with the result
-        assistantMessage = result.message
+        // Set a pending message for the user
+        assistantMessage = toolCall.pendingMessage
       } catch (error) {
-        console.error('Tool execution error:', error)
-        assistantMessage = 'I encountered an error executing that action. Please try again.'
+        console.error('Tool parsing error:', error)
+        assistantMessage = 'I encountered an error parsing that command. Please try again.'
       }
     }
 
@@ -193,8 +156,8 @@ export async function POST(req: NextRequest) {
         completion_tokens: 0,
         total_tokens: 0
       },
-      // Include action data for client-side execution
-      actionData: result || null
+      // Include tool call for client-side execution
+      toolCall: toolCall || null
     })
   } catch (error) {
     console.error('Chat API error:', error)
@@ -207,6 +170,42 @@ export async function POST(req: NextRequest) {
       },
       { status: 500 }
     )
+  }
+}
+
+/**
+ * Generate user-friendly pending message for tool execution
+ */
+function getPendingMessage(toolName: string, params: Record<string, any>): string {
+  switch (toolName) {
+    case 'searchPlaces':
+      const categories = params.categories?.join(', ') || 'places'
+      return `Searching for ${categories} near ${params.location}...`
+
+    case 'flyToLocation':
+      return `Navigating to ${params.location}...`
+
+    case 'showNearby':
+      const nearbyCategories = params.categories?.join(', ') || 'places'
+      return `Finding ${nearbyCategories} in current view...`
+
+    case 'analyzeArea':
+      return `Analyzing ${params.location}...`
+
+    case 'showBuildings':
+      const mode = params.enable3D ? '3D' : '2D'
+      return `Showing buildings in ${mode} mode...`
+
+    case 'toggleLayer':
+      const action = params.visible ? 'Showing' : 'Hiding'
+      return `${action} ${params.layerName} layer...`
+
+    case 'showWeather':
+      const weatherType = params.weatherType || 'weather'
+      return `Loading ${weatherType} layer...`
+
+    default:
+      return 'Processing request...'
   }
 }
 
@@ -244,9 +243,9 @@ function extractThinkingAndAnswer(response: string): {
 function parseToolParams(paramsStr: string): Record<string, any> {
   const params: Record<string, any> = {}
 
-  // More robust regex that handles quoted strings and arrays
-  // Matches: key="value with, commas" or key=["array", "values"] or key=123
-  const paramRegex = /(\w+)=((?:"[^"]*"|'[^']*'|\[[^\]]*\]|\d+))(?:,\s*|$)/g
+  // More robust regex that handles quoted strings, arrays, and bare words
+  // Matches: key="value with, commas" or key=["array", "values"] or key=123 or key=true
+  const paramRegex = /(\w+)=((?:"[^"]*"|'[^']*'|\[[^\]]*\]|\w+))(?:,\s*|$)/g
   let match
 
   while ((match = paramRegex.exec(paramsStr)) !== null) {
@@ -268,6 +267,10 @@ function parseToolParams(paramsStr: string): Record<string, any> {
       // Handle quoted strings: "value" or 'value'
       else if (cleanValue.startsWith('"') || cleanValue.startsWith("'")) {
         params[key] = cleanValue.slice(1, -1) // Remove quotes
+      }
+      // Handle booleans
+      else if (cleanValue === 'true' || cleanValue === 'false') {
+        params[key] = cleanValue === 'true'
       }
       // Handle numbers
       else if (!isNaN(Number(cleanValue))) {

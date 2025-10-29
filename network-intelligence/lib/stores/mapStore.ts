@@ -20,6 +20,15 @@ export interface SelectedFeature {
   properties: Record<string, any>
 }
 
+export interface MapMarker {
+  id: string
+  coordinates: [number, number]
+  label: string
+  type: 'address' | 'event' | 'subject' | 'generic'
+  metadata?: Record<string, any>
+  marker?: mapboxgl.Marker // Actual Mapbox marker instance
+}
+
 export interface ViewportBounds {
   north: number
   south: number
@@ -49,6 +58,12 @@ interface MapState {
   // Hovered features
   hoveredFeature: SelectedFeature | null
   setHoveredFeature: (feature: SelectedFeature | null) => void
+
+  // Markers
+  markers: MapMarker[]
+  addMarker: (marker: Omit<MapMarker, 'id' | 'marker'>) => string
+  removeMarker: (id: string) => void
+  clearMarkers: () => void
 
   // Map mode (e.g., 'view', 'draw', 'measure')
   mapMode: 'view' | 'draw' | 'measure' | 'select'
@@ -134,6 +149,91 @@ export const useMapStore = create<MapState>()(
       // Hovered features
       hoveredFeature: null,
       setHoveredFeature: (feature) => set({ hoveredFeature: feature }),
+
+      // Markers
+      markers: [],
+      addMarker: (markerData) => {
+        const { map } = get()
+        const id = `marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+        // Create the marker on the map if map is available
+        let mapboxMarker: mapboxgl.Marker | undefined
+        if (map) {
+          // Create custom marker element
+          const el = document.createElement('div')
+          el.className = 'custom-map-marker'
+          el.style.cssText = `
+            width: 32px;
+            height: 32px;
+            background-color: #3b82f6;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+          `
+
+          // Add icon based on type
+          const icons = {
+            address: '📍',
+            event: '⚡',
+            subject: '👤',
+            generic: '📌'
+          }
+          el.innerHTML = icons[markerData.type] || icons.generic
+
+          // Create Mapbox marker
+          mapboxMarker = new (window as any).mapboxgl.Marker(el)
+            .setLngLat(markerData.coordinates)
+            .setPopup(
+              new (window as any).mapboxgl.Popup({ offset: 25 })
+                .setHTML(`<div style="padding: 8px; font-size: 14px; font-weight: 600;">${markerData.label}</div>`)
+            )
+            .addTo(map)
+        }
+
+        const newMarker: MapMarker = {
+          ...markerData,
+          id,
+          marker: mapboxMarker
+        }
+
+        set((state) => ({
+          markers: [...state.markers, newMarker]
+        }))
+
+        return id
+      },
+
+      removeMarker: (id) => {
+        const { markers } = get()
+        const marker = markers.find(m => m.id === id)
+
+        // Remove from map
+        if (marker?.marker) {
+          marker.marker.remove()
+        }
+
+        set((state) => ({
+          markers: state.markers.filter(m => m.id !== id)
+        }))
+      },
+
+      clearMarkers: () => {
+        const { markers } = get()
+
+        // Remove all markers from map
+        markers.forEach(marker => {
+          if (marker.marker) {
+            marker.marker.remove()
+          }
+        })
+
+        set({ markers: [] })
+      },
 
       // Map mode
       mapMode: 'view',

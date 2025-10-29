@@ -192,6 +192,93 @@
   .lighting-night {
     background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
   }
+
+  /* ==================================================================
+     CARD SYSTEM - Felt/Mundi Inspired (Professional Glassmorphism)
+     ================================================================== */
+
+  /* Map Card - Primary focus element (Light Theme Only) */
+  .map-card {
+    @apply rounded-none overflow-hidden;
+    @apply shadow-none;
+    @apply border-0;
+    @apply bg-gray-50;
+  }
+
+  /* Panel Card - Chat/Analysis sidebar (Light Theme Only) */
+  .panel-card {
+    @apply rounded-2xl overflow-hidden;
+    @apply backdrop-blur-lg;
+    @apply shadow-2xl;
+    @apply border border-gray-200/60;
+    background-color: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.12),
+                0 8px 16px -8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 2px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  /* Message Card - User messages */
+  .message-card-user {
+    @apply rounded-2xl;
+    @apply bg-mundi-500 text-white;
+    @apply shadow-md;
+    box-shadow: 0 2px 8px rgba(29, 72, 229, 0.2);
+  }
+
+  /* Message Card - Assistant messages (Light Theme Only) */
+  .message-card-assistant {
+    @apply rounded-2xl;
+    @apply backdrop-blur-sm;
+    @apply border border-gray-200/60;
+    @apply shadow-sm;
+    background-color: rgba(249, 250, 251, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /* Artifact Card - Rich content displays (Light Theme Only) */
+  .artifact-card {
+    @apply rounded-2xl;
+    @apply backdrop-blur-md;
+    @apply border border-gray-200/60;
+    @apply shadow-lg;
+    @apply hover:shadow-xl transition-shadow duration-200;
+    background-color: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08),
+                inset 0 1px 2px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .artifact-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12),
+                inset 0 1px 2px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  /* Tab Card - Collapsed chat tab */
+  .tab-card {
+    @apply rounded-2xl;
+    @apply backdrop-blur-lg;
+    @apply shadow-xl;
+    @apply border border-white/20;
+    background-color: rgba(23, 107, 248, 0.95);
+  }
+
+  .tab-card:hover {
+    background-color: rgb(23, 107, 248);
+  }
+
+  /* Adaptive spacing variables */
+  .layout-container {
+    --gap-tight: 12px;
+    --gap-normal: 16px;
+    --gap-loose: 20px;
+    --padding-edge: 16px;
+  }
+
+  @media (min-width: 1920px) {
+    .layout-container {
+      --padding-edge: 20px;
+    }
+  }
 }
 
 @layer base {

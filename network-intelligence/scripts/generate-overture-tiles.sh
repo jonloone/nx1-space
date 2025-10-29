@@ -111,13 +111,13 @@ echo ""
 
 # Step 3: Generate PMTiles
 echo "🔨 Step 3: Generating PMTiles with tippecanoe..."
-echo "   Zoom levels: 6-10"
+echo "   Zoom levels: 6-14 (city-level searches)"
 echo ""
 
 tippecanoe \
   --output="$PMTILES_FILE" \
   --force \
-  --maximum-zoom=10 \
+  --maximum-zoom=14 \
   --minimum-zoom=6 \
   --drop-densest-as-needed \
   --extend-zooms-if-still-dropping \

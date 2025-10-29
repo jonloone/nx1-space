@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, forwardRef } from 'react'
 import { Sparkles } from 'lucide-react'
 import styles from './copilot-custom.module.css'
-import AIChatPanel, { ChatMessage } from '@/components/ai/AIChatPanel'
+import AIChatPanel, { ChatMessage, AIChatPanelRef } from '@/components/ai/AIChatPanel'
 import { getInvestigationCommandHandler } from '@/lib/services/investigationCommandHandler'
+import { useAnalysisStore } from '@/lib/stores/analysisStore'
 
 interface CopilotSidebarWrapperProps {
   className?: string
@@ -22,12 +23,12 @@ interface CopilotSidebarWrapperProps {
  * - Investigation command processing
  * - Map action integration
  * - Direct integration with /api/copilot endpoint
+ * - Ref forwarding for programmatic message injection
  */
-export default function CopilotSidebarWrapper({
-  className = '',
-  onAction
-}: CopilotSidebarWrapperProps) {
+const CopilotSidebarWrapper = forwardRef<AIChatPanelRef, CopilotSidebarWrapperProps>(
+  function CopilotSidebarWrapper({ className = '', onAction }, ref) {
   const [isLoading, setIsLoading] = useState(false)
+  const { pushArtifact } = useAnalysisStore()
 
   const handleQuery = async (query: string): Promise<ChatMessage> => {
     setIsLoading(true)
@@ -41,8 +42,73 @@ export default function CopilotSidebarWrapper({
         console.log('🔍 Processing investigation command:', command.type)
         const messages = await investigationHandler.executeCommand(command)
 
-        // Return the first message (Citizens 360 commands return multiple, but we'll handle that differently)
-        // For now, return the first artifact message
+        // Process map actions for all messages
+        const { getMapActionHandler } = await import('@/lib/services/mapActionHandler')
+        const { useMapStore } = await import('@/lib/stores/mapStore')
+        const mapHandler = getMapActionHandler()
+        const mapStore = useMapStore.getState()
+        const mapInstance = mapStore.map
+
+        if (mapInstance) {
+          for (const message of messages) {
+            if (message.mapAction) {
+              console.log('🗺️ Processing map action:', message.mapAction.type)
+              const action = message.mapAction
+
+              switch (action.type) {
+                case 'flyTo':
+                  if (action.coordinates) {
+                    mapInstance.flyTo({
+                      center: action.coordinates,
+                      zoom: action.zoom || 12,
+                      pitch: action.pitch || 0,
+                      bearing: action.bearing || 0,
+                      essential: true,
+                      duration: 2000
+                    })
+                  }
+                  break
+
+                case 'addMarkers':
+                  if (action.markers) {
+                    // Add markers to map using mapbox markers
+                    action.markers.forEach(marker => {
+                      const el = document.createElement('div')
+                      el.className = 'alert-marker'
+                      el.style.width = '24px'
+                      el.style.height = '24px'
+                      el.style.borderRadius = '50%'
+                      el.style.cursor = 'pointer'
+
+                      // Color by priority
+                      const priority = marker.properties?.priority || 'medium'
+                      el.style.backgroundColor = priority === 'critical' ? '#ef4444' :
+                                                  priority === 'high' ? '#f97316' : '#3b82f6'
+                      el.style.border = '2px solid white'
+                      el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
+
+                      const mapboxgl = (window as any).mapboxgl
+                      if (mapboxgl) {
+                        new mapboxgl.Marker(el)
+                          .setLngLat(marker.coordinates)
+                          .addTo(mapInstance)
+                      }
+                    })
+                  }
+                  break
+              }
+            }
+          }
+        }
+
+        // Push artifacts to analysis store for each message
+        messages.forEach(message => {
+          if (message.artifact) {
+            pushArtifact(message.artifact, message.id)
+          }
+        })
+
+        // Return the first message (multiple messages will be displayed via artifact system)
         return messages[0]
       }
 
@@ -67,12 +133,77 @@ export default function CopilotSidebarWrapper({
       const data = await response.json()
 
       // Extract assistant message from OpenAI-format response
-      const assistantContent = data.choices?.[0]?.message?.content || 'No response generated'
+      let assistantContent = data.choices?.[0]?.message?.content || 'No response generated'
 
-      // Execute map action on client side if action data is present
-      if (data.actionData && onAction) {
-        console.log('Executing map action:', data.actionData.action, data.actionData.data)
-        onAction(data.actionData.action, data.actionData.data)
+      // Execute tool call on client side if present
+      if (data.toolCall && onAction) {
+        const { tool, params } = data.toolCall
+        console.log('🔧 Executing tool client-side:', tool, params)
+
+        // Import and execute the map action handler
+        const { getMapActionHandler } = await import('@/lib/services/mapActionHandler')
+        const handler = getMapActionHandler()
+
+        let result: any = null
+
+        try {
+          // Execute the appropriate action client-side where we have map access
+          switch (tool) {
+            case 'searchPlaces':
+              result = await handler.handleSearchNearLocation(
+                params.location,
+                params.categories || [],
+                params.radius || 5000
+              )
+              break
+
+            case 'flyToLocation':
+              result = await handler.handleFlyTo(params.location, params.zoom)
+              break
+
+            case 'showNearby':
+              result = await handler.handleSearchInViewport(
+                params.categories,
+                params.radius || 5000
+              )
+              break
+
+            case 'analyzeArea':
+              result = await handler.handleAnalyzeArea(
+                params.location,
+                params.radius || 10000
+              )
+              break
+
+            case 'showBuildings':
+              result = await handler.handleShowBuildings(params.enable3D || false)
+              break
+
+            case 'toggleLayer':
+              result = await handler.handleToggleLayer(
+                params.layerName,
+                params.visible !== false // Default to true if not specified
+              )
+              break
+
+            case 'showWeather':
+              result = await handler.handleShowWeather(params.weatherType)
+              break
+          }
+
+          if (result) {
+            // Execute the map action (flyTo, show places, etc.)
+            if (result.action && result.data && onAction) {
+              onAction(result.action, result.data)
+            }
+
+            // Use the result message instead of pending message
+            assistantContent = result.message
+          }
+        } catch (error) {
+          console.error('Tool execution error:', error)
+          assistantContent = 'Error executing action. Please try again.'
+        }
       }
 
       // Return as ChatMessage
@@ -101,10 +232,13 @@ export default function CopilotSidebarWrapper({
   return (
     <div className={`${styles.copilotSidebar} ${className}`}>
       <AIChatPanel
+        ref={ref}
         onQuery={handleQuery}
         isLoading={isLoading}
         placeholder="Ask about investigations, search locations, or analyze patterns..."
       />
     </div>
   )
-}
+})
+
+export default CopilotSidebarWrapper

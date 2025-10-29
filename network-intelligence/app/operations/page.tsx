@@ -6,11 +6,21 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import MissionControlLayout from '@/components/opintel/layout/MissionControlLayout'
 import LeftSidebar from '@/components/opintel/panels/LeftSidebar'
 import RightPanel from '@/components/opintel/panels/RightPanel'
+import IntelligenceAlertPanel from '@/components/opintel/panels/IntelligenceAlertPanel'
+import SubjectProfileViewer from '@/components/opintel/SubjectProfileViewer'
+import AlertQueue from '@/components/opintel/AlertQueue'
+import TemporalPlaybackControls from '@/components/opintel/TemporalPlaybackControls'
+import AdvancedSearchFilterPanel from '@/components/opintel/AdvancedSearchFilterPanel'
 import GERSMapLayer from '@/components/gers/GERSMapLayer'
 import AddLayerDropdown from '@/components/opintel/panels/AddLayerDropdown'
 import { InvestigationMode } from '@/components/investigation'
 import CopilotProvider from '@/components/chat/CopilotProvider'
+import CopilotSidebarWrapper from '@/components/chat/CopilotSidebarWrapper'
+import { AIChatPanelRef, ChatMessage } from '@/components/ai/AIChatPanel'
+import MapboxAlertVisualization from '@/components/opintel/MapboxAlertVisualization'
+import type { IntelligenceAlert } from '@/lib/types/chatArtifacts'
 import { useMapStore, usePanelStore } from '@/lib/stores'
+import { useAnalysisStore } from '@/lib/stores/analysisStore'
 import { GERSPlace, LOD_CONFIG } from '@/lib/services/gersDemoService'
 import { getOverturePlacesService } from '@/lib/services/overturePlacesService'
 import { getOvertureLayersManager, OVERTURE_LAYER_CONFIGS } from '@/lib/services/overtureLayersManager'
@@ -24,6 +34,10 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pM
 export default function OperationsPage() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
+  const chatRef = useRef<AIChatPanelRef>(null)
+
+  // Chat sidebar state
+  const [isChatExpanded, setIsChatExpanded] = useState(false)
 
   // Zustand stores
   const {
@@ -39,6 +53,7 @@ export default function OperationsPage() {
     saveToCache
   } = useMapStore()
   const { rightPanelMode, rightPanelData, openRightPanel, closeRightPanel } = usePanelStore()
+  const { pushArtifact } = useAnalysisStore()
 
   // GERs search state (for custom search features)
   const [gersPlaces, setGersPlaces] = useState<GERSPlace[]>([])
@@ -62,6 +77,13 @@ export default function OperationsPage() {
 
   // Investigation Mode state
   const [isInvestigationModeActive, setIsInvestigationModeActive] = useState(false)
+
+  // Viewport tracking for alert visualization
+  const [viewport, setViewport] = useState({
+    zoom: 4,
+    latitude: 39.8283,
+    longitude: -98.5795
+  })
 
   // Initialize map
   useEffect(() => {
@@ -89,6 +111,12 @@ export default function OperationsPage() {
       })
 
       mapInstance.on('error', (e) => {
+        // Suppress tile 404 errors (expected for optional layers)
+        const errorMessage = e.error?.message || ''
+        if (errorMessage.includes('404') || errorMessage.includes('pmtiles')) {
+          // Silent - these are expected for optional building tiles
+          return
+        }
         console.error('❌ Map error:', e)
       })
     } catch (error) {
@@ -105,6 +133,32 @@ export default function OperationsPage() {
   useEffect(() => {
     initializeCache()
   }, [initializeCache])
+
+  // Track viewport changes for alert visualization
+  useEffect(() => {
+    if (!map.current || !isLoaded) return
+
+    const updateViewport = () => {
+      if (!map.current) return
+      const center = map.current.getCenter()
+      setViewport({
+        zoom: map.current.getZoom(),
+        latitude: center.lat,
+        longitude: center.lng
+      })
+    }
+
+    // Update on map move
+    map.current.on('move', updateViewport)
+    map.current.on('zoom', updateViewport)
+
+    return () => {
+      if (map.current) {
+        map.current.off('move', updateViewport)
+        map.current.off('zoom', updateViewport)
+      }
+    }
+  }, [isLoaded])
 
   // Track if default layers have been loaded
   const [defaultLayersLoaded, setDefaultLayersLoaded] = useState(false)
@@ -650,6 +704,39 @@ export default function OperationsPage() {
     openRightPanel('feature', place)
   }
 
+  // Inject alert into chat with artifact
+  const handleInjectAlert = (alert: IntelligenceAlert) => {
+    console.log('💬 Injecting alert into chat:', alert.id)
+
+    // Auto-expand chat if collapsed
+    if (!isChatExpanded) {
+      setIsChatExpanded(true)
+    }
+
+    const messageId = `alert-${Date.now()}`
+
+    // Inject contextual message with alert artifact
+    chatRef.current?.injectMessage({
+      id: messageId,
+      role: 'assistant',
+      content: `**${alert.priority.toUpperCase()} Priority Alert**\n\n${alert.subjectName} at ${alert.location?.name || 'Unknown location'}`,
+      timestamp: new Date(),
+      artifact: {
+        type: 'intelligence-alert',
+        data: alert
+      }
+    })
+
+    // Push artifact to analysis store
+    pushArtifact({
+      type: 'intelligence-alert',
+      data: alert
+    }, messageId)
+
+    // Close right panel if open
+    closeRightPanel()
+  }
+
   // Handle map actions from AI chat
   const handleChatAction = async (action: string, data: any) => {
     console.log('💬 Chat action:', action, data)
@@ -723,9 +810,13 @@ export default function OperationsPage() {
         isLive={true}
         activeUsers={12}
         hideSidebar={isInvestigationModeActive}
+        useChatInterface={!isInvestigationModeActive}
+        chatRef={chatRef}
+        isChatExpanded={isChatExpanded}
+        onToggleChat={() => setIsChatExpanded(!isChatExpanded)}
+        onChatAction={handleChatAction}
         onSearch={handleSearch}
         onPlaceSelect={handleGERSPlaceSelect}
-        onChatAction={handleChatAction}
       leftSidebar={
         <LeftSidebar
           dataSources={dataSources}
@@ -831,21 +922,52 @@ export default function OperationsPage() {
       }
       rightPanel={
         rightPanelMode ? (
-          <RightPanel
-            mode={rightPanelMode}
-            data={rightPanelData}
-            onClose={() => {
-              // Clear highlight when closing panel
-              const highlightService = getFeatureHighlightService()
-              highlightService.clearHighlight()
-              selectFeature(null)
-              closeRightPanel()
-            }}
-          />
+          rightPanelMode === 'alert' && rightPanelData?.alert ? (
+            <IntelligenceAlertPanel
+              alert={rightPanelData.alert}
+              relatedAlerts={rightPanelData.relatedAlerts || []}
+              onClose={() => {
+                closeRightPanel()
+              }}
+              onAlertClick={(alertId) => {
+                console.log('Navigate to alert:', alertId)
+              }}
+              onSubjectClick={(subjectId) => {
+                console.log('View subject profile:', subjectId)
+                openRightPanel('subject', { subjectId })
+              }}
+            />
+          ) : rightPanelMode === 'subject' && rightPanelData?.subjectId ? (
+            <SubjectProfileViewer
+              subjectId={rightPanelData.subjectId}
+              onClose={() => {
+                closeRightPanel()
+              }}
+              onAlertClick={(alert) => {
+                openRightPanel('alert', { alert })
+              }}
+              onRelatedSubjectClick={(subjectId) => {
+                openRightPanel('subject', { subjectId })
+              }}
+            />
+          ) : (
+            <RightPanel
+              mode={rightPanelMode}
+              data={rightPanelData}
+              onClose={() => {
+                // Clear highlight when closing panel
+                const highlightService = getFeatureHighlightService()
+                highlightService.clearHighlight()
+                selectFeature(null)
+                closeRightPanel()
+              }}
+              onInjectAlert={handleInjectAlert}
+            />
+          )
         ) : null
       }
-    >
-      {/* Map Canvas */}
+      >
+        {/* Map Canvas */}
       <div
         ref={mapContainer}
         className="absolute inset-0 w-full h-full bg-slate-900"
@@ -868,6 +990,15 @@ export default function OperationsPage() {
           map={map.current}
           places={gersPlaces}
           onPlaceClick={handleGERSPlaceSelect}
+        />
+      )}
+
+      {/* Alert Visualization Layers - Mapbox Native (No floating) */}
+      {map.current && isLoaded && (
+        <MapboxAlertVisualization
+          map={map.current}
+          autoUpdate={true}
+          onAlertClick={handleInjectAlert}
         />
       )}
 

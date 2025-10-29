@@ -44,13 +44,20 @@ export function useG6Graph(options: UseG6GraphOptions) {
 
   // Initialize G6 graph
   useEffect(() => {
-    if (!containerRef.current) return
+    console.log('🔴 useG6Graph effect running with data:', { nodes: data.nodes?.length, edges: data.edges?.length, width, height })
+
+    if (!containerRef.current) {
+      console.log('🔴 Container ref not ready yet')
+      return
+    }
 
     // Clean up existing graph
     if (graphRef.current) {
+      console.log('🔴 Destroying existing graph')
       graphRef.current.destroy()
     }
 
+    console.log('🔴 Creating new G6 graph instance')
     // Create new graph instance with initial data
     const graph = new Graph({
       container: containerRef.current,
@@ -159,6 +166,7 @@ export function useG6Graph(options: UseG6GraphOptions) {
 
     graphRef.current = graph
     setIsReady(true)
+    console.log('🔴 G6 graph created successfully and ready')
 
     // Cleanup
     return () => {

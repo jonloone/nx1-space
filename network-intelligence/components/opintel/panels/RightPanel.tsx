@@ -14,7 +14,8 @@ import {
   ExternalLink,
   Copy,
   Download,
-  Share2
+  Share2,
+  Navigation
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,14 +24,16 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import type { IntelligenceAlert } from '@/lib/types/chatArtifacts'
 
 interface RightPanelProps {
-  mode: 'feature' | 'alert' | 'layer' | 'analysis' | null
+  mode: 'feature' | 'alert' | 'layer' | 'analysis' | 'cluster' | null
   data?: any
   onClose: () => void
+  onInjectAlert?: (alert: IntelligenceAlert) => void
 }
 
-export default function RightPanel({ mode, data, onClose }: RightPanelProps) {
+export default function RightPanel({ mode, data, onClose, onInjectAlert }: RightPanelProps) {
   if (!mode) return null
 
   const renderHeader = () => {
@@ -45,6 +48,10 @@ export default function RightPanel({ mode, data, onClose }: RightPanelProps) {
       case 'alert':
         icon = <AlertTriangle className="h-4 w-4" />
         title = 'Alert Details'
+        break
+      case 'cluster':
+        icon = <AlertTriangle className="h-4 w-4" />
+        title = 'Alert Cluster'
         break
       case 'layer':
         icon = <Palette className="h-4 w-4" />
@@ -81,6 +88,7 @@ export default function RightPanel({ mode, data, onClose }: RightPanelProps) {
         <div className="p-4">
           {mode === 'feature' && <FeatureDetailsPanel data={data} />}
           {mode === 'alert' && <AlertDetailsPanel data={data} />}
+          {mode === 'cluster' && <ClusterAlertsPanel data={data} onInjectAlert={onInjectAlert} />}
           {mode === 'layer' && <LayerStylePanel data={data} />}
           {mode === 'analysis' && <AnalysisResultsPanel data={data} />}
         </div>
@@ -441,6 +449,151 @@ function AnalysisResultsPanel({ data }: { data: any }) {
         <Button variant="outline" className="w-full border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]" size="sm">
           View Details
         </Button>
+      </div>
+    </div>
+  )
+}
+
+// Cluster Alerts Panel
+function ClusterAlertsPanel({ data, onInjectAlert }: { data: any; onInjectAlert?: (alert: IntelligenceAlert) => void }) {
+  const { alerts = [], coordinates, onAlertClick, onFocusCluster } = data || {}
+
+  // Sort alerts by priority
+  const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 }
+  const sortedAlerts = [...(alerts as IntelligenceAlert[])].sort((a, b) => {
+    return priorityOrder[a.priority] - priorityOrder[b.priority]
+  })
+
+  const criticalCount = alerts.filter((a: IntelligenceAlert) => a.priority === 'critical').length
+  const highCount = alerts.filter((a: IntelligenceAlert) => a.priority === 'high').length
+
+  const getSeverityColor = (priority: string) => {
+    switch (priority) {
+      case 'critical':
+        return 'bg-[#EF4444]'
+      case 'high':
+        return 'bg-[#F59E0B]'
+      case 'medium':
+        return 'bg-[#F59E0B]'
+      case 'low':
+        return 'bg-[#176BF8]'
+      default:
+        return 'bg-[#A3A3A3]'
+    }
+  }
+
+  const getSeverityTextColor = (priority: string) => {
+    switch (priority) {
+      case 'critical':
+        return 'text-[#EF4444]'
+      case 'high':
+        return 'text-[#F59E0B]'
+      case 'medium':
+        return 'text-[#F59E0B]'
+      case 'low':
+        return 'text-[#176BF8]'
+      default:
+        return 'text-[#A3A3A3]'
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Cluster Summary */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-5 w-5 text-[#EF4444]" />
+          <h4 className="text-lg font-bold text-[#171717]">
+            {alerts.length} Intelligence Alert{alerts.length !== 1 ? 's' : ''}
+          </h4>
+        </div>
+        {(criticalCount > 0 || highCount > 0) && (
+          <div className="flex gap-2">
+            {criticalCount > 0 && (
+              <Badge variant="outline" className="text-xs border-[#EF4444] text-[#EF4444]">
+                {criticalCount} CRITICAL
+              </Badge>
+            )}
+            {highCount > 0 && (
+              <Badge variant="outline" className="text-xs border-[#F59E0B] text-[#F59E0B]">
+                {highCount} HIGH
+              </Badge>
+            )}
+          </div>
+        )}
+        {coordinates && (
+          <div className="text-xs text-[#737373] font-mono">
+            {coordinates[1].toFixed(4)}, {coordinates[0].toFixed(4)}
+          </div>
+        )}
+      </div>
+
+      <Separator className="bg-[#E5E5E5]" />
+
+      {/* Focus Button */}
+      {onFocusCluster && (
+        <>
+          <Button
+            onClick={onFocusCluster}
+            className="w-full bg-[#176BF8] hover:bg-[#0D4DB8] text-white"
+            size="sm"
+          >
+            <Navigation className="h-3 w-3 mr-2" />
+            Focus on Cluster
+          </Button>
+          <Separator className="bg-[#E5E5E5]" />
+        </>
+      )}
+
+      {/* Alert List */}
+      <div className="space-y-3">
+        <h5 className="text-xs font-semibold text-[#525252]">Alerts in Cluster</h5>
+        <div className="space-y-2">
+          {sortedAlerts.map((alert: IntelligenceAlert) => (
+            <Card
+              key={alert.id}
+              className="bg-white border border-[#E5E5E5] shadow-sm hover:bg-[#F5F5F5] cursor-pointer transition-colors"
+              onClick={() => {
+                // Inject into chat if handler provided, otherwise use old behavior
+                if (onInjectAlert) {
+                  onInjectAlert(alert)
+                } else {
+                  onAlertClick?.(alert)
+                }
+              }}
+            >
+              <CardContent className="p-3">
+                <div className="flex items-start gap-2">
+                  <div className={cn('w-2 h-2 rounded-full mt-1.5', getSeverityColor(alert.priority))} />
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="text-sm font-semibold text-[#171717] leading-tight">
+                        {alert.title}
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'text-[10px] uppercase border-[#E5E5E5]',
+                          getSeverityTextColor(alert.priority)
+                        )}
+                      >
+                        {alert.priority}
+                      </Badge>
+                    </div>
+                    <div className="text-xs text-[#737373]">
+                      {alert.location?.name || 'Unknown location'}
+                    </div>
+                    {alert.description && (
+                      <div className="text-xs text-[#737373] line-clamp-2 leading-relaxed">
+                        {alert.description}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   )

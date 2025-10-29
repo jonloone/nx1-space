@@ -15,12 +15,16 @@ interface NetworkGraphCardProps {
 export default function NetworkGraphCard({ artifact }: NetworkGraphCardProps) {
   const { data } = artifact
 
+  console.log('🔵 NetworkGraphCard rendering with data:', data)
+  console.log('🔵 Nodes:', data.nodes?.length, 'Edges:', data.edges?.length, 'CenterNode:', data.centerNode)
+
   // Transform NetworkGraphData to NetworkAnalysisCard props
   // NetworkGraphData has: { title, nodes: NetworkNode[], edges: NetworkEdge[], centerNode: string }
   // NetworkAnalysisCard expects: { centerNode: NetworkNode, nodes: NetworkNode[], connections: NetworkConnection[] }
 
   // Find the center node object
   const centerNodeObj = data.nodes.find(n => n.id === data.centerNode)
+  console.log('🔵 Center node found:', centerNodeObj)
 
   if (!centerNodeObj) {
     return (
@@ -65,6 +69,8 @@ export default function NetworkGraphCard({ artifact }: NetworkGraphCardProps) {
     frequency: edge.weight || 1,
     lastContact: edge.timestamp
   }))
+
+  console.log('🔵 Transformed data - Center:', transformedCenterNode.name, 'Nodes:', transformedNodes.length, 'Connections:', transformedConnections.length)
 
   return (
     <Card className="border border-border shadow-mundi-sm hover:shadow-mundi-md transition-all">

@@ -4,16 +4,9 @@
  */
 
 import type { ChatMessage } from '@/components/ai/AIChatPanel'
-import type { InvestigationSubject, LocationStop } from '@/lib/demo/investigation-demo-data'
-import {
-  createSubjectProfileArtifact,
-  createTimelineArtifact,
-  createIntelligenceAnalysisArtifact,
-  createHeatmapSummaryArtifact
-} from '@/lib/utils/artifactFactories'
 
 export interface InvestigationQuery {
-  type: 'load-case' | 'analyze-subject' | 'show-route' | 'list-subjects'
+  type: 'show-alerts' | 'load-case' | 'analyze-subject' | 'show-route' | 'list-subjects'
   params: {
     caseNumber?: string
     subjectId?: string
@@ -26,6 +19,21 @@ export class InvestigationCommandHandler {
    */
   parseQuery(query: string): InvestigationQuery | null {
     const lowerQuery = query.toLowerCase()
+
+    // Show alerts pattern (default for most investigative queries)
+    if (
+      lowerQuery.includes('alert') ||
+      lowerQuery.includes('show me') ||
+      lowerQuery.includes('what\'s happening') ||
+      lowerQuery.includes('whats happening') ||
+      lowerQuery.includes('status') ||
+      lowerQuery.includes('activity') ||
+      lowerQuery.includes('updates') ||
+      lowerQuery.includes('citizens') ||
+      lowerQuery.includes('investigation')
+    ) {
+      return { type: 'show-alerts', params: {} }
+    }
 
     // Load case pattern
     if (lowerQuery.includes('load') && /ct-\d{4}-\d{4}/.test(lowerQuery)) {
@@ -65,6 +73,9 @@ export class InvestigationCommandHandler {
     console.log('🔍 Executing investigation command:', command.type)
 
     switch (command.type) {
+      case 'show-alerts':
+        return this.handleShowAlerts()
+
       case 'load-case':
         return this.handleLoadCase(command.params.caseNumber)
 
@@ -75,14 +86,282 @@ export class InvestigationCommandHandler {
         return [{
           id: Date.now().toString(),
           role: 'assistant',
-          content: 'Command not yet implemented. Try: "Load investigation case CT-2024-8473"',
+          content: 'Command not yet implemented. Try: "Show me the alerts"',
           timestamp: new Date()
         }]
     }
   }
 
   /**
-   * Handle: Load investigation case (Demo implementation)
+   * Handle: Show intelligence alerts
+   */
+  private async handleShowAlerts(): Promise<ChatMessage[]> {
+    try {
+      const { getCitizens360DataService } = await import('./citizens360DataService')
+      const dataService = getCitizens360DataService()
+
+      // Generate intelligence alerts from recent activity
+      const alerts = await dataService.generateIntelligenceAlerts()
+
+      if (alerts.length === 0) {
+        return [{
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: '✅ **No active alerts**\n\nAll monitored cases show routine activity. No critical events or anomalies detected in the past 24 hours.',
+          timestamp: new Date()
+        }]
+      }
+
+      // Count critical and high-priority alerts
+      const criticalCount = alerts.filter(a => a.priority === 'critical').length
+      const highCount = alerts.filter(a => a.priority === 'high').length
+
+      // Find the most critical alert with a location
+      const criticalAlert = alerts.find(a => a.priority === 'critical' && a.location)
+
+      // Generate LLM analysis
+      const analysis = await this.generateAlertAnalysis(alerts, criticalCount, highCount)
+
+      const messages: ChatMessage[] = []
+
+      // 1. Add LLM analysis message
+      messages.push({
+        id: `${Date.now()}-analysis`,
+        role: 'assistant',
+        content: analysis,
+        timestamp: new Date()
+      })
+
+      // 2. Add map actions - zoom to critical alert and show alert markers
+      if (criticalAlert && criticalAlert.location) {
+        messages.push({
+          id: `${Date.now()}-map-zoom`,
+          role: 'assistant',
+          content: `📍 Zooming to critical alert: **${criticalAlert.location.name}**`,
+          timestamp: new Date(),
+          mapAction: {
+            type: 'flyTo',
+            coordinates: criticalAlert.location.coordinates,
+            zoom: 15,
+            pitch: 45,
+            bearing: 0
+          }
+        })
+
+        // Add alert markers to map
+        const alertMarkers = alerts
+          .filter(a => a.location)
+          .map(a => ({
+            id: a.id,
+            coordinates: a.location!.coordinates,
+            properties: {
+              title: a.title,
+              priority: a.priority,
+              category: a.category,
+              subjectName: a.subjectName,
+              caseName: a.caseName,
+              timestamp: a.timestamp.toISOString(),
+              description: a.description
+            }
+          }))
+
+        messages.push({
+          id: `${Date.now()}-alert-markers`,
+          role: 'assistant',
+          content: `🗺️ Displaying ${alertMarkers.length} alert location${alertMarkers.length !== 1 ? 's' : ''} on map`,
+          timestamp: new Date(),
+          mapAction: {
+            type: 'addMarkers',
+            markers: alertMarkers,
+            markerStyle: 'alert-priority' // Color by priority
+          }
+        })
+      }
+
+      // 3. Add summary message with alerts artifact
+      const summary = `🚨 **Intelligence Alerts** - ${alerts.length} active alert${alerts.length !== 1 ? 's' : ''}\n\n` +
+        `**Critical:** ${criticalCount} | **High:** ${highCount}\n\n` +
+        `Showing alerts from the past 24 hours requiring investigative action.`
+
+      messages.push({
+        id: `${Date.now()}-alerts`,
+        role: 'assistant',
+        content: summary,
+        timestamp: new Date(),
+        artifact: {
+          type: 'intelligence-alerts',
+          data: {
+            title: 'Active Intelligence Alerts',
+            timestamp: new Date(),
+            alerts,
+            summary: `${criticalCount} critical and ${highCount} high-priority alerts detected`,
+            totalCritical: criticalCount,
+            totalAnomalies: alerts.filter(a => a.category === 'behavioral-anomaly' || a.category === 'location-anomaly').length
+          }
+        }
+      })
+
+      // 4. Add details for top 3 critical/high alerts
+      const topAlerts = alerts.slice(0, 3)
+      for (const alert of topAlerts) {
+        const priorityEmoji = alert.priority === 'critical' ? '🔴' : '🟠'
+        const timeAgo = this.formatTimeAgo(alert.timestamp)
+
+        messages.push({
+          id: `${Date.now()}-detail-${alert.id}`,
+          role: 'assistant',
+          content: `${priorityEmoji} **${alert.title}**\n\n` +
+            `**Case:** ${alert.caseName} (${alert.caseNumber})\n` +
+            `**Subject:** ${alert.subjectName}\n` +
+            `**Category:** ${this.formatCategory(alert.category)}\n` +
+            `**Time:** ${timeAgo}\n` +
+            `**Confidence:** ${alert.confidence}\n\n` +
+            `${alert.description}` +
+            (alert.actionRequired ? '\n\n⚠️ **Action Required**' : ''),
+          timestamp: new Date()
+        })
+      }
+
+      if (alerts.length > 3) {
+        messages.push({
+          id: `${Date.now()}-more`,
+          role: 'assistant',
+          content: `📋 *${alerts.length - 3} additional alert${alerts.length - 3 !== 1 ? 's' : ''} in full report above.*\n\n` +
+            `To investigate a specific case, ask: "Load investigation case CT-2024-8473"`,
+          timestamp: new Date()
+        })
+      }
+
+      return messages
+
+    } catch (error) {
+      console.error('Failed to generate alerts:', error)
+      return [{
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `❌ Failed to load intelligence alerts. ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date()
+      }]
+    }
+  }
+
+  /**
+   * Generate LLM analysis of alerts
+   */
+  private async generateAlertAnalysis(alerts: any[], criticalCount: number, highCount: number): Promise<string> {
+    try {
+      // Prepare alert summary for LLM
+      const alertSummary = alerts.slice(0, 5).map(a => ({
+        priority: a.priority,
+        category: a.category,
+        title: a.title,
+        subject: a.subjectName,
+        case: a.caseName,
+        timestamp: this.formatTimeAgo(a.timestamp),
+        location: a.location?.name || 'Unknown'
+      }))
+
+      const prompt = `You are a senior intelligence analyst reviewing alert data. Provide a brief, professional analysis.
+
+ALERT SUMMARY:
+- Total Alerts: ${alerts.length}
+- Critical: ${criticalCount}
+- High Priority: ${highCount}
+
+TOP ALERTS:
+${alertSummary.map((a, i) => `${i + 1}. [${a.priority.toUpperCase()}] ${a.title}
+   Subject: ${a.subject} | Case: ${a.case}
+   Location: ${a.location} | Time: ${a.timestamp}
+   Category: ${a.category}`).join('\n\n')}
+
+Provide a 2-3 sentence intelligence assessment focusing on:
+1. Overall threat pattern
+2. Most concerning activity
+3. Recommended immediate action
+
+Be concise, professional, and action-oriented. Do not use emojis.`
+
+      const response = await fetch('https://api.vult.r.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.VULTR_API_KEY || process.env.NEXT_PUBLIC_VULTR_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'llama2-13b-chat-Q5_K_M',
+          messages: [
+            { role: 'system', content: 'You are a senior intelligence analyst. Be concise and professional.' },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 200,
+          temperature: 0.3
+        })
+      })
+
+      if (!response.ok) {
+        console.warn('LLM analysis failed, using fallback')
+        return this.getFallbackAnalysis(alerts, criticalCount, highCount)
+      }
+
+      const data = await response.json()
+      const analysis = data.choices?.[0]?.message?.content?.trim()
+
+      if (!analysis) {
+        return this.getFallbackAnalysis(alerts, criticalCount, highCount)
+      }
+
+      return `🎯 **Intelligence Assessment**\n\n${analysis}`
+
+    } catch (error) {
+      console.error('LLM analysis error:', error)
+      return this.getFallbackAnalysis(alerts, criticalCount, highCount)
+    }
+  }
+
+  /**
+   * Fallback analysis if LLM fails
+   */
+  private getFallbackAnalysis(alerts: any[], criticalCount: number, highCount: number): string {
+    const topAlert = alerts[0]
+    const categories = [...new Set(alerts.map(a => a.category))]
+
+    return `🎯 **Intelligence Assessment**\n\n` +
+      `Multiple high-priority alerts detected across ${categories.length} threat categories. ` +
+      `Primary concern: ${topAlert.title} involving ${topAlert.subjectName}. ` +
+      `Recommend immediate review of critical alerts and coordination with case teams for ${topAlert.caseName}.`
+  }
+
+  /**
+   * Format time ago (e.g., "2 hours ago")
+   */
+  private formatTimeAgo(timestamp: Date): string {
+    const now = new Date()
+    const diffMs = now.getTime() - timestamp.getTime()
+    const diffMins = Math.floor(diffMs / (1000 * 60))
+    const diffHours = Math.floor(diffMins / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffMins < 60) {
+      return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`
+    } else if (diffHours < 24) {
+      return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
+    } else {
+      return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+    }
+  }
+
+  /**
+   * Format category for display
+   */
+  private formatCategory(category: string): string {
+    return category
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  }
+
+  /**
+   * Handle: Load investigation case
    */
   private async handleLoadCase(caseNumber?: string): Promise<ChatMessage[]> {
     if (!caseNumber) {
@@ -95,42 +374,95 @@ export class InvestigationCommandHandler {
     }
 
     try {
-      // Create demo data
-      const demoData = this.createDemoInvestigationData()
+      // Load case data from Citizens 360 Data Service
+      const { getCitizens360DataService } = await import('./citizens360DataService')
+      const dataService = getCitizens360DataService()
+
+      // Get case metadata
+      const caseMetadata = await dataService.getCaseMetadata(caseNumber)
+      if (!caseMetadata) {
+        return [{
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `❌ Case ${caseNumber} not found. Available cases: CT-2024-8473`,
+          timestamp: new Date()
+        }]
+      }
+
+      // Load all subjects for this case
+      const subjects = await dataService.loadCaseSubjects(caseNumber)
+      if (subjects.length === 0) {
+        return [{
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `❌ No subjects found for case ${caseNumber}`,
+          timestamp: new Date()
+        }]
+      }
+
+      // Get primary subject (first one)
+      const primarySubject = subjects[0]
+
+      // Load timeline for primary subject
+      const timelineEvents = await dataService.loadTimeline(caseNumber, primarySubject.subjectId)
 
       // Create artifact messages
       const messages: ChatMessage[] = []
 
-      // 1. Subject Profile
+      // 1. Case Overview
+      messages.push({
+        id: `${Date.now()}-0`,
+        role: 'assistant',
+        content: `🔒 **${caseMetadata.codename}** (${caseNumber})\n\n${caseMetadata.briefing}\n\n**Status:** ${caseMetadata.status} | **Priority:** ${caseMetadata.priority} | **Subjects:** ${subjects.length}`,
+        timestamp: new Date()
+      })
+
+      // 2. Subject Profile (using new comprehensive data)
       messages.push({
         id: `${Date.now()}-1`,
         role: 'assistant',
-        content: `📋 Investigation Case Loaded: ${caseNumber}`,
+        content: `👤 **Primary Subject:** ${primarySubject.name.full}\n**Classification:** ${primarySubject.classification}\n**Status:** ${primarySubject.status}\n**Threat Level:** ${primarySubject.intelligence.threatLevel}`,
         timestamp: new Date(),
-        artifact: createSubjectProfileArtifact(
-          demoData.subject,
-          demoData.intelligence,
-          demoData.locationStops
-        )
+        artifact: {
+          type: 'subject-profile',
+          data: primarySubject
+        }
       })
 
-      // 2. Intelligence Analysis
-      messages.push({
-        id: `${Date.now()}-2`,
-        role: 'assistant',
-        content: demoData.intelligence.summary,
-        timestamp: new Date(),
-        artifact: createIntelligenceAnalysisArtifact(demoData.intelligence)
-      })
+      // 3. Timeline (if available)
+      if (timelineEvents.length > 0) {
+        const stats = await dataService.getTimelineStats(caseNumber, primarySubject.subjectId)
 
-      // 3. Timeline
-      messages.push({
-        id: `${Date.now()}-3`,
-        role: 'assistant',
-        content: `📅 Timeline: ${demoData.locationStops.length} locations tracked`,
-        timestamp: new Date(),
-        artifact: createTimelineArtifact(demoData.locationStops, demoData.subject)
-      })
+        messages.push({
+          id: `${Date.now()}-2`,
+          role: 'assistant',
+          content: `📅 **Timeline:** ${stats.totalEvents} events over ${Math.round((stats.dateRange.end.getTime() - stats.dateRange.start.getTime()) / (1000 * 60 * 60))} hours\n\n**Breakdown:** ${stats.bySignificance.routine || 0} routine, ${stats.bySignificance.suspicious || 0} suspicious, ${stats.bySignificance.anomaly || 0} anomalies, ${stats.bySignificance.critical || 0} critical`,
+          timestamp: new Date(),
+          artifact: {
+            type: 'timeline',
+            data: {
+              title: `${primarySubject.name.full} - 72 Hour Surveillance`,
+              period: stats.dateRange,
+              events: timelineEvents,
+              summary: `${stats.totalEvents} events tracked during surveillance period`
+            }
+          }
+        })
+      }
+
+      // 4. Associates List (if any)
+      if (subjects.length > 1) {
+        const associatesList = subjects.slice(1).map(s =>
+          `• **${s.name.full}** (${s.subjectId}) - ${s.classification} - Threat: ${s.intelligence.threatLevel}`
+        ).join('\n')
+
+        messages.push({
+          id: `${Date.now()}-3`,
+          role: 'assistant',
+          content: `👥 **Associates (${subjects.length - 1}):**\n\n${associatesList}`,
+          timestamp: new Date()
+        })
+      }
 
       return messages
 
@@ -179,7 +511,7 @@ export class InvestigationCommandHandler {
       return [{
         id: Date.now().toString(),
         role: 'assistant',
-        content: 'Try: "Load investigation case CT-2024-8473" to see Citizens 360 artifacts in action!',
+        content: '🔍 **Citizens 360 Intelligence Platform**\n\nTry asking:\n• "Show me the alerts"\n• "What\'s the current status?"\n• "Show investigation updates"\n\nOr load a specific case: "Load investigation case CT-2024-8473"',
         timestamp: new Date()
       }]
     }
@@ -188,103 +520,6 @@ export class InvestigationCommandHandler {
     return this.executeCommand(command)
   }
 
-  /**
-   * Create demo investigation data
-   */
-  private createDemoInvestigationData() {
-    const now = new Date()
-    const startDate = new Date(now.getTime() - 72 * 60 * 60 * 1000)
-
-    const subject: InvestigationSubject = {
-      subjectId: 'SUBJECT-8473',
-      caseNumber: 'CT-2024-8473',
-      classification: 'person-of-interest',
-      investigation: 'Operation Digital Shadow',
-      startDate,
-      endDate: now,
-      legalAuthorization: 'Federal Warrant (SDNY)'
-    }
-
-    const locationStops: LocationStop[] = [
-      {
-        id: 'stop-1',
-        name: 'Williamsburg Apartment',
-        type: 'residence',
-        lat: 40.7145,
-        lng: -73.9566,
-        arrivalTime: new Date(startDate.getTime()),
-        departureTime: new Date(startDate.getTime() + 8 * 60 * 60 * 1000),
-        dwellTimeMinutes: 480,
-        visitCount: 1,
-        significance: 'routine',
-        notes: 'Subject\'s residence'
-      },
-      {
-        id: 'stop-2',
-        name: 'Chelsea Tech Office',
-        type: 'workplace',
-        lat: 40.7450,
-        lng: -74.0010,
-        arrivalTime: new Date(startDate.getTime() + 9 * 60 * 60 * 1000),
-        departureTime: new Date(startDate.getTime() + 17 * 60 * 60 * 1000),
-        dwellTimeMinutes: 480,
-        visitCount: 1,
-        significance: 'routine',
-        notes: 'Regular workplace'
-      },
-      {
-        id: 'stop-3',
-        name: 'Red Hook Warehouse',
-        type: 'meeting',
-        lat: 40.6743,
-        lng: -74.0140,
-        arrivalTime: new Date(startDate.getTime() + 26 * 60 * 60 * 1000),
-        departureTime: new Date(startDate.getTime() + 27 * 60 * 60 * 1000),
-        dwellTimeMinutes: 42,
-        visitCount: 1,
-        significance: 'anomaly',
-        notes: '⚠️ Late night meeting at 2:47 AM'
-      }
-    ]
-
-    const intelligence = {
-      behavioralInsights: [
-        {
-          type: 'anomaly' as const,
-          title: 'Late Night Activity',
-          description: 'Subject visited industrial warehouse at unusual hour (2:47 AM)',
-          confidence: 92,
-          severity: 'high' as const,
-          tags: ['late-night', 'warehouse']
-        }
-      ],
-      geographicIntelligence: {
-        primaryZone: 'Williamsburg, Brooklyn',
-        secondaryZones: ['Chelsea, Manhattan', 'Red Hook, Brooklyn'],
-        clusters: [],
-        travelPatterns: ['Regular commute pattern with late-night deviation']
-      },
-      networkInference: {
-        likelyAssociates: 2,
-        meetingLocations: ['Red Hook Warehouse'],
-        suspiciousContacts: ['Unidentified associates at warehouse'],
-        networkRisk: 'high' as const,
-        inference: 'Multiple associates detected at industrial site'
-      },
-      recommendations: [
-        {
-          priority: 'immediate' as const,
-          action: 'Warrant for warehouse facility',
-          rationale: 'Critical anomaly detected',
-          resources: ['Surveillance team', 'Warrant preparation']
-        }
-      ],
-      riskScore: 72,
-      summary: 'Subject exhibits established routine with critical deviation on Night 2/3. Late-night warehouse visit with multiple associates indicates high-priority activity requiring immediate attention.'
-    }
-
-    return { subject, locationStops, intelligence }
-  }
 }
 
 // Singleton instance
