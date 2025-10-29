@@ -47,7 +47,7 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
 
       // If already at max expanded cards, minimize the oldest expanded card
       if (expandedCount >= MAX_EXPANDED_CARDS) {
-        // Find the oldest expanded card (last in array since newest is first)
+        // Find the oldest expanded card (first in array since oldest is first)
         const oldestExpandedIndex = updatedArtifacts.findIndex(a => !a.isMinimized && a.isExpanded)
 
         if (oldestExpandedIndex !== -1) {
@@ -59,9 +59,9 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
         }
       }
 
-      // Add new artifact to the START of array (newest first, top-left position)
+      // Add new artifact to the END of array (oldest first order)
       return {
-        artifacts: [newArtifact, ...updatedArtifacts],
+        artifacts: [...updatedArtifacts, newArtifact],
         currentArtifactId: newArtifact.id
       }
     })
