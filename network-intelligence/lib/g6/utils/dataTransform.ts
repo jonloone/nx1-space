@@ -81,15 +81,25 @@ export function transformNetworkToG6(
   nodes: NetworkNode[],
   connections: NetworkConnection[]
 ): GraphData {
-  // Transform nodes
-  const g6Nodes = nodes.map(node =>
-    transformNode(node, node.id === centerNode.id)
+  console.log('🟡 transformNetworkToG6 called with:', { centerNode: centerNode.id, nodesCount: nodes.length, connectionsCount: connections.length })
+
+  // Transform center node first (marked as center)
+  const centerG6Node = transformNode(centerNode, true)
+
+  // Transform other nodes
+  const otherG6Nodes = nodes.map(node =>
+    transformNode(node, false)
   )
+
+  // Combine center node with other nodes
+  const g6Nodes = [centerG6Node, ...otherG6Nodes]
 
   // Transform edges
   const g6Edges = connections.map(connection =>
     transformEdge(connection)
   )
+
+  console.log('🟡 transformNetworkToG6 result:', { nodes: g6Nodes.length, edges: g6Edges.length })
 
   return {
     nodes: g6Nodes,
