@@ -58,6 +58,46 @@ export function NetworkAnalysisCard({
   console.log('🟢 NetworkAnalysisCard rendering with:', { centerNode: centerNode.name, nodesCount: nodes.length, connectionsCount: connections.length })
 
   const [selectedNode, setSelectedNode] = useState<NetworkNode | null>(null)
+  const [containerWidth, setContainerWidth] = useState(400)
+  const [isLayoutReady, setIsLayoutReady] = useState(false)
+  const containerRef = React.useRef<HTMLDivElement>(null)
+
+  // Measure container width with proper timing for panel animations
+  React.useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth
+
+        // Use measured width if valid, otherwise use calculated fallback
+        // Fallback: 600px (panel) - 1px (border) - 32px (card padding) = 567px
+        const MIN_WIDTH = 567
+        const effectiveWidth = width > 0 ? width - 32 : MIN_WIDTH
+
+        console.log('📏 NetworkAnalysisCard width measurement:', {
+          measured: width,
+          effective: effectiveWidth,
+          containerReady: !!containerRef.current
+        })
+
+        setContainerWidth(effectiveWidth)
+        setIsLayoutReady(true)
+      }
+    }
+
+    // Delay initial measurement to allow panel animation to complete (350ms)
+    // This ensures stable dimensions before G6 initializes
+    const initialTimer = setTimeout(() => {
+      updateWidth()
+    }, 350)
+
+    // Also listen for window resizes
+    window.addEventListener('resize', updateWidth)
+
+    return () => {
+      clearTimeout(initialTimer)
+      window.removeEventListener('resize', updateWidth)
+    }
+  }, [])
 
   // Get connections for a specific node
   const getNodeConnections = (nodeId: string) => {
@@ -72,12 +112,13 @@ export function NetworkAnalysisCard({
 
   return (
     <motion.div
+      ref={containerRef}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        'w-full min-w-[450px] bg-white rounded-lg border border-purple-200 shadow-md',
+        'w-full bg-white rounded-lg border border-purple-200 shadow-md',
         className
       )}
     >
@@ -128,7 +169,7 @@ export function NetworkAnalysisCard({
           centerNode={centerNode}
           nodes={nodes}
           connections={connections}
-          width={418} // Card width minus padding
+          width={containerWidth}
           height={400}
           onNodeClick={(node) => {
             setSelectedNode(node)

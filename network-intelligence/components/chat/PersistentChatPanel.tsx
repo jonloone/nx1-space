@@ -1,6 +1,10 @@
 /**
  * Persistent Chat Panel
  *
+ * @deprecated This component has been replaced by CommandPaletteBar.
+ * Use CommandPaletteBar instead for full-width bottom command palette.
+ * This file is kept for reference but is no longer used in production.
+ *
  * Minimized context-aware navigator that sits at bottom-left.
  *
  * Features:

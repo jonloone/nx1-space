@@ -25,15 +25,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import type { IntelligenceAlert } from '@/lib/types/chatArtifacts'
+import { NetworkAnalysisCard } from '@/components/investigation/NetworkAnalysisCard'
+import type { Network } from 'lucide-react'
 
 interface RightPanelProps {
-  mode: 'feature' | 'alert' | 'layer' | 'analysis' | 'cluster' | null
+  mode: 'feature' | 'alert' | 'layer' | 'analysis' | 'cluster' | 'network-analysis' | null
   data?: any
   onClose: () => void
   onInjectAlert?: (alert: IntelligenceAlert) => void
+  onAction?: (action: string, data: any) => void
 }
 
-export default function RightPanel({ mode, data, onClose, onInjectAlert }: RightPanelProps) {
+export default function RightPanel({ mode, data, onClose, onInjectAlert, onAction }: RightPanelProps) {
   if (!mode) return null
 
   const renderHeader = () => {
@@ -61,6 +64,10 @@ export default function RightPanel({ mode, data, onClose, onInjectAlert }: Right
         icon = <BarChart3 className="h-4 w-4" />
         title = 'Analysis Results'
         break
+      case 'network-analysis':
+        icon = <Navigation className="h-4 w-4" />
+        title = 'Network Analysis'
+        break
     }
 
     return (
@@ -85,12 +92,20 @@ export default function RightPanel({ mode, data, onClose, onInjectAlert }: Right
     <div className="h-full flex flex-col bg-white border-l border-[#E5E5E5]">
       {renderHeader()}
       <ScrollArea className="flex-1">
-        <div className="p-4">
+        <div className={mode === 'network-analysis' ? 'p-0' : 'p-4'}>
           {mode === 'feature' && <FeatureDetailsPanel data={data} />}
           {mode === 'alert' && <AlertDetailsPanel data={data} />}
           {mode === 'cluster' && <ClusterAlertsPanel data={data} onInjectAlert={onInjectAlert} />}
           {mode === 'layer' && <LayerStylePanel data={data} />}
           {mode === 'analysis' && <AnalysisResultsPanel data={data} />}
+          {mode === 'network-analysis' && data && (
+            <NetworkAnalysisCard
+              centerNode={data.centerNode}
+              nodes={data.nodes}
+              connections={data.connections}
+              onAction={onAction}
+            />
+          )}
         </div>
       </ScrollArea>
     </div>

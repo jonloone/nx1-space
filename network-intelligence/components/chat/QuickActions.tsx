@@ -2,7 +2,7 @@
  * QuickActions Component
  *
  * Displays contextual quick action buttons for common tasks.
- * Appears in the PersistentChatPanel for easy access.
+ * Appears in the CommandPaletteBar for easy access.
  */
 
 'use client'

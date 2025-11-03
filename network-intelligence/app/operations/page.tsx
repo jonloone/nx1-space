@@ -17,6 +17,7 @@ import { InvestigationMode } from '@/components/investigation'
 import CopilotProvider from '@/components/chat/CopilotProvider'
 import CopilotSidebarWrapper from '@/components/chat/CopilotSidebarWrapper'
 import { AIChatPanelRef, ChatMessage } from '@/components/ai/AIChatPanel'
+import { CommandPaletteBarRef } from '@/components/chat/CommandPaletteBar'
 import MapboxAlertVisualization from '@/components/opintel/MapboxAlertVisualization'
 import type { IntelligenceAlert } from '@/lib/types/chatArtifacts'
 import { useMapStore, usePanelStore } from '@/lib/stores'
@@ -34,7 +35,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pM
 export default function OperationsPage() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
-  const chatRef = useRef<AIChatPanelRef>(null)
+  const chatRef = useRef<CommandPaletteBarRef>(null)
 
   // Chat sidebar state
   const [isChatExpanded, setIsChatExpanded] = useState(false)
