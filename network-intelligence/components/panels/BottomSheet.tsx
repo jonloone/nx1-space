@@ -54,8 +54,11 @@ export default function BottomSheet({ children, className = '' }: BottomSheetPro
 
   // Update spring when detent changes
   useEffect(() => {
+    console.log('🔄 BottomSheet useEffect triggered - isOpen:', isOpen, 'detent:', detent, 'isDragging:', isDragging)
+
     if (!isOpen) {
       // Animate out
+      console.log('🚪 Animating out - closing panel')
       api.start({
         y: typeof window !== 'undefined' ? window.innerHeight : 1000,
         immediate: false
@@ -63,12 +66,39 @@ export default function BottomSheet({ children, className = '' }: BottomSheetPro
     } else {
       // Animate to detent
       const targetHeight = getDetentHeight(detent)
-      const targetY = (typeof window !== 'undefined' ? window.innerHeight : 1000) - targetHeight
+      const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 1000
+      // Need to move UP (negative value) to show the bottom portion
+      const targetY = -(windowHeight - targetHeight)
+
+      console.log('🎯 Spring animation calculation:', {
+        windowHeight,
+        targetHeight,
+        targetY,
+        detent,
+        currentYValue: y.get()
+      })
 
       api.start({
         y: targetY,
         immediate: isDragging
       })
+
+      // Check DOM after a short delay
+      setTimeout(() => {
+        if (sheetRef.current) {
+          const computedStyle = window.getComputedStyle(sheetRef.current)
+          console.log('🎨 BottomSheet DOM after animation:', {
+            transform: computedStyle.transform,
+            bottom: computedStyle.bottom,
+            position: computedStyle.position,
+            zIndex: computedStyle.zIndex,
+            height: computedStyle.height,
+            visibility: computedStyle.visibility,
+            display: computedStyle.display,
+            opacity: computedStyle.opacity
+          })
+        }
+      }, 100)
 
       setCurrentHeight(targetHeight)
     }
@@ -77,8 +107,11 @@ export default function BottomSheet({ children, className = '' }: BottomSheetPro
   // Drag gesture
   const bind = useDrag(
     ({ last, velocity: [, vy], direction: [, dy], offset: [, offsetY], cancel }) => {
-      // Prevent dragging up beyond expanded
-      if (offsetY < (typeof window !== 'undefined' ? window.innerHeight : 1000) * (1 - DETENT_CONFIG.expanded)) {
+      const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 1000
+
+      // Prevent dragging up beyond expanded (offsetY is negative when dragging up)
+      const maxUpDrag = -(windowHeight * (1 - DETENT_CONFIG.expanded))
+      if (offsetY < maxUpDrag) {
         cancel()
         return
       }
@@ -87,7 +120,8 @@ export default function BottomSheet({ children, className = '' }: BottomSheetPro
         // Drag ended - snap to nearest detent
         setDragging(false)
 
-        const currentHeightValue = (typeof window !== 'undefined' ? window.innerHeight : 1000) - offsetY
+        // Convert offsetY (negative = up) to height
+        const currentHeightValue = windowHeight + offsetY
 
         // Determine target detent based on velocity and position
         const targetDetent = getDetentFromVelocity(currentHeightValue, vy, dy)
@@ -101,23 +135,26 @@ export default function BottomSheet({ children, className = '' }: BottomSheetPro
         // Dragging
         setDragging(true)
 
-        // Update spring position immediately
+        // Update spring position immediately (offsetY is already negative for up movement)
         api.start({
           y: offsetY,
           immediate: true
         })
 
-        // Update current height in store
-        const height = (typeof window !== 'undefined' ? window.innerHeight : 1000) - offsetY
+        // Update current height in store (convert negative offsetY to height)
+        const height = windowHeight + offsetY
         setCurrentHeight(height)
       }
     },
     {
       from: () => [0, y.get()],
-      bounds: () => ({
-        top: (typeof window !== 'undefined' ? window.innerHeight : 1000) * (1 - DETENT_CONFIG.expanded),
-        bottom: typeof window !== 'undefined' ? window.innerHeight : 1000
-      }),
+      bounds: () => {
+        const wh = typeof window !== 'undefined' ? window.innerHeight : 1000
+        return {
+          top: -(wh * (1 - DETENT_CONFIG.expanded)), // Most negative (expanded)
+          bottom: 0 // Closed position
+        }
+      },
       rubberband: true,
       filterTaps: true,
       axis: 'y'
@@ -144,8 +181,11 @@ export default function BottomSheet({ children, className = '' }: BottomSheetPro
 
   // Don't render if not open
   if (!isOpen) {
+    console.log('🚫 BottomSheet not rendering - isOpen:', isOpen)
     return null
   }
+
+  console.log('✅ BottomSheet rendering - isOpen:', isOpen, 'detent:', detent, 'currentHeight:', currentHeight)
 
   return (
     <>
@@ -162,14 +202,14 @@ export default function BottomSheet({ children, className = '' }: BottomSheetPro
         ref={sheetRef}
         {...bind()}
         style={{
-          y,
+          transform: y.to(val => `translateY(${val}px)`),
           touchAction: 'none',
           position: 'fixed',
           bottom: 0,
           left: 0,
           right: 0,
           height: '100vh',
-          zIndex: 50
+          zIndex: 1001 // Above AlertVisualization (1000)
         }}
         className={`flex flex-col ${className}`}
       >

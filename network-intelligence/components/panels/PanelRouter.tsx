@@ -5,6 +5,7 @@ import { usePanelStore } from '@/lib/stores/panelStore'
 import SearchResultsPanel from './SearchResultsPanel'
 import POIContextPanel from './POIContextPanel'
 import IntelligencePanel from './IntelligencePanel'
+import TimelinePanel from './TimelinePanel'
 
 /**
  * PanelRouter Component
@@ -34,14 +35,7 @@ export default function PanelRouter() {
       return <IntelligencePanel />
 
     case 'timeline':
-      return (
-        <div className="p-6">
-          <h2 className="text-lg font-semibold">Timeline</h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            Timeline visualization coming soon...
-          </p>
-        </div>
-      )
+      return <TimelinePanel />
 
     case 'document':
       return (

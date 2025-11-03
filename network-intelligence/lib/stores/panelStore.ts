@@ -18,8 +18,8 @@ export interface PanelContent {
   subtitle?: string
 }
 
-// Right panel modes for alert visualization
-export type RightPanelMode = 'alert' | 'cluster' | null
+// Right panel modes for alert visualization and network analysis
+export type RightPanelMode = 'alert' | 'cluster' | 'network-analysis' | null
 
 export const DETENT_CONFIG = {
   collapsed: 0.20,  // 20% viewport height
@@ -58,17 +58,27 @@ interface PanelState {
 
 export const usePanelStore = create<PanelState>()(
   devtools(
-    (set, get) => ({
-      // Bottom panel state
-      isOpen: false,
-      detent: 'hidden',
-      content: null,
-      isDragging: false,
-      currentHeight: 0,
+    (set, get) => {
+      // Wrap set to log all state changes
+      const loggedSet = (partial: any) => {
+        console.log('🔄 Store state changing:', partial)
+        console.trace('State change stack trace')
+        set(partial)
+      }
+
+      return {
+        // Bottom panel state
+        isOpen: false,
+        detent: 'hidden',
+        content: null,
+        isDragging: false,
+        currentHeight: 0,
 
       // Bottom panel actions
       openPanel: (content, detent = 'collapsed') => {
-        set({
+        console.log('🚪 openPanel called with:', { contentType: content.type, detent })
+        console.trace('openPanel stack trace')
+        loggedSet({
           isOpen: true,
           detent,
           content,
@@ -77,23 +87,25 @@ export const usePanelStore = create<PanelState>()(
       },
 
       closePanel: () => {
-        set({ isOpen: false, detent: 'hidden', content: null, currentHeight: 0 })
+        console.log('🚪 closePanel called - stack trace:')
+        console.trace()
+        loggedSet({ isOpen: false, detent: 'hidden', content: null, currentHeight: 0 })
       },
 
       setDetent: (detent) => {
-        set({ detent, currentHeight: get().getDetentHeight(detent) })
+        loggedSet({ detent, currentHeight: get().getDetentHeight(detent) })
       },
 
       setDragging: (dragging) => {
-        set({ isDragging: dragging })
+        loggedSet({ isDragging: dragging })
       },
 
       setCurrentHeight: (height) => {
-        set({ currentHeight: height })
+        loggedSet({ currentHeight: height })
       },
 
       updateContent: (content) => {
-        set({ content })
+        loggedSet({ content })
       },
 
       getDetentHeight: (detent) => {
@@ -108,21 +120,21 @@ export const usePanelStore = create<PanelState>()(
 
       // Right panel actions
       setRightPanelMode: (mode) => {
-        set({ rightPanelMode: mode })
+        loggedSet({ rightPanelMode: mode })
       },
 
       setRightPanelData: (data) => {
-        set({ rightPanelData: data })
+        loggedSet({ rightPanelData: data })
       },
 
       openRightPanel: (mode, data) => {
-        set({ rightPanelMode: mode, rightPanelData: data || null })
+        loggedSet({ rightPanelMode: mode, rightPanelData: data || null })
       },
 
       closeRightPanel: () => {
-        set({ rightPanelMode: null, rightPanelData: null })
+        loggedSet({ rightPanelMode: null, rightPanelData: null })
       }
-    }),
+    }},
     { name: 'PanelStore' }
   )
 )

@@ -26,8 +26,9 @@ import {
 import NexusOneLogo from '@/components/branding/NexusOneLogo'
 import IntegratedSearchBar from '@/components/search/IntegratedSearchBar'
 import ChatContainer from '@/components/chat/ChatContainer'
-import PersistentChatPanel from '@/components/chat/PersistentChatPanel'
+import CommandPaletteBar from '@/components/chat/CommandPaletteBar'
 import { CardDock } from '@/components/opintel/CardDock'
+import RightPanel from '@/components/opintel/panels/RightPanel'
 import { IntelligenceAlertArtifact } from '@/components/ai/artifacts/IntelligenceAlertArtifact'
 import { SubjectProfileCard } from '@/components/investigation/SubjectProfileCard'
 import { TimelineCard } from '@/components/investigation/TimelineCard'
@@ -35,8 +36,7 @@ import { NetworkAnalysisCard } from '@/components/investigation/NetworkAnalysisC
 import ArtifactRenderer from '@/components/ai/artifacts/ArtifactRenderer'
 import { AIChatPanelRef } from '@/components/ai/AIChatPanel'
 import { getCitizens360DataService } from '@/lib/services/citizens360DataService'
-import BottomSheet from '@/components/panels/BottomSheet'
-import PanelRouter from '@/components/panels/PanelRouter'
+import SimpleBottomPanel from '@/components/panels/SimpleBottomPanel'
 import { usePanelStore } from '@/lib/stores/panelStore'
 import { useMapStore } from '@/lib/stores/mapStore'
 import { useAnalysisStore } from '@/lib/stores/analysisStore'
@@ -115,9 +115,10 @@ export default function MissionControlLayout({
   const [searchQuery, setSearchQuery] = useState('')
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [chatHeight, setChatHeight] = useState(70) // Default collapsed height
+  const [mouseDownPos, setMouseDownPos] = useState<{ x: number; y: number } | null>(null)
 
   // Panel and map stores
-  const { isOpen: isPanelOpen, currentHeight: panelHeight, rightPanelMode, closeRightPanel } = usePanelStore()
+  const { isOpen: isPanelOpen, currentHeight: panelHeight, rightPanelMode, rightPanelData, closeRightPanel, openRightPanel, openPanel } = usePanelStore()
   const { setPadding, flyTo, addMarker } = useMapStore()
   const { artifacts, removeArtifact, pushArtifact, expandArtifact, minimizeArtifact } = useAnalysisStore()
 
@@ -171,9 +172,42 @@ export default function MissionControlLayout({
     }
   }, [isPanelOpen, panelHeight, setPadding])
 
+  // Adjust map padding based on command palette height
+  useEffect(() => {
+    if (useChatInterface && chatHeight > 0) {
+      // Add padding to bottom of map to account for command palette
+      // Add a bit extra (20px) so map content isn't right at palette edge
+      setPadding({ bottom: chatHeight + 20 })
+    }
+  }, [useChatInterface, chatHeight, setPadding])
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     onSearch?.(searchQuery)
+  }
+
+  // Track mouse down position to detect if it's a click or drag
+  const handleMapMouseDown = (e: React.MouseEvent) => {
+    setMouseDownPos({ x: e.clientX, y: e.clientY })
+    // Don't prevent default - let map handle the event too
+  }
+
+  // Only minimize command palette if this was a click (not a drag)
+  const handleMapClick = (e: React.MouseEvent) => {
+    if (!mouseDownPos || !useChatInterface || !chatRef?.current) return
+
+    // Calculate distance moved
+    const deltaX = Math.abs(e.clientX - mouseDownPos.x)
+    const deltaY = Math.abs(e.clientY - mouseDownPos.y)
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+
+    // If mouse moved less than 5 pixels, it's a click (not a drag)
+    if (distance < 5) {
+      chatRef.current.collapse()
+    }
+
+    setMouseDownPos(null)
+    // Don't prevent default - let map handle the event too
   }
 
   // Handle progressive investigation actions
@@ -211,6 +245,8 @@ export default function MissionControlLayout({
         const subjectId = data.subjectId || data.profile?.subjectId || 'SUBJECT-2547'
         const caseNumber = 'CT-2024-8473'
 
+        console.log('📅 Opening timeline panel for subject:', subjectId)
+
         try {
           const timeline = await citizens360Service.loadTimeline(caseNumber, subjectId)
           const subject = await citizens360Service.getSubjectById(caseNumber, subjectId)
@@ -225,17 +261,28 @@ export default function MissionControlLayout({
 
             const subjectName = data.subjectName || subject?.name?.full || data.profile?.name?.full || 'Subject'
 
-            pushArtifact({
-              type: 'timeline',
+            // Open timeline in bottom panel (instead of artifact card)
+            const panelContent = {
+              type: 'timeline' as const,
               data: {
-                title: `${subjectName} - Movement Timeline`,
-                period,
                 events: timeline,
-                summary: `${timeline.length} events over ${Math.ceil((period.end.getTime() - period.start.getTime()) / (1000 * 60 * 60 * 24))} days`,
-                subjectId, // Include subjectId for network loading
-                subjectName
-              }
-            })
+                subjectName,
+                period,
+                subjectId
+              },
+              title: `${subjectName} - Timeline`,
+              subtitle: `${timeline.length} events over ${Math.ceil((period.end.getTime() - period.start.getTime()) / (1000 * 60 * 60 * 24))} days`
+            }
+
+            console.log('📅 Opening panel with content:', panelContent)
+            openPanel(panelContent, 'medium')
+
+            // Verify panel state after opening
+            setTimeout(() => {
+              console.log('📅 Panel state check - isOpen:', isPanelOpen, 'detent:', usePanelStore.getState().detent)
+            }, 100)
+
+            console.log('📅 Timeline panel opened with', timeline.length, 'events')
           }
         } catch (error) {
           console.error('Failed to load timeline:', error)
@@ -263,47 +310,16 @@ export default function MissionControlLayout({
           console.log('📡 Network data:', network ? `${network.nodes.length} nodes, ${network.connections.length} connections` : 'NULL')
 
           if (network) {
-            // Transform network data to NetworkGraphData format
-            // Service returns: { centerNode: {id, name, type, riskLevel}, nodes: [], connections: [] }
-            // Type expects: { title, nodes: NetworkNode[], edges: NetworkEdge[], centerNode: string }
+            // Open network analysis in right panel
+            console.log('📡 Opening network analysis panel with data:', network)
 
-            const networkGraphData = {
-              title: `${network.centerNode.name} - Network Analysis`,
-              centerNode: network.centerNode.id, // Convert object to ID string
-              nodes: [
-                // Include center node
-                {
-                  id: network.centerNode.id,
-                  label: network.centerNode.name,
-                  type: network.centerNode.type,
-                  riskScore: network.centerNode.riskLevel === 'high' ? 90 : network.centerNode.riskLevel === 'medium' ? 50 : 20
-                },
-                // Map other nodes: change 'name' to 'label', add riskScore
-                ...network.nodes.map(node => ({
-                  id: node.id,
-                  label: node.name,
-                  type: node.type === 'organization' ? 'entity' : node.type, // Map 'organization' to 'entity'
-                  riskScore: node.riskLevel === 'high' ? 90 : node.riskLevel === 'medium' ? 50 : 20
-                }))
-              ],
-              edges: network.connections.map((conn, idx) => ({
-                source: conn.from,
-                target: conn.to,
-                type: conn.type,
-                weight: conn.frequency,
-                timestamp: conn.lastContact,
-                label: conn.frequency > 1 ? `${conn.frequency}x` : undefined
-              }))
-            }
-
-            console.log('📡 Pushing network-graph artifact with data:', networkGraphData)
-
-            pushArtifact({
-              type: 'network-graph',
-              data: networkGraphData
+            openRightPanel('network-analysis', {
+              centerNode: network.centerNode,
+              nodes: network.nodes,
+              connections: network.connections
             })
 
-            console.log('📡 Network-graph artifact pushed successfully')
+            console.log('📡 Network analysis panel opened successfully')
           } else {
             console.warn('📡 No network data returned from service')
           }
@@ -388,6 +404,16 @@ export default function MissionControlLayout({
       <div className="absolute inset-0 map-card">
         {children}
 
+        {/* Transparent overlay to capture clicks for closing command palette - only when expanded */}
+        {useChatInterface && chatHeight > 70 && (
+          <div
+            className="absolute inset-0 pointer-events-auto"
+            style={{ zIndex: 35 }}
+            onMouseDown={handleMapMouseDown}
+            onClick={handleMapClick}
+          />
+        )}
+
           {/* Top-Left Logo & Controls - Floating inside map card (hidden when chat interface is active) */}
           {!hideSidebar && !useChatInterface && (
             <div className="absolute top-6 left-6 z-50 flex items-center gap-3">
@@ -460,17 +486,13 @@ export default function MissionControlLayout({
           )}
       </div>
 
-      {/* Persistent Chat Panel - Bottom Left */}
+      {/* Command Palette Bar - Full Width Bottom */}
       {!hideSidebar && useChatInterface && (
-        <div className="absolute bottom-4 left-4 z-50 pointer-events-none">
-          <div className="pointer-events-auto">
-            <PersistentChatPanel
-              ref={chatRef}
-              onAction={handleInvestigationAction}
-              onHeightChange={setChatHeight}
-            />
-          </div>
-        </div>
+        <CommandPaletteBar
+          ref={chatRef}
+          onAction={handleInvestigationAction}
+          onHeightChange={setChatHeight}
+        />
       )}
 
       {/* Investigation Cards - Adaptive Masonry Grid (Max 3 Expanded) */}
@@ -520,15 +542,6 @@ export default function MissionControlLayout({
                       events={artifact.data.events}
                       subjectName={artifact.data.subjectName}
                       subjectId={artifact.data.subjectId}
-                      onAction={handleInvestigationAction}
-                      onClose={() => removeArtifact(artifact.id)}
-                    />
-                  )}
-                  {artifact.type === 'network-analysis' && (
-                    <NetworkAnalysisCard
-                      centerNode={artifact.data.centerNode}
-                      nodes={artifact.data.nodes}
-                      connections={artifact.data.connections}
                       onAction={handleInvestigationAction}
                       onClose={() => removeArtifact(artifact.id)}
                     />
@@ -600,21 +613,26 @@ export default function MissionControlLayout({
       <AnimatePresence mode="wait">
         {isRightPanelOpen && (
           <motion.aside
-            initial={{ x: 480, opacity: 0 }}
+            initial={{ x: 600, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 480, opacity: 0 }}
+            exit={{ x: 600, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute top-0 right-0 bottom-0 z-[60] w-[480px] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl"
+            className="absolute top-0 right-0 bottom-0 z-[60] w-[600px] bg-white dark:bg-gray-900 shadow-2xl"
           >
-            {rightPanel}
+            {rightPanel || (
+              <RightPanel
+                mode={rightPanelMode}
+                data={rightPanelData}
+                onClose={closeRightPanel}
+                onAction={handleInvestigationAction}
+              />
+            )}
           </motion.aside>
         )}
       </AnimatePresence>
 
-      {/* Bottom Sheet Panel */}
-      <BottomSheet>
-        <PanelRouter />
-      </BottomSheet>
+      {/* Bottom Panel */}
+      <SimpleBottomPanel />
     </div>
   )
 }

@@ -263,7 +263,10 @@ export function IntelligenceAlertArtifact({
                 <Button
                   variant="outline"
                   className="h-8 text-xs border-gray-200 hover:bg-gray-50"
-                  onClick={() => onAction?.('view-timeline', alert)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onAction?.('view-timeline', alert)
+                  }}
                 >
                   <Clock className="w-3.5 h-3.5 mr-1" />
                   Timeline
@@ -271,7 +274,10 @@ export function IntelligenceAlertArtifact({
                 <Button
                   variant="outline"
                   className="h-8 text-xs border-gray-200 hover:bg-gray-50"
-                  onClick={() => onAction?.('show-network', alert)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onAction?.('show-network', alert)
+                  }}
                 >
                   Network
                 </Button>
