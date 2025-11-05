@@ -5,6 +5,7 @@
 
 import type { SubjectProfileData, TimelineEvent, IntelligenceAlert } from '@/lib/types/chatArtifacts'
 import type { CaseMetadata } from '@/lib/data/citizens360/cases-index'
+import { getMultiIntReportService } from './multiIntReportService'
 
 /**
  * Citizens 360 Data Service
@@ -230,6 +231,10 @@ export class Citizens360DataService {
           })
 
           for (const event of recentEvents) {
+            // Generate multi-INT analysis for the event
+            const multiIntService = getMultiIntReportService()
+            const multiIntAnalysis = await multiIntService.analyzeEvent(event)
+
             const alert: IntelligenceAlert = {
               id: `alert-${event.id}`,
               timestamp: event.timestamp,
@@ -249,7 +254,57 @@ export class Citizens360DataService {
               confidence: event.confidence,
               actionRequired: event.significance === 'critical',
               relatedEventId: event.id,
-              tags: this.generateAlertTags(event, subject)
+              tags: this.generateAlertTags(event, subject),
+              // Populate analysis from multi-INT service
+              analysis: {
+                intelligenceSummary: multiIntAnalysis.intelligence_summary,
+                riskIndicators: multiIntAnalysis.risk_indicators,
+                recommendedActions: multiIntAnalysis.recommended_actions,
+                confidenceScore: multiIntAnalysis.confidence_score,
+                geoint: multiIntAnalysis.geoint ? {
+                  buildingType: multiIntAnalysis.geoint.building_type,
+                  landUseZone: multiIntAnalysis.geoint.land_use_zone,
+                  addressVerified: multiIntAnalysis.geoint.address_verified,
+                  contextualNotes: multiIntAnalysis.geoint.contextual_notes
+                } : undefined,
+                sigint: multiIntAnalysis.sigint ? {
+                  nearbyCellTowers: 1,
+                  strongestTower: {
+                    operator: multiIntAnalysis.sigint.operator,
+                    radioType: multiIntAnalysis.sigint.radio_type,
+                    distanceMeters: multiIntAnalysis.sigint.distance_meters
+                  },
+                  estimatedSignalStrength: multiIntAnalysis.sigint.signal_strength === 'strong' ? 90 :
+                                          multiIntAnalysis.sigint.signal_strength === 'medium' ? 60 : 30
+                } : undefined,
+                osint: multiIntAnalysis.osint ? {
+                  businessData: {
+                    name: multiIntAnalysis.osint.business_name || '',
+                    owner: multiIntAnalysis.osint.business_owner,
+                    operatingHours: multiIntAnalysis.osint.operating_hours,
+                    status: multiIntAnalysis.osint.business_status,
+                    ownership: multiIntAnalysis.osint.owner_subject_link ? {
+                      owner_subject_id: multiIntAnalysis.osint.owner_subject_link
+                    } : undefined,
+                    suspicious: {
+                      risk_score: multiIntAnalysis.osint.risk_score,
+                      flags: multiIntAnalysis.osint.suspicious_flags
+                    }
+                  },
+                  socialMediaPresence: {
+                    level: multiIntAnalysis.osint.social_media_presence,
+                    has_website: multiIntAnalysis.osint.social_media_presence !== 'none'
+                  }
+                } : undefined,
+                temporal: {
+                  timeOfDay: multiIntAnalysis.temporal.time_of_day,
+                  dayOfWeek: multiIntAnalysis.temporal.day_of_week,
+                  anomalyDetected: multiIntAnalysis.temporal.is_anomalous,
+                  anomalyReasons: multiIntAnalysis.temporal.anomaly_reasons,
+                  trafficLevel: multiIntAnalysis.temporal.traffic_level,
+                  pedestrianDensity: multiIntAnalysis.temporal.pedestrian_density
+                }
+              }
             }
 
             alerts.push(alert)

@@ -477,6 +477,56 @@ export interface IntelligenceAlert {
   actionRequired: boolean
   relatedEventId?: string
   tags: string[]
+  // Multi-INT Analysis (optional, populated when alert is analyzed)
+  analysis?: {
+    intelligenceSummary: string
+    riskIndicators: string[]
+    recommendedActions: string[]
+    confidenceScore: number
+    // Optional detailed INT breakdowns
+    geoint?: {
+      buildingType?: string
+      landUseZone?: string
+      addressVerified: boolean
+      contextualNotes: string[]
+    }
+    sigint?: {
+      nearbyCellTowers: number
+      strongestTower?: {
+        operator: string
+        radioType: string
+        distanceMeters: number
+      }
+      estimatedSignalStrength?: number
+    }
+    osint?: {
+      businessData?: {
+        name: string
+        owner?: string
+        operatingHours?: string
+        status?: 'open' | 'closed'
+        ownership?: {
+          owner_subject_id?: string
+        }
+        suspicious?: {
+          risk_score: number
+          flags: string[]
+        }
+      }
+      socialMediaPresence?: {
+        level: 'high' | 'medium' | 'low' | 'none'
+        has_website: boolean
+      }
+    }
+    temporal?: {
+      timeOfDay: string
+      dayOfWeek: string
+      anomalyDetected: boolean
+      anomalyReasons: string[]
+      trafficLevel?: string
+      pedestrianDensity?: string
+    }
+  }
 }
 
 // ============================================================================

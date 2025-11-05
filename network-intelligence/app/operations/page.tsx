@@ -13,7 +13,8 @@ import TemporalPlaybackControls from '@/components/opintel/TemporalPlaybackContr
 import AdvancedSearchFilterPanel from '@/components/opintel/AdvancedSearchFilterPanel'
 import GERSMapLayer from '@/components/gers/GERSMapLayer'
 import AddLayerDropdown from '@/components/opintel/panels/AddLayerDropdown'
-import { InvestigationMode } from '@/components/investigation'
+// DISABLED: Investigation mode now triggered via AI chat artifacts
+// import { InvestigationMode } from '@/components/investigation'
 import CopilotProvider from '@/components/chat/CopilotProvider'
 import CopilotSidebarWrapper from '@/components/chat/CopilotSidebarWrapper'
 import { AIChatPanelRef, ChatMessage } from '@/components/ai/AIChatPanel'
@@ -36,6 +37,7 @@ export default function OperationsPage() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const chatRef = useRef<CommandPaletteBarRef>(null)
+  const summarizedAlerts = useRef<Set<string>>(new Set())
 
   // Chat sidebar state
   const [isChatExpanded, setIsChatExpanded] = useState(false)
@@ -76,8 +78,8 @@ export default function OperationsPage() {
   // Add Layer Dialog state
   const [isAddLayerDialogOpen, setIsAddLayerDialogOpen] = useState(false)
 
-  // Investigation Mode state
-  const [isInvestigationModeActive, setIsInvestigationModeActive] = useState(false)
+  // Investigation Mode - DISABLED: Will be triggered via AI chat artifacts instead
+  // const [isInvestigationModeActive, setIsInvestigationModeActive] = useState(false)
 
   // Viewport tracking for alert visualization
   const [viewport, setViewport] = useState({
@@ -705,37 +707,22 @@ export default function OperationsPage() {
     openRightPanel('feature', place)
   }
 
-  // Inject alert into chat with artifact
+  // Handle alert click - Open panel with alert details (no chat injection)
   const handleInjectAlert = (alert: IntelligenceAlert) => {
-    console.log('💬 Injecting alert into chat:', alert.id)
+    console.log('🎯 Alert clicked:', alert.id)
+    console.log('📍 Subject:', alert.subjectName)
 
-    // Auto-expand chat if collapsed
-    if (!isChatExpanded) {
-      setIsChatExpanded(true)
-    }
+    // Note: All alert details and analysis are shown in the panel
+    // No chat injection - everything is in the alert panel
 
-    const messageId = `alert-${Date.now()}`
+    // Mark as handled
+    summarizedAlerts.current.add(alert.id)
 
-    // Inject contextual message with alert artifact
-    chatRef.current?.injectMessage({
-      id: messageId,
-      role: 'assistant',
-      content: `**${alert.priority.toUpperCase()} Priority Alert**\n\n${alert.subjectName} at ${alert.location?.name || 'Unknown location'}`,
-      timestamp: new Date(),
-      artifact: {
-        type: 'intelligence-alert',
-        data: alert
-      }
+    // Open right panel with alert details
+    openRightPanel('alert', {
+      alert,
+      timestamp: new Date()
     })
-
-    // Push artifact to analysis store
-    pushArtifact({
-      type: 'intelligence-alert',
-      data: alert
-    }, messageId)
-
-    // Close right panel if open
-    closeRightPanel()
   }
 
   // Handle map actions from AI chat
@@ -810,8 +797,8 @@ export default function OperationsPage() {
         notificationCount={5}
         isLive={true}
         activeUsers={12}
-        hideSidebar={isInvestigationModeActive}
-        useChatInterface={!isInvestigationModeActive}
+        hideSidebar={false}
+        useChatInterface={true}
         chatRef={chatRef}
         isChatExpanded={isChatExpanded}
         onToggleChat={() => setIsChatExpanded(!isChatExpanded)}
@@ -835,10 +822,10 @@ export default function OperationsPage() {
 
             console.log('📋 Loading preset:', presetId)
 
-            // Check if this is the investigation intelligence preset
+            // Investigation intelligence preset - Now handled by AI chat
             if (presetId === 'investigation-intelligence') {
-              console.log('🔍 Activating Investigation Intelligence Mode')
-              setIsInvestigationModeActive(true)
+              console.log('🔍 Investigation Intelligence - Use AI chat to trigger investigation artifacts')
+              // No longer activates a separate mode
               return
             }
 
@@ -1003,16 +990,8 @@ export default function OperationsPage() {
         />
       )}
 
-      {/* Investigation Mode */}
-      {isInvestigationModeActive && map.current && (
-        <InvestigationMode
-          map={map.current}
-          onExit={() => {
-            console.log('🚪 Exiting Investigation Mode')
-            setIsInvestigationModeActive(false)
-          }}
-        />
-      )}
+      {/* Investigation Mode - DISABLED: Now triggered via AI chat artifacts */}
+      {/* Investigation components will be dynamically created as artifacts */}
 
       {/* Add Layer Dropdown */}
       <AddLayerDropdown
