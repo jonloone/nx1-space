@@ -18,8 +18,18 @@ export interface PanelContent {
   subtitle?: string
 }
 
-// Right panel modes for alert visualization and network analysis
-export type RightPanelMode = 'alert' | 'cluster' | 'network-analysis' | null
+// Right panel modes for alert visualization, network analysis, timeline details, and intelligence analysis
+export type RightPanelMode =
+  | 'alert'
+  | 'cluster'
+  | 'network-analysis'
+  | 'timeline-detail'
+  | 'route-analysis'
+  | 'imagery-analysis'
+  | 'isochrone-analysis'
+  | 'unified-analysis'
+  | 'layer-control'
+  | null
 
 export const DETENT_CONFIG = {
   collapsed: 0.20,  // 20% viewport height

@@ -8,6 +8,10 @@ import LeftSidebar from '@/components/opintel/panels/LeftSidebar'
 import RightPanel from '@/components/opintel/panels/RightPanel'
 import IntelligenceAlertPanel from '@/components/opintel/panels/IntelligenceAlertPanel'
 import SubjectProfileViewer from '@/components/opintel/SubjectProfileViewer'
+import RouteAnalysisPanel from '@/components/opintel/panels/RouteAnalysisPanel'
+import ImageryAnalysisPanel from '@/components/opintel/panels/ImageryAnalysisPanel'
+import IsochroneAnalysisPanel from '@/components/opintel/panels/IsochroneAnalysisPanel'
+import UnifiedAnalysisPanel from '@/components/opintel/panels/UnifiedAnalysisPanel'
 import AlertQueue from '@/components/opintel/AlertQueue'
 import TemporalPlaybackControls from '@/components/opintel/TemporalPlaybackControls'
 import AdvancedSearchFilterPanel from '@/components/opintel/AdvancedSearchFilterPanel'
@@ -936,6 +940,44 @@ export default function OperationsPage() {
               }}
               onRelatedSubjectClick={(subjectId) => {
                 openRightPanel('subject', { subjectId })
+              }}
+            />
+          ) : rightPanelMode === 'route-analysis' && rightPanelData ? (
+            <RouteAnalysisPanel
+              data={rightPanelData}
+              onClose={() => {
+                closeRightPanel()
+              }}
+              onFlyToWaypoint={(coords) => {
+                if (map.current) {
+                  map.current.flyTo({
+                    center: coords,
+                    zoom: 16,
+                    essential: true,
+                    duration: 2000
+                  })
+                }
+              }}
+            />
+          ) : rightPanelMode === 'imagery-analysis' && rightPanelData ? (
+            <ImageryAnalysisPanel
+              data={rightPanelData}
+              onClose={() => {
+                closeRightPanel()
+              }}
+            />
+          ) : rightPanelMode === 'isochrone-analysis' && rightPanelData ? (
+            <IsochroneAnalysisPanel
+              data={rightPanelData}
+              onClose={() => {
+                closeRightPanel()
+              }}
+            />
+          ) : rightPanelMode === 'unified-analysis' && rightPanelData ? (
+            <UnifiedAnalysisPanel
+              data={rightPanelData}
+              onClose={() => {
+                closeRightPanel()
               }}
             />
           ) : (

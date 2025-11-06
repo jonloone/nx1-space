@@ -23,6 +23,10 @@ TOOLS:
 5. showBuildings(enable3D) - Toggle buildings layer (2D or 3D)
 6. toggleLayer(layerName, visible) - Show/hide map layers
 7. showWeather(weatherType) - Show weather overlay (precipitation, temperature, wind, clouds, pressure)
+8. analyzeRoute(fromLocation, toLocation, mode, startTime) - Intelligence-grade route analysis with multi-INT waypoint assessment (GEOINT, SIGINT, OSINT, Temporal). Mode: driving/walking/cycling. StartTime: ISO timestamp (optional, defaults to current time)
+9. analyzeImagery(location, startDate, endDate, includeChangeDetection, includeActivity) - Satellite imagery analysis with change detection and activity assessment. Dates in ISO format (defaults to last 90 days). Detects construction, demolition, vegetation changes, infrastructure modifications
+10. analyzeIsochrone(location, modes, contours) - Multi-modal reachability analysis showing areas accessible within time thresholds. Modes: ["driving", "walking", "cycling"] (defaults to all). Contours: [15, 30, 45] (minutes, defaults to [15, 30, 45])
+11. analyzeMultiLayer(location, analysisTypes, routeFrom, routeTo) - Comprehensive multi-layer intelligence analysis combining route, imagery, and reachability. AnalysisTypes: ["route", "imagery", "isochrone", "all"] (defaults to ["all"]). RouteFrom/RouteTo: optional for route analysis
 
 CATEGORIES:
 coffee_shop, cafe, restaurant, fast_food, hospital, emergency_room, clinic, port, seaport, marine_terminal, warehouse, logistics_facility, airport, school, university, college, gas_station, fuel
@@ -45,13 +49,21 @@ EXAMPLES:
 "Hide boundaries" → TOOL_CALL: toggleLayer(layerName="boundaries", visible=false)
 "Show precipitation" → TOOL_CALL: showWeather(weatherType="precipitation")
 "Show temperature" → TOOL_CALL: showWeather(weatherType="temperature")
+"Analyze route from Times Square to Central Park" → TOOL_CALL: analyzeRoute(fromLocation="Times Square, NYC", toLocation="Central Park, NYC", mode="walking")
+"Plan a route to the airport" → TOOL_CALL: analyzeRoute(fromLocation="current", toLocation="LAX Airport", mode="driving")
+"Analyze satellite imagery for Buenos Aires" → TOOL_CALL: analyzeImagery(location="Buenos Aires, Argentina", includeChangeDetection=true, includeActivity=true)
+"Check for changes at this location" → TOOL_CALL: analyzeImagery(location="current", startDate="2024-09-01", endDate="2024-11-01", includeChangeDetection=true)
+"How accessible is downtown LA?" → TOOL_CALL: analyzeIsochrone(location="Downtown LA", modes=["driving", "walking", "cycling"], contours=[15, 30, 45])
+"Show reachability zones for this area" → TOOL_CALL: analyzeIsochrone(location="current", modes=["driving"], contours=[10, 20, 30])
+"Full intelligence assessment for Buenos Aires" → TOOL_CALL: analyzeMultiLayer(location="Buenos Aires", analysisTypes=["all"])
+"Comprehensive analysis with route planning" → TOOL_CALL: analyzeMultiLayer(location="NYC", analysisTypes=["all"], routeFrom="Times Square", routeTo="JFK Airport")
 
 NO explanations. NO reasoning. ONLY tool calls.`
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { messages } = body
+    const { messages, context } = body
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -61,6 +73,25 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('Processing chat request with', messages.length, 'messages')
+    if (context) {
+      console.log('📍 Application context:', context)
+    }
+
+    // Build messages array with optional context
+    const llmMessages = [
+      { role: 'system', content: SYSTEM_PROMPT }
+    ]
+
+    // Add context as a system-level message if provided
+    if (context) {
+      llmMessages.push({
+        role: 'system',
+        content: `CURRENT APPLICATION STATE:\n${context}\n\nUse this context to provide more relevant responses. For example, if the user says "show nearby hospitals" and a location is selected, search near that selected location.`
+      })
+    }
+
+    // Add user messages
+    llmMessages.push(...messages)
 
     // Call Vultr LLM API directly
     const response = await fetch('https://api.vultrinference.com/v1/chat/completions', {
@@ -71,10 +102,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: 'deepseek-r1-distill-qwen-32b',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          ...messages
-        ],
+        messages: llmMessages,
         temperature: 0.7,
         max_tokens: 2000
       })
@@ -204,6 +232,23 @@ function getPendingMessage(toolName: string, params: Record<string, any>): strin
       const weatherType = params.weatherType || 'weather'
       return `Loading ${weatherType} layer...`
 
+    case 'analyzeRoute':
+      const mode = params.mode || 'driving'
+      return `Analyzing ${mode} route from ${params.fromLocation} to ${params.toLocation} with multi-INT assessment...`
+
+    case 'analyzeImagery':
+      const changeDetection = params.includeChangeDetection ? ' with change detection' : ''
+      const activity = params.includeActivity ? ' and activity analysis' : ''
+      return `Analyzing satellite imagery for ${params.location}${changeDetection}${activity}...`
+
+    case 'analyzeIsochrone':
+      const isoModes = params.modes?.join(', ') || 'all transportation modes'
+      return `Analyzing reachability zones for ${params.location} using ${isoModes}...`
+
+    case 'analyzeMultiLayer':
+      const analysisTypes = params.analysisTypes?.join(', ') || 'all layers'
+      return `Running comprehensive multi-layer intelligence analysis (${analysisTypes}) for ${params.location}...`
+
     default:
       return 'Processing request...'
   }
@@ -293,9 +338,21 @@ function parseToolParams(paramsStr: string): Record<string, any> {
 export async function GET() {
   return NextResponse.json({
     status: 'Copilot API is running',
-    version: '2.0.0',
+    version: '3.0.0',
     engine: 'Vultr LLM Direct Integration',
-    tools: ['searchPlaces', 'flyToLocation', 'showNearby', 'analyzeArea'],
+    tools: [
+      'searchPlaces',
+      'flyToLocation',
+      'showNearby',
+      'analyzeArea',
+      'showBuildings',
+      'toggleLayer',
+      'showWeather',
+      'analyzeRoute',
+      'analyzeImagery',
+      'analyzeIsochrone',
+      'analyzeMultiLayer'
+    ],
     message: 'Send POST requests with messages array to interact with the map via natural language'
   })
 }
