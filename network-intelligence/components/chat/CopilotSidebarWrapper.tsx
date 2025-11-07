@@ -243,6 +243,18 @@ const CopilotSidebarWrapper = forwardRef<AIChatPanelRef, CopilotSidebarWrapperPr
     }
   }
 
+  // Apply default domain settings on map load
+  useEffect(() => {
+    if (!mapStore.map || !currentDomain) return
+
+    console.log('🎯 Applying default domain on mount:', currentDomain.name)
+    const domainLayerService = getDomainLayerService()
+    domainLayerService.switchDomain(currentDomain.id, mapStore.map, {
+      animateViewport: false,
+      preserveUserLayers: false
+    })
+  }, [mapStore.map]) // Only run when map becomes available
+
   const handleDomainChange = (domain: ICDomain, layers: ICLayerId[]) => {
     setCurrentDomain(domain)
     setCurrentLayers(layers)

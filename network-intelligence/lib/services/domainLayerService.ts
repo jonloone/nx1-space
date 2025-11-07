@@ -159,7 +159,41 @@ export class DomainLayerService {
         })
       }
 
-      console.log('[DomainLayerService] 3D terrain enabled')
+      // Add Mapbox 3D buildings for urban terrain obstacles
+      if (!map.getLayer('3d-buildings')) {
+        map.addLayer({
+          id: '3d-buildings',
+          type: 'fill-extrusion',
+          source: 'composite',
+          'source-layer': 'building',
+          filter: ['==', 'extrude', 'true'],
+          minzoom: 14,
+          paint: {
+            'fill-extrusion-color': '#aaa',
+            'fill-extrusion-height': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15,
+              0,
+              15.05,
+              ['get', 'height']
+            ],
+            'fill-extrusion-base': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15,
+              0,
+              15.05,
+              ['get', 'min_height']
+            ],
+            'fill-extrusion-opacity': 0.8
+          }
+        })
+      }
+
+      console.log('[DomainLayerService] 3D terrain and buildings enabled')
     } catch (error) {
       console.error('[DomainLayerService] Failed to enable 3D terrain:', error)
     }
@@ -179,6 +213,11 @@ export class DomainLayerService {
       // Remove hillshading layer
       if (map.getLayer('hillshading')) {
         map.removeLayer('hillshading')
+      }
+
+      // Remove 3D buildings layer
+      if (map.getLayer('3d-buildings')) {
+        map.removeLayer('3d-buildings')
       }
     } catch (error) {
       console.error('[DomainLayerService] Failed to disable 3D terrain:', error)
