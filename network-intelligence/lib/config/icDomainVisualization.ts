@@ -387,7 +387,7 @@ export const DOMAIN_VISUALIZATIONS: Record<ICDomainId, DomainVisualizationConfig
         type: 'slider',
         icon: 'Maximize2',
         description: 'Vertical exaggeration (1x to 5x)',
-        defaultValue: 2.5
+        defaultValue: 2.0
       },
       {
         id: 'hillshading-toggle',

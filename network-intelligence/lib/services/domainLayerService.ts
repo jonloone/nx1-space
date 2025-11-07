@@ -73,9 +73,9 @@ export class DomainLayerService {
     }
 
     // Apply basemap change
-    if (map && map.isStyleLoaded()) {
+    if (map) {
       const currentStyle = map.getStyle()
-      const currentStyleUrl = (currentStyle as any).sprite || ''
+      const currentStyleUrl = (currentStyle as any)?.sprite || ''
 
       // Only change if different
       if (!currentStyleUrl.includes(basemap)) {
@@ -84,11 +84,16 @@ export class DomainLayerService {
 
         // Wait for style to load before applying terrain
         map.once('style.load', () => {
-          this.applyDomainSpecificFeatures(domainId, map)
+          // Small delay to ensure style is fully ready
+          setTimeout(() => {
+            this.applyDomainSpecificFeatures(domainId, map)
+          }, 100)
         })
       } else {
-        // Style is already loaded, apply features immediately
-        this.applyDomainSpecificFeatures(domainId, map)
+        // Style is already loaded, apply features with small delay for safety
+        setTimeout(() => {
+          this.applyDomainSpecificFeatures(domainId, map)
+        }, 100)
       }
     }
 
@@ -132,10 +137,10 @@ export class DomainLayerService {
         })
       }
 
-      // Enable terrain with pronounced exaggeration
+      // Enable terrain with moderate exaggeration
       map.setTerrain({
         source: 'mapbox-dem',
-        exaggeration: 2.5  // Higher exaggeration for better visibility
+        exaggeration: 2.0  // Balanced exaggeration for clear terrain visibility
       })
 
       // Add hillshading layer with stronger contrast
