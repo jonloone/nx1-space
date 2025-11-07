@@ -167,6 +167,99 @@ export default function OperationsPage() {
     }
   }, [isLoaded])
 
+  // Visualize route analysis on map
+  useEffect(() => {
+    if (!map.current || !isLoaded) return
+    if (rightPanelMode !== 'route-analysis' || !rightPanelData) return
+
+    const mapInstance = map.current
+    const routeData = rightPanelData
+
+    // Add route line source
+    if (!mapInstance.getSource('route-line')) {
+      mapInstance.addSource('route-line', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: routeData.route.path
+          }
+        }
+      })
+
+      // Add route line layer
+      mapInstance.addLayer({
+        id: 'route-line',
+        type: 'line',
+        source: 'route-line',
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#1D48E5',
+          'line-width': 4,
+          'line-opacity': 0.8
+        }
+      })
+    } else {
+      // Update existing source
+      const source = mapInstance.getSource('route-line') as mapboxgl.GeoJSONSource
+      source.setData({
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: routeData.route.path
+        }
+      })
+    }
+
+    // Add waypoint markers
+    const markers: mapboxgl.Marker[] = []
+    routeData.analyzedWaypoints.forEach((waypoint: any, index: number) => {
+      const el = document.createElement('div')
+      el.className = 'waypoint-marker'
+      el.style.width = '12px'
+      el.style.height = '12px'
+      el.style.borderRadius = '50%'
+      el.style.border = '2px solid white'
+      el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
+      el.style.cursor = 'pointer'
+
+      // Color by risk
+      const riskIndicators = waypoint.analysis?.riskIndicators || []
+      el.style.backgroundColor = riskIndicators.length > 2 ? '#ef4444' :
+                                  riskIndicators.length > 0 ? '#f97316' : '#3b82f6'
+
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat(waypoint.coordinates)
+        .addTo(mapInstance)
+
+      markers.push(marker)
+    })
+
+    // Fit map to route bounds
+    const bounds = new mapboxgl.LngLatBounds()
+    routeData.route.path.forEach((coord: [number, number]) => {
+      bounds.extend(coord)
+    })
+    mapInstance.fitBounds(bounds, { padding: 80, duration: 1000 })
+
+    // Cleanup
+    return () => {
+      if (mapInstance.getLayer('route-line')) {
+        mapInstance.removeLayer('route-line')
+      }
+      if (mapInstance.getSource('route-line')) {
+        mapInstance.removeSource('route-line')
+      }
+      markers.forEach(marker => marker.remove())
+    }
+  }, [isLoaded, rightPanelMode, rightPanelData])
+
   // Track if default layers have been loaded
   const [defaultLayersLoaded, setDefaultLayersLoaded] = useState(false)
 
