@@ -106,10 +106,10 @@ export async function POST(req: NextRequest) {
         'Authorization': `Bearer ${process.env.VULTR_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'deepseek-r1-distill-qwen-32b',
+        model: 'llama-3.3-70b-instruct',
         messages: llmMessages,
         temperature: 0.1,
-        max_tokens: 200
+        max_tokens: 150
       })
     })
 
