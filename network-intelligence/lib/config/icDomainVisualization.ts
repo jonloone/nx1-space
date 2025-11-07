@@ -62,11 +62,11 @@ export const DOMAIN_VISUALIZATIONS: Record<ICDomainId, DomainVisualizationConfig
   ground: {
     domainId: 'ground',
 
-    defaultBasemap: 'satellite-streets',
-    alternativeBasemaps: ['light', 'dark', 'satellite'],
+    defaultBasemap: 'light',  // Clean street map for urban infrastructure analysis
+    alternativeBasemaps: ['satellite-streets', 'dark', 'outdoors'],
 
     defaultLayers: [
-      { id: 'overture-buildings', enabled: true, priority: 1, opacity: 0.8, zIndex: 6 },
+      { id: 'overture-buildings-2d', enabled: true, priority: 1, opacity: 0.8, zIndex: 6 },  // 2D for facility identification
       { id: 'overture-transportation', enabled: true, priority: 2, opacity: 0.7, zIndex: 4 },
       { id: 'overture-places', enabled: true, priority: 2, opacity: 0.9, zIndex: 7 },
       { id: 'cell-towers', enabled: true, priority: 3, opacity: 1.0, zIndex: 10 },
@@ -161,8 +161,8 @@ export const DOMAIN_VISUALIZATIONS: Record<ICDomainId, DomainVisualizationConfig
         label: '3D Buildings',
         type: 'toggle',
         icon: 'Box',
-        defaultValue: true,
-        description: 'Render buildings in 3D with height extrusion'
+        defaultValue: false,
+        description: 'Enable 3D building extrusion (2D better for facility ID)'
       }
     ],
 
