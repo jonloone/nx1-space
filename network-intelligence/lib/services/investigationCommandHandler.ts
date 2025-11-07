@@ -20,18 +20,23 @@ export class InvestigationCommandHandler {
   parseQuery(query: string): InvestigationQuery | null {
     const lowerQuery = query.toLowerCase()
 
-    // Show alerts pattern (default for most investigative queries)
-    if (
+    // Show alerts pattern (only for investigation-specific queries, not analysis commands)
+    // Skip if query contains analysis-related keywords
+    const isAnalysisCommand = lowerQuery.includes('analyze') ||
+                               lowerQuery.includes('imagery') ||
+                               lowerQuery.includes('satellite') ||
+                               lowerQuery.includes('isochrone') ||
+                               lowerQuery.includes('reachability') ||
+                               lowerQuery.includes('accessibility')
+
+    if (!isAnalysisCommand && (
       lowerQuery.includes('alert') ||
-      lowerQuery.includes('show me') ||
+      (lowerQuery.includes('show') && lowerQuery.includes('me')) ||
       lowerQuery.includes('what\'s happening') ||
       lowerQuery.includes('whats happening') ||
-      lowerQuery.includes('status') ||
-      lowerQuery.includes('activity') ||
       lowerQuery.includes('updates') ||
-      lowerQuery.includes('citizens') ||
-      lowerQuery.includes('investigation')
-    ) {
+      lowerQuery.includes('citizens')
+    )) {
       return { type: 'show-alerts', params: {} }
     }
 
@@ -53,8 +58,12 @@ export class InvestigationCommandHandler {
       }
     }
 
-    // Show route pattern
-    if (lowerQuery.includes('route') || lowerQuery.includes('movement')) {
+    // Show route pattern (only for investigation-specific route commands, not general route analysis)
+    if (
+      (lowerQuery.includes('show') && (lowerQuery.includes('route') || lowerQuery.includes('movement'))) ||
+      (lowerQuery.includes('display') && (lowerQuery.includes('route') || lowerQuery.includes('movement'))) ||
+      (lowerQuery.includes('subject') && (lowerQuery.includes('route') || lowerQuery.includes('movement')))
+    ) {
       return { type: 'show-route', params: {} }
     }
 
