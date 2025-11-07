@@ -358,8 +358,8 @@ export const DOMAIN_VISUALIZATIONS: Record<ICDomainId, DomainVisualizationConfig
   surface: {
     domainId: 'surface',
 
-    defaultBasemap: 'satellite',  // Satellite imagery provides better context for terrain
-    alternativeBasemaps: ['outdoors', 'light'],
+    defaultBasemap: 'satellite-streets',  // Hybrid style with satellite imagery + vector data for 3D buildings
+    alternativeBasemaps: ['satellite', 'outdoors', 'light'],
 
     defaultLayers: [
       { id: 'terrain-3d', enabled: true, priority: 1, opacity: 1.0, zIndex: 1 },  // 3D terrain elevation
