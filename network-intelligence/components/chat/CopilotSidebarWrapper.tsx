@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, forwardRef } from 'react'
+import React, { useState, forwardRef, useEffect } from 'react'
 import { Sparkles } from 'lucide-react'
 import styles from './copilot-custom.module.css'
 import AIChatPanel, { ChatMessage, AIChatPanelRef } from '@/components/ai/AIChatPanel'
