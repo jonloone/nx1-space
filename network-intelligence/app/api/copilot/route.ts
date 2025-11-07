@@ -13,7 +13,12 @@ import { getMapActionHandler } from '@/lib/services/mapActionHandler'
  */
 
 // System instructions for the AI
-const SYSTEM_PROMPT = `You are a map control AI. Respond ONLY with tool calls - no explanations, no reasoning.
+const SYSTEM_PROMPT = `You are a map control AI. You MUST respond with ONLY a tool call - nothing else.
+
+CRITICAL: Your entire response must be EXACTLY in this format: TOOL_CALL: toolName(param1="value", param2="value")
+DO NOT include explanations, reasoning, thinking, or any other text.
+DO NOT use <think> tags.
+Your response must start with "TOOL_CALL:" and contain ONLY the function call.
 
 TOOLS:
 1. searchPlaces(location, categories, radius) - Search POIs near location
@@ -103,8 +108,8 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'deepseek-r1-distill-qwen-32b',
         messages: llmMessages,
-        temperature: 0.7,
-        max_tokens: 2000
+        temperature: 0.1,
+        max_tokens: 200
       })
     })
 
