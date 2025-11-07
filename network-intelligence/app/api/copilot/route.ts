@@ -206,48 +206,57 @@ export async function POST(req: NextRequest) {
  */
 function getPendingMessage(toolName: string, params: Record<string, any>): string {
   switch (toolName) {
-    case 'searchPlaces':
+    case 'searchPlaces': {
       const categories = params.categories?.join(', ') || 'places'
       return `Searching for ${categories} near ${params.location}...`
+    }
 
     case 'flyToLocation':
       return `Navigating to ${params.location}...`
 
-    case 'showNearby':
+    case 'showNearby': {
       const nearbyCategories = params.categories?.join(', ') || 'places'
       return `Finding ${nearbyCategories} in current view...`
+    }
 
     case 'analyzeArea':
       return `Analyzing ${params.location}...`
 
-    case 'showBuildings':
+    case 'showBuildings': {
       const mode = params.enable3D ? '3D' : '2D'
       return `Showing buildings in ${mode} mode...`
+    }
 
-    case 'toggleLayer':
+    case 'toggleLayer': {
       const action = params.visible ? 'Showing' : 'Hiding'
       return `${action} ${params.layerName} layer...`
+    }
 
-    case 'showWeather':
+    case 'showWeather': {
       const weatherType = params.weatherType || 'weather'
       return `Loading ${weatherType} layer...`
+    }
 
-    case 'analyzeRoute':
+    case 'analyzeRoute': {
       const mode = params.mode || 'driving'
       return `Analyzing ${mode} route from ${params.fromLocation} to ${params.toLocation} with multi-INT assessment...`
+    }
 
-    case 'analyzeImagery':
+    case 'analyzeImagery': {
       const changeDetection = params.includeChangeDetection ? ' with change detection' : ''
       const activity = params.includeActivity ? ' and activity analysis' : ''
       return `Analyzing satellite imagery for ${params.location}${changeDetection}${activity}...`
+    }
 
-    case 'analyzeIsochrone':
+    case 'analyzeIsochrone': {
       const isoModes = params.modes?.join(', ') || 'all transportation modes'
       return `Analyzing reachability zones for ${params.location} using ${isoModes}...`
+    }
 
-    case 'analyzeMultiLayer':
+    case 'analyzeMultiLayer': {
       const analysisTypes = params.analysisTypes?.join(', ') || 'all layers'
       return `Running comprehensive multi-layer intelligence analysis (${analysisTypes}) for ${params.location}...`
+    }
 
     default:
       return 'Processing request...'
