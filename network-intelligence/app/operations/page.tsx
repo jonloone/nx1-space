@@ -24,6 +24,7 @@ import CopilotSidebarWrapper from '@/components/chat/CopilotSidebarWrapper'
 import { AIChatPanelRef, ChatMessage } from '@/components/ai/AIChatPanel'
 import { CommandPaletteBarRef } from '@/components/chat/CommandPaletteBar'
 import MapboxAlertVisualization from '@/components/opintel/MapboxAlertVisualization'
+import { SatelliteTrackingIntegration } from '@/components/space/SatelliteTrackingIntegration'
 import type { IntelligenceAlert } from '@/lib/types/chatArtifacts'
 import { useMapStore, usePanelStore } from '@/lib/stores'
 import { useAnalysisStore } from '@/lib/stores/analysisStore'
@@ -1122,6 +1123,16 @@ export default function OperationsPage() {
           map={map.current}
           autoUpdate={true}
           onAlertClick={handleInjectAlert}
+        />
+      )}
+
+      {/* Satellite Tracking - Real-time orbital mechanics */}
+      {map.current && isLoaded && (
+        <SatelliteTrackingIntegration
+          map={map.current}
+          isActive={true}
+          showOrbits={true}
+          showLabels={true}
         />
       )}
 
