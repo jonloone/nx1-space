@@ -88,11 +88,6 @@ export class OrbitalMechanicsService {
       // Propagate to the specified time
       const positionAndVelocity = satellite.propagate(satrec, date)
 
-      if (satellite.error) {
-        console.error('❌ Propagation error:', satellite.error)
-        return null
-      }
-
       // Check if position is valid
       if (!positionAndVelocity.position || typeof positionAndVelocity.position === 'boolean') {
         return null
