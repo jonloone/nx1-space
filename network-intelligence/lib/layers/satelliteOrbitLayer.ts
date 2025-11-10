@@ -198,10 +198,8 @@ export function updateOrbitGroundTracks(
     return // Orbits not enabled
   }
 
-  // Only show orbit for selected satellite (or all if none selected)
-  const tracksToShow = selectedCatalogNumber
-    ? new Map([[selectedCatalogNumber, groundTracks.get(selectedCatalogNumber)!]])
-    : groundTracks
+  // Show all orbits (always display all ground tracks for better visualization)
+  const tracksToShow = groundTracks
 
   const features: any[] = []
 
