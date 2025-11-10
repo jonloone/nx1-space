@@ -23,6 +23,7 @@ export interface CardDockProps {
   onExpand: (id: string) => void
   onRemove: (id: string) => void
   className?: string
+  sidebarWidth?: number // Width of left sidebar (for positioning)
 }
 
 // Map artifact types to icons
@@ -77,23 +78,28 @@ export function CardDock({
   minimizedArtifacts,
   onExpand,
   onRemove,
-  className
+  className,
+  sidebarWidth = 0
 }: CardDockProps) {
   // Don't render if no minimized cards
   if (minimizedArtifacts.length === 0) {
     return null
   }
 
+  // Calculate left position: sidebar width + 24px padding
+  const leftPosition = sidebarWidth + 24
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0, left: leftPosition }}
       exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.3 }}
       className={cn(
-        'fixed top-6 left-6 right-24 z-30 h-10 backdrop-blur-md bg-white/80 border border-gray-200/50 shadow-sm rounded-lg',
+        'fixed top-6 right-24 z-30 h-10 backdrop-blur-md bg-white/80 border border-gray-200/50 shadow-sm rounded-lg',
         className
       )}
+      style={{ left: `${leftPosition}px` }}
     >
       {/* Horizontal scrollable tab container */}
       <div className="h-full px-4 flex items-center gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">

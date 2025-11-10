@@ -94,6 +94,33 @@ export class Citizens360DataService {
   }
 
   /**
+   * Get all subjects across all cases
+   */
+  async getAllSubjects(): Promise<Array<SubjectProfileData & { caseNumber: string }>> {
+    const cases = await this.getAllCases()
+    const allSubjects: Array<SubjectProfileData & { caseNumber: string }> = []
+
+    // Load subjects from all implemented cases
+    for (const caseMetadata of cases) {
+      try {
+        const subjects = await this.loadCaseSubjects(caseMetadata.caseNumber)
+        // Add case number to each subject for reference
+        subjects.forEach(subject => {
+          allSubjects.push({
+            ...subject,
+            caseNumber: caseMetadata.caseNumber
+          })
+        })
+      } catch (error) {
+        // Skip cases that aren't implemented yet
+        console.log(`Skipping ${caseMetadata.caseNumber}: not yet implemented`)
+      }
+    }
+
+    return allSubjects
+  }
+
+  /**
    * Load timeline events for a subject
    */
   async loadTimeline(caseNumber: string, subjectId: string): Promise<TimelineEvent[]> {

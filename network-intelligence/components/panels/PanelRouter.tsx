@@ -5,7 +5,6 @@ import { usePanelStore } from '@/lib/stores/panelStore'
 import SearchResultsPanel from './SearchResultsPanel'
 import POIContextPanel from './POIContextPanel'
 import IntelligencePanel from './IntelligencePanel'
-import TimelinePanel from './TimelinePanel'
 
 /**
  * PanelRouter Component
@@ -35,7 +34,12 @@ export default function PanelRouter() {
       return <IntelligencePanel />
 
     case 'timeline':
-      return <TimelinePanel />
+      // Timeline now appears as inline bubble timeline, not in bottom panel
+      return (
+        <div className="p-6 text-center text-muted-foreground">
+          <p className="text-sm">Timeline is now displayed inline at the bottom right</p>
+        </div>
+      )
 
     case 'document':
       return (

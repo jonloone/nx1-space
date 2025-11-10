@@ -600,6 +600,25 @@ ${topCategories}
   }
 
   /**
+   * Geocode a location name to coordinates
+   * Used by copilot sidebar for route analysis and other features
+   * Returns [lng, lat] array format to match routing service expectations
+   */
+  async geocodeLocation(locationName: string): Promise<[number, number] | null> {
+    try {
+      const location = await this.locationResolver.resolveLocation(locationName)
+      if (location) {
+        // Return coordinates as [lng, lat] tuple
+        return location.coordinates
+      }
+      return null
+    } catch (error) {
+      console.error('Geocoding error:', error)
+      return null
+    }
+  }
+
+  /**
    * Get summary of places in array
    */
   private getPlacesSummary(places: GERSPlace[]): string {

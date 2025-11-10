@@ -51,7 +51,7 @@ COPY (
   SELECT
     id,
     class,
-    subclass,
+    COALESCE(subtype, '') as subtype,
     ST_X(ST_Centroid(geometry)) as longitude,
     ST_Y(ST_Centroid(geometry)) as latitude
   FROM read_parquet('s3://overturemaps-us-west-2/release/2025-09-24.0/theme=base/type=land_use/*',
@@ -91,7 +91,7 @@ with open('landuse-nyc.csv', 'r') as f:
     reader = csv.DictReader(f)
     for row in reader:
         land_class = row['class']
-        subclass = row.get('subclass', '')
+        subtype = row.get('subtype', '')
 
         feature = {
             "type": "Feature",
@@ -99,7 +99,7 @@ with open('landuse-nyc.csv', 'r') as f:
             "properties": {
                 "id": row['id'],
                 "class": land_class,
-                "subclass": subclass,
+                "subtype": subtype,
                 "significance": significance_map.get(land_class, 'routine'),
                 "name": f"{land_class.title()} Zone"
             },

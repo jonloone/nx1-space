@@ -15,7 +15,7 @@
  * ⚠️ LEGAL DISCLAIMER: For authorized law enforcement use only.
  */
 
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   FileText,
@@ -29,7 +29,11 @@ import {
   TrendingUp,
   Users,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  Radio,
+  Search,
+  Building,
+  Activity
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -38,6 +42,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import type { InvestigationSubject, LocationStop } from '@/lib/demo/investigation-demo-data'
+import { getMultiIntReportService, type TimelineEvent, type MultiIntEventAnalysis } from '@/lib/services/multiIntReportService'
 
 interface IntelligenceReportProps {
   subject: InvestigationSubject
@@ -60,6 +65,55 @@ export default function IntelligenceReport({
   onClose
 }: IntelligenceReportProps) {
   const reportRef = useRef<HTMLDivElement>(null)
+  const [multiIntAnalyses, setMultiIntAnalyses] = useState<Map<string, MultiIntEventAnalysis>>(new Map())
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+
+  // Convert LocationStop to TimelineEvent for multi-INT analysis
+  const convertToTimelineEvent = (location: LocationStop): TimelineEvent => ({
+    id: location.id,
+    timestamp: location.arrivalTime.toISOString(),
+    location: {
+      lat: location.lat,
+      lon: location.lng,
+      name: location.name,
+      type: location.type
+    },
+    activity: location.type,
+    metadata: {
+      dwellTime: location.dwellTimeMinutes,
+      visitCount: location.visitCount,
+      significance: location.significance,
+      notes: location.notes
+    }
+  })
+
+  // Perform multi-INT analysis on load
+  useEffect(() => {
+    const analyzeLocations = async () => {
+      setIsAnalyzing(true)
+      const service = getMultiIntReportService()
+      await service.initialize()
+
+      const analyses = new Map<string, MultiIntEventAnalysis>()
+
+      // Analyze anomaly and suspicious locations with multi-INT
+      const criticalLocations = [
+        ...patternAnalysis.anomalyLocations,
+        ...patternAnalysis.suspiciousLocations
+      ]
+
+      for (const location of criticalLocations) {
+        const event = convertToTimelineEvent(location)
+        const analysis = await service.analyzeEvent(event)
+        analyses.set(location.id, analysis)
+      }
+
+      setMultiIntAnalyses(analyses)
+      setIsAnalyzing(false)
+    }
+
+    analyzeLocations()
+  }, [locations, patternAnalysis])
 
   const handlePrint = () => {
     window.print()
@@ -364,6 +418,184 @@ export default function IntelligenceReport({
                 </div>
               )}
             </div>
+          </section>
+
+          <Separator className="bg-[#E5E5E5]" />
+
+          {/* Multi-INT Analysis */}
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-[#171717] flex items-center gap-2">
+              <Activity className="h-5 w-5 text-[#8B5CF6]" />
+              Multi-Source Intelligence Fusion
+            </h2>
+            <p className="text-sm text-[#737373]">
+              Comprehensive SIGINT, OSINT, GEOINT, and Temporal analysis of critical locations
+            </p>
+
+            {isAnalyzing ? (
+              <Card>
+                <CardContent className="p-4 text-center text-sm text-[#737373]">
+                  Analyzing locations with multi-INT fusion...
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {Array.from(multiIntAnalyses.entries()).map(([locationId, analysis]) => {
+                  const location = [...patternAnalysis.anomalyLocations, ...patternAnalysis.suspiciousLocations]
+                    .find(loc => loc.id === locationId)
+
+                  if (!location) return null
+
+                  return (
+                    <Card key={locationId} className="border-l-4 border-[#8B5CF6]">
+                      <CardContent className="p-4 space-y-3">
+                        {/* Location Header */}
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-semibold text-[#171717]">{location.name}</h3>
+                            <p className="text-xs text-[#737373] font-mono">
+                              {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            {analysis.riskIndicators.length > 0 && (
+                              <Badge variant="outline" className="text-xs border-[#EF4444] text-[#EF4444]">
+                                {analysis.riskIndicators.length} Risks
+                              </Badge>
+                            )}
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {location.type}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {/* Intelligence Domains */}
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* GEOINT */}
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1 text-xs font-semibold text-[#10B981]">
+                              <Building className="h-3 w-3" />
+                              GEOINT
+                            </div>
+                            <div className="text-xs space-y-0.5 text-[#525252]">
+                              {analysis.geoint.buildingType && (
+                                <div>Building: {analysis.geoint.buildingType}</div>
+                              )}
+                              {analysis.geoint.landUseZone && (
+                                <div>Zone: {analysis.geoint.landUseZone}</div>
+                              )}
+                              {analysis.geoint.addressVerified !== undefined && (
+                                <div>Address: {analysis.geoint.addressVerified ? '✓ Verified' : '✗ Unverified'}</div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* SIGINT */}
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1 text-xs font-semibold text-[#3B82F6]">
+                              <Radio className="h-3 w-3" />
+                              SIGINT
+                            </div>
+                            <div className="text-xs space-y-0.5 text-[#525252]">
+                              {analysis.sigint.nearbyCellTowers > 0 ? (
+                                <>
+                                  <div>{analysis.sigint.nearbyCellTowers} towers in range</div>
+                                  {analysis.sigint.strongestTower && (
+                                    <div>Primary: {analysis.sigint.strongestTower.operator}</div>
+                                  )}
+                                  {analysis.sigint.estimatedSignalStrength && (
+                                    <div>Signal: {analysis.sigint.estimatedSignalStrength}%</div>
+                                  )}
+                                </>
+                              ) : (
+                                <div className="text-[#737373]">No towers in range</div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* OSINT */}
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1 text-xs font-semibold text-[#F59E0B]">
+                              <Search className="h-3 w-3" />
+                              OSINT
+                            </div>
+                            <div className="text-xs space-y-0.5 text-[#525252]">
+                              {analysis.osint.businessData ? (
+                                <>
+                                  {analysis.osint.businessData.ownership?.owner_subject_id && (
+                                    <div className="text-[#EF4444] font-semibold">
+                                      ⚠️ Subject-owned
+                                    </div>
+                                  )}
+                                  {analysis.osint.businessData.suspicious && (
+                                    <div>Risk: {analysis.osint.businessData.suspicious.risk_score}/100</div>
+                                  )}
+                                  {analysis.osint.socialMediaPresence && (
+                                    <div>
+                                      Social: {analysis.osint.socialMediaPresence.has_website ? '✓' : '✗'}
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <div className="text-[#737373]">No OSINT data</div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Temporal */}
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1 text-xs font-semibold text-[#8B5CF6]">
+                              <Clock className="h-3 w-3" />
+                              Temporal
+                            </div>
+                            <div className="text-xs space-y-0.5 text-[#525252]">
+                              {analysis.temporal.timeOfDay && (
+                                <div>Time: {analysis.temporal.timeOfDay}</div>
+                              )}
+                              {analysis.temporal.anomalyDetected && (
+                                <div className="text-[#EF4444]">⚠️ Anomaly detected</div>
+                              )}
+                              {analysis.temporal.trafficLevel && (
+                                <div>Traffic: {analysis.temporal.trafficLevel}</div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Risk Indicators */}
+                        {analysis.riskIndicators.length > 0 && (
+                          <div className="pt-2 border-t border-[#E5E5E5]">
+                            <div className="text-xs font-semibold text-[#EF4444] mb-1">
+                              Risk Indicators:
+                            </div>
+                            <div className="space-y-1">
+                              {analysis.riskIndicators.slice(0, 3).map((risk, idx) => (
+                                <div key={idx} className="text-xs text-[#525252] flex items-start gap-1">
+                                  <span className="text-[#EF4444]">•</span>
+                                  {risk}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Recommended Actions */}
+                        {analysis.recommendedActions.length > 0 && (
+                          <div className="pt-2 border-t border-[#E5E5E5]">
+                            <div className="text-xs font-semibold text-[#10B981] mb-1">
+                              Actions:
+                            </div>
+                            <div className="text-xs text-[#525252]">
+                              {analysis.recommendedActions.slice(0, 2).join(' • ')}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            )}
           </section>
 
           <Separator className="bg-[#E5E5E5]" />

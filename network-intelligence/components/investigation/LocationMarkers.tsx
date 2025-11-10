@@ -29,6 +29,8 @@ interface LocationMarkersProps {
   currentTime?: Date
   showLabels?: boolean
   renderQuality?: RenderQuality
+  selectedLocationId?: string | null
+  highlightedLocationIds?: string[]
 }
 
 /**
@@ -73,7 +75,9 @@ export function useLocationMarkersLayers({
   onLocationClick,
   currentTime,
   showLabels = true,
-  renderQuality = 'standard'
+  renderQuality = 'standard',
+  selectedLocationId = null,
+  highlightedLocationIds = []
 }: LocationMarkersProps) {
   const layers = useMemo(() => {
     const layerArray: any[] = []
@@ -115,8 +119,31 @@ export function useLocationMarkersLayers({
       }
     }
 
-    // Layer 2: Main location markers (all quality levels)
-    // Single unified marker with white border for visibility
+    // Layer 2: Selection highlight ring (if location selected)
+    if (selectedLocationId) {
+      const selectedLocation = visibleLocations.find(loc => loc.id === selectedLocationId)
+      if (selectedLocation) {
+        layerArray.push(
+          new ScatterplotLayer({
+            id: 'location-markers-selection-ring',
+            data: [selectedLocation],
+            getPosition: (d: LocationStop) => [d.lng, d.lat],
+            getFillColor: [59, 130, 246, 0], // Transparent blue
+            getRadius: (d: LocationStop) => getMarkerSize(d.dwellTimeMinutes, d.visitCount) * 1.8,
+            radiusMinPixels: 22,
+            radiusMaxPixels: 180,
+            pickable: false,
+            stroked: true,
+            getLineColor: [59, 130, 246, 255], // Blue ring
+            getLineWidth: 4,
+            lineWidthMinPixels: 4
+          })
+        )
+      }
+    }
+
+    // Layer 3: Main location markers (all quality levels)
+    // Enhanced with selection and highlighting support
     layerArray.push(
       new ScatterplotLayer({
         id: 'location-markers-main',
@@ -124,15 +151,44 @@ export function useLocationMarkersLayers({
         getPosition: (d: LocationStop) => [d.lng, d.lat],
         getFillColor: (d: LocationStop) => {
           const color = getSignificanceColor(d.significance)
-          return [...color, 230] // Slightly transparent for depth
+          const isSelected = d.id === selectedLocationId
+          const isHighlighted = highlightedLocationIds.includes(d.id)
+          const hasSelection = selectedLocationId !== null && selectedLocationId !== undefined
+
+          // Full opacity for selected/highlighted, dimmed for others when selection active
+          let opacity = 230
+          if (hasSelection) {
+            if (isSelected) {
+              opacity = 255 // Full opacity for selected
+            } else if (isHighlighted) {
+              opacity = 200 // Slightly dimmed for highlighted
+            } else {
+              opacity = 100 // Dimmed for non-selected
+            }
+          }
+
+          return [...color, opacity]
         },
-        getRadius: (d: LocationStop) => getMarkerSize(d.dwellTimeMinutes, d.visitCount),
+        getRadius: (d: LocationStop) => {
+          const baseSize = getMarkerSize(d.dwellTimeMinutes, d.visitCount)
+          const isSelected = d.id === selectedLocationId
+
+          // Make selected marker 40% larger
+          return isSelected ? baseSize * 1.4 : baseSize
+        },
         radiusMinPixels: 10,
         radiusMaxPixels: 100,
         pickable: true,
         stroked: true,
-        getLineColor: [255, 255, 255, 255],
-        getLineWidth: 2,
+        getLineColor: (d: LocationStop) => {
+          const isSelected = d.id === selectedLocationId
+          // Blue border for selected, white for others
+          return isSelected ? [59, 130, 246, 255] : [255, 255, 255, 255]
+        },
+        getLineWidth: (d: LocationStop) => {
+          const isSelected = d.id === selectedLocationId
+          return isSelected ? 3 : 2
+        },
         lineWidthMinPixels: 2,
         onClick: (info: any) => {
           if (info.object && onLocationClick) {
@@ -140,8 +196,10 @@ export function useLocationMarkersLayers({
           }
         },
         updateTriggers: {
-          getFillColor: [currentTime],
-          getRadius: [currentTime]
+          getFillColor: [currentTime, selectedLocationId, highlightedLocationIds],
+          getRadius: [currentTime, selectedLocationId],
+          getLineColor: [selectedLocationId],
+          getLineWidth: [selectedLocationId]
         }
       })
     )

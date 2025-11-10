@@ -35,6 +35,7 @@ import type { InvestigationIntelligence } from '@/lib/services/investigationInte
 import { getOverturePlacesService } from '@/lib/services/overturePlacesService'
 import { getOvertureBuildingsService } from '@/lib/services/overtureBuildingsService'
 import { getFeatureHighlightService } from '@/lib/services/featureHighlightService'
+import { useTimelinePanelStore } from '@/lib/stores/timelinePanelStore'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
@@ -64,6 +65,9 @@ export default function InvestigationMode({ map, onExit }: InvestigationModeProp
   const [selectedLocation, setSelectedLocation] = useState<EnrichedLocation | null>(null)
   const [selectedBuilding, setSelectedBuilding] = useState<any>(null)
   const [showNarrativeIntro, setShowNarrativeIntro] = useState(false)
+
+  // Get timeline selection state
+  const { selectedLocationId } = useTimelinePanelStore()
 
   const patternAnalysis = useMemo(
     () => demoData ? analyzePatterns(demoData.locationStops) : null,
@@ -151,6 +155,38 @@ export default function InvestigationMode({ map, onExit }: InvestigationModeProp
     }
   }, [demoData, currentTime])
 
+  // Listen for timeline events to fly map to selected locations
+  useEffect(() => {
+    const handleFlyToLocation = (event: CustomEvent) => {
+      if (map && event.detail) {
+        const { coordinates, locationId, zoom } = event.detail
+        console.log('✈️ Flying to timeline location:', { coordinates, locationId, zoom })
+
+        // Fly to location
+        map.flyTo({
+          center: coordinates,
+          zoom: zoom || 16,
+          duration: 2000,
+          essential: true
+        })
+
+        // Find and highlight the location
+        if (locationId && demoData?.locationStops) {
+          const location = demoData.locationStops.find(loc => loc.id === locationId)
+          if (location) {
+            setSelectedLocation(location)
+            setActivePanel('location')
+          }
+        }
+      }
+    }
+
+    window.addEventListener('timeline:fly-to-location', handleFlyToLocation as EventListener)
+    return () => {
+      window.removeEventListener('timeline:fly-to-location', handleFlyToLocation as EventListener)
+    }
+  }, [map, demoData])
+
   // Panel state
   const [activePanel, setActivePanel] = useState<ActivePanel>('profile')
 
@@ -218,6 +254,12 @@ export default function InvestigationMode({ map, onExit }: InvestigationModeProp
           // Could implement phase-specific views here
           setActivePanel('report')
         }
+        break
+
+      case 'generateReport':
+        // AI-triggered Multi-INT intelligence report
+        console.log('🤖 AI requesting Multi-INT intelligence report')
+        setActivePanel('report')
         break
 
       default:
@@ -288,7 +330,8 @@ export default function InvestigationMode({ map, onExit }: InvestigationModeProp
       }
     },
     currentTime: currentTime || new Date(),
-    showLabels: true
+    showLabels: true,
+    selectedLocationId: selectedLocationId || undefined
   })
 
   const heatmapLayer = useFrequencyHeatmapLayer({

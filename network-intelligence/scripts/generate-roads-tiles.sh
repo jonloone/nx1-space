@@ -64,10 +64,7 @@ COPY (
         'id', id,
         'class', COALESCE(class, 'unknown'),
         'subclass', COALESCE(subclass, 'unknown'),
-        'surface', COALESCE(surface, 'unknown'),
-        'name', COALESCE(names.primary, 'Road'),
-        'lanes', COALESCE(road_lanes, 0),
-        'speed_limit', COALESCE(speed_limits[1].min_speed.value, 0)
+        'name', COALESCE(names.primary, 'Road')
       ),
       'geometry', ST_AsGeoJSON(geometry)::JSON
     )::VARCHAR as geojson

@@ -15,7 +15,9 @@ export async function POST(request: NextRequest) {
 
     console.log('[Routing API] Proxying request to Valhalla:', {
       locations: body.locations?.length,
-      costing: body.costing
+      costing: body.costing,
+      from: body.locations?.[0],
+      to: body.locations?.[1]
     })
 
     // Forward request to Valhalla

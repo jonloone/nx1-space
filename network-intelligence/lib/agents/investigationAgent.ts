@@ -13,17 +13,19 @@
  */
 
 import { VultrLLMService } from '../services/vultrLLMService'
+import { crewaiService, type CrewAIResponse } from '../services/crewaiService'
 import type { InvestigationDemoData, LocationStop } from '../demo/investigation-demo-data'
 import type { InvestigationSubject } from '../demo/investigation-demo-data'
 
 export interface AgentAction {
-  type: 'flyTo' | 'highlight' | 'playSegment' | 'showSummary' | 'none'
+  type: 'flyTo' | 'highlight' | 'playSegment' | 'showSummary' | 'generateReport' | 'none'
   params?: {
     location?: { lat: number; lng: number; zoom?: number }
     locationId?: string
     startTime?: Date
     endTime?: Date
     phase?: string
+    reportType?: 'full' | 'multi-int' | 'summary'
   }
 }
 
@@ -43,6 +45,7 @@ export interface ChatMessage {
 
 export class InvestigationAgent {
   private llm: VultrLLMService
+  private useCrewAI: boolean = true // Enable CrewAI for enhanced intelligence
   private context: {
     subject?: InvestigationSubject
     locations?: LocationStop[]
@@ -50,8 +53,9 @@ export class InvestigationAgent {
     scenario?: any
   } = {}
 
-  constructor(llm: VultrLLMService) {
+  constructor(llm: VultrLLMService, options?: { useCrewAI?: boolean }) {
     this.llm = llm
+    this.useCrewAI = options?.useCrewAI !== undefined ? options.useCrewAI : true
   }
 
   /**
@@ -72,6 +76,17 @@ export class InvestigationAgent {
    */
   async processQuery(query: string, conversationHistory: ChatMessage[] = []): Promise<AgentResponse> {
     console.log('🔍 Processing query:', query)
+
+    // Check if this is a route analysis query and CrewAI is enabled
+    if (this.useCrewAI && this.isRouteQuery(query)) {
+      console.log('🚀 Delegating to CrewAI for route intelligence analysis')
+      try {
+        return await this.processWithCrewAI(query)
+      } catch (error) {
+        console.error('❌ CrewAI failed, falling back to standard LLM:', error)
+        // Fall through to standard processing
+      }
+    }
 
     // Build context for LLM
     const systemPrompt = this.buildSystemPrompt()
@@ -111,6 +126,92 @@ export class InvestigationAgent {
   }
 
   /**
+   * Check if query is a route analysis query
+   */
+  private isRouteQuery(query: string): boolean {
+    const queryLower = query.toLowerCase()
+    const routeKeywords = [
+      'route', 'path', 'navigate', 'from', 'to',
+      'drive', 'walk', 'travel', 'journey', 'waypoint',
+      'analyze route', 'plan route', 'assess route'
+    ]
+
+    return routeKeywords.some(keyword => queryLower.includes(keyword))
+  }
+
+  /**
+   * Process route query with CrewAI multi-agent system
+   */
+  private async processWithCrewAI(query: string): Promise<AgentResponse> {
+    try {
+      // Build context for CrewAI
+      const mapContext = {
+        subject_id: this.context.subject?.subjectId,
+        case_number: this.context.subject?.caseNumber,
+        locations: this.context.locations?.map(loc => ({
+          name: loc.name,
+          lat: loc.latitude,
+          lng: loc.longitude,
+          type: loc.type
+        }))
+      }
+
+      // Execute CrewAI workflow
+      const crewResponse: CrewAIResponse = await crewaiService.autoExecute(
+        query,
+        mapContext
+      )
+
+      if (!crewResponse.success) {
+        throw new Error(crewResponse.error || 'CrewAI execution failed')
+      }
+
+      // Convert CrewAI response to AgentResponse format
+      const actions: AgentAction[] = crewResponse.actions.map(action => ({
+        type: action.type as any,
+        params: action
+      }))
+
+      // Extract insights from the intelligence report
+      const insights = this.extractInsights(crewResponse.output)
+
+      return {
+        message: crewResponse.output,
+        actions,
+        insights
+      }
+    } catch (error) {
+      console.error('❌ CrewAI processing error:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Extract key insights from CrewAI intelligence report
+   */
+  private extractInsights(report: string): string[] {
+    const insights: string[] = []
+
+    // Extract recommendations
+    const recommendationsMatch = report.match(/### RECOMMENDATIONS\n([\s\S]*?)(?=\n###|$)/i)
+    if (recommendationsMatch) {
+      const recommendations = recommendationsMatch[1]
+        .split('\n')
+        .filter(line => line.trim().startsWith('-'))
+        .map(line => line.trim().substring(1).trim())
+      insights.push(...recommendations)
+    }
+
+    // Extract key findings from executive summary
+    const summaryMatch = report.match(/### EXECUTIVE SUMMARY\n([\s\S]*?)(?=\n###|$)/i)
+    if (summaryMatch) {
+      insights.push(summaryMatch[1].trim())
+    }
+
+    return insights.slice(0, 5) // Return top 5 insights
+  }
+
+  /**
    * Build system prompt with investigation context
    */
   private buildSystemPrompt(): string {
@@ -147,7 +248,7 @@ Always respond in JSON format with this structure:
   "message": "Your conversational response to the user",
   "actions": [
     {
-      "type": "flyTo" | "highlight" | "playSegment" | "showSummary" | "none",
+      "type": "flyTo" | "highlight" | "playSegment" | "showSummary" | "generateReport" | "none",
       "params": { ... }
     }
   ],
@@ -160,6 +261,7 @@ ACTION TYPES:
 - highlight: Pulse effect on location { locationId: "stop-X" }
 - playSegment: Animate route { startTime: ISO8601, endTime: ISO8601 }
 - showSummary: Display summary panel { phase: "day-1" | "day-2" | "day-3" }
+- generateReport: Generate Multi-INT intelligence report with SIGINT, OSINT, GEOINT, Temporal analysis { reportType: "multi-int" }
 
 IMPORTANT:
 - Be concise but thorough

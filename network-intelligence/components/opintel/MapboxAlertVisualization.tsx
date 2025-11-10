@@ -54,12 +54,14 @@ export default function MapboxAlertVisualization({
    * Load alerts from Citizens 360 data service
    */
   const loadAlerts = useCallback(async () => {
+    console.log('🔄 Starting alert data load...')
     try {
       setLoading(true)
       const dataService = getCitizens360DataService()
-      const generatedAlerts = await dataService.generateIntelligenceAlerts()
+      console.log('📦 Citizens360DataService obtained')
 
-      console.log(`📊 Loaded ${generatedAlerts.length} intelligence alerts`)
+      const generatedAlerts = await dataService.generateIntelligenceAlerts()
+      console.log(`📊 Loaded ${generatedAlerts.length} intelligence alerts from Citizens360`)
 
       const byPriority = {
         critical: generatedAlerts.filter(a => a.priority === 'critical').length,
@@ -68,14 +70,28 @@ export default function MapboxAlertVisualization({
         low: generatedAlerts.filter(a => a.priority === 'low').length
       }
 
-      console.log('Alert breakdown:', byPriority)
+      console.log('📈 Alert breakdown by priority:', byPriority)
+
+      // Log first few alerts for debugging
+      if (generatedAlerts.length > 0) {
+        console.log('📍 Sample alert:', generatedAlerts[0])
+        console.log('   - Location:', generatedAlerts[0].location)
+        console.log('   - Coordinates:', generatedAlerts[0].location?.coordinates)
+      } else {
+        console.warn('⚠️ No alerts generated! This might indicate:')
+        console.warn('   - No active/monitoring cases in Citizens360')
+        console.warn('   - No recent critical/anomaly events in timelines')
+        console.warn('   - Events might be older than 24 hours')
+      }
 
       setAlerts(generatedAlerts)
       setLastUpdate(new Date())
     } catch (err) {
-      console.error('Failed to load alerts:', err)
+      console.error('❌ Failed to load alerts:', err)
+      console.error('Error details:', err)
     } finally {
       setLoading(false)
+      console.log('✅ Alert loading complete')
     }
   }, [])
 
@@ -268,15 +284,29 @@ export default function MapboxAlertVisualization({
    * Initialize Mapbox layers
    */
   useEffect(() => {
-    if (!map || layersInitialized.current || alerts.length === 0) return
-
-    // Wait for map style to be loaded
-    if (!map.getStyle || !map.getStyle()) {
-      console.log('⏸️ Map style not loaded yet, waiting...')
+    if (!map || layersInitialized.current || alerts.length === 0) {
+      if (alerts.length === 0) {
+        console.log('⏸️ No alerts yet, waiting for data load...')
+      }
       return
     }
 
-    console.log('🗺️ Initializing Mapbox native alert layers...')
+    // Wait for map to be fully loaded and idle
+    if (!map.loaded || !map.loaded()) {
+      console.log('⏸️ Map not fully loaded yet, waiting for idle state...')
+
+      // Listen for idle event (fires when map finishes rendering)
+      const idleHandler = () => {
+        console.log('🎨 Map is idle, initializing alert layers...')
+        layersInitialized.current = false // Reset to trigger re-init
+        map.off('idle', idleHandler)
+      }
+
+      map.once('idle', idleHandler)
+      return
+    }
+
+    console.log('🗺️ Initializing Mapbox native alert layers with', alerts.length, 'alerts')
 
     try {
       const geojson = alertsToGeoJSON(alerts)
@@ -469,13 +499,30 @@ export default function MapboxAlertVisualization({
       }
 
       layersInitialized.current = true
-      console.log('✅ All alert layers initialized')
+      console.log('✅ All alert layers initialized successfully')
+      console.log('📊 Alert layer summary:')
+      console.log('  - alerts-heatmap: Visible at zoom 0-10')
+      console.log('  - alerts-clusters: Visible at zoom 11-12')
+      console.log('  - alerts-cluster-count: Cluster labels')
+      console.log('  - alerts-unclustered-point: Individual markers zoom 13+')
+      console.log('  - alerts-critical-pulse: Critical alert pulse effect')
+      console.log(`  - Total alerts rendered: ${alerts.length}`)
+
+      // Verify layers are visible
+      setTimeout(() => {
+        if (map.getLayer('alerts-clusters')) {
+          const visibility = map.getLayoutProperty('alerts-clusters', 'visibility')
+          console.log(`🔍 Clusters layer visibility: ${visibility || 'visible'}`)
+        }
+      }, 100)
 
       // Color buildings based on alert locations
       colorBuildingsByAlerts(alerts)
 
     } catch (error) {
       console.error('❌ Failed to initialize alert layers:', error)
+      console.error('Error details:', error)
+      layersInitialized.current = false // Allow retry
     }
   }, [map, alerts, alertsToGeoJSON, colorBuildingsByAlerts])
 

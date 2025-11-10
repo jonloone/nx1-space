@@ -11,6 +11,7 @@ export type ArtifactType =
   | 'subject-profile'
   | 'timeline'
   | 'route'
+  | 'route-analysis' // Route with full multi-INT analysis
   | 'investigation-list'
   | 'intelligence-analysis'
   | 'heatmap-summary'
@@ -260,6 +261,113 @@ export interface RouteWaypoint {
   timestamp: Date
   dwellTime?: number
   significance?: 'routine' | 'suspicious' | 'anomaly'
+}
+
+// ============================================================================
+// Route Analysis Artifact (Intelligence-Grade)
+// ============================================================================
+
+export interface RouteAnalysisArtifact extends ChatArtifact {
+  type: 'route-analysis'
+  data: RouteAnalysisData
+}
+
+export interface RouteAnalysisData {
+  // Basic route information
+  title: string
+  from: {
+    name: string
+    coordinates: [number, number]
+  }
+  to: {
+    name: string
+    coordinates: [number, number]
+  }
+  mode: 'driving' | 'walking' | 'cycling'
+  startTime: Date
+
+  // Route geometry and metadata
+  path: Array<[number, number]> // [lng, lat]
+  distance: number // meters
+  duration: number // seconds
+
+  // Analyzed waypoints with multi-INT data
+  analyzedWaypoints: Array<{
+    coordinates: [number, number]
+    timestamp: Date
+    distanceFromStart: number
+    analysis: {
+      // GEOINT
+      geoint?: {
+        buildingType?: string
+        landUseZone?: string
+        addressVerified: boolean
+        contextualNotes: string[]
+      }
+      // SIGINT
+      sigint?: {
+        primaryTowerId: string
+        operator: string
+        radioType: string
+        distanceMeters: number
+        signalStrength: 'strong' | 'medium' | 'weak'
+      }
+      // OSINT
+      osint?: {
+        businessName?: string
+        businessOwner?: string
+        ownerSubjectLink?: string
+        riskScore: number
+        suspiciousFlags: string[]
+      }
+      // Temporal
+      temporal: {
+        timeOfDay: string
+        isAnomalous: boolean
+        anomalyReasons: string[]
+        trafficLevel?: string
+        pedestrianDensity?: string
+      }
+      // Overall assessment for this waypoint
+      riskIndicators: string[]
+      recommendedActions: string[]
+      confidenceScore: number
+    }
+  }>
+
+  // Anomaly detection results
+  anomalyDetection: {
+    hasAnomalies: boolean
+    anomalyCount: number
+    anomalies: Array<{
+      waypointIndex: number
+      location: string
+      reasons: string[]
+      severity: 'low' | 'medium' | 'high' | 'critical'
+    }>
+  }
+
+  // Route-level risk assessment
+  riskAssessment: {
+    overallRiskScore: number // 0-100
+    riskLevel: 'low' | 'medium' | 'high' | 'critical'
+    highRiskSegments: Array<{
+      startIndex: number
+      endIndex: number
+      riskScore: number
+      reason: string
+    }>
+    recommendedActions: string[]
+  }
+
+  // Statistics
+  statistics: {
+    totalDistance: number // meters
+    totalDuration: number // seconds
+    averageConfidence: number // 0-100
+    sigintCoverage: number // percentage with cell coverage
+    highRiskPercentage: number // percentage in high-risk areas
+  }
 }
 
 // ============================================================================

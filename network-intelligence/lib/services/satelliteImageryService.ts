@@ -193,53 +193,83 @@ export class SatelliteImageryService {
   }
 
   /**
-   * Get Sentinel-2 imagery from AWS Open Data
+   * Get Sentinel-2 imagery from AWS Open Data (REAL IMPLEMENTATION)
    */
   private async getSentinel2Imagery(options: SatelliteImageryOptions): Promise<SatelliteImage[]> {
-    // In production, this would query the Sentinel-2 STAC catalog
-    // For now, return mock data structure
-    console.log('🛰️ Fetching Sentinel-2 imagery from AWS Open Data')
+    console.log('🛰️ Fetching Sentinel-2 imagery from AWS STAC API')
 
-    // Mock implementation - in production, query STAC API
+    try {
+      // Use real STAC service
+      const { getSentinel2StacService } = await import('./sentinel2StacService')
+      const stacService = getSentinel2StacService()
+
+      const startDate = options.startDate || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) // 90 days ago
+      const endDate = options.endDate || new Date()
+
+      const images = await stacService.searchTimeSeries(
+        options.center,
+        startDate,
+        endDate,
+        {
+          maxCloudCover: options.maxCloudCover,
+          limit: 100,
+          bufferKm: 10
+        }
+      )
+
+      console.log(`✓ Found ${images.length} real Sentinel-2 images from STAC API`)
+      return images
+    } catch (error) {
+      console.error('❌ Failed to fetch from STAC API, falling back to mock data:', error)
+
+      // Fallback to mock data if STAC API fails
+      return this.getMockSentinel2Imagery(options)
+    }
+  }
+
+  /**
+   * Generate mock Sentinel-2 imagery (fallback)
+   */
+  private getMockSentinel2Imagery(options: SatelliteImageryOptions): SatelliteImage[] {
+    console.log('⚠️ Using mock Sentinel-2 data (STAC API unavailable)')
+
     const mockImages: SatelliteImage[] = []
-
-    // Generate mock images for demonstration
-    const startDate = options.startDate || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) // 90 days ago
+    const startDate = options.startDate || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
     const endDate = options.endDate || new Date()
     const daysBetween = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
 
     // Sentinel-2 has ~5 day revisit time
     for (let i = 0; i < daysBetween; i += 5) {
       const acquisitionDate = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000)
-      const cloudCover = Math.random() * 40 // 0-40% cloud cover
+      const cloudCover = Math.random() * 40
 
       if (!options.maxCloudCover || cloudCover <= options.maxCloudCover) {
         const [lng, lat] = options.center
-        const offset = 0.1 // ~10km at equator
+        const offset = 0.1
 
         mockImages.push({
-          id: `S2_${acquisitionDate.toISOString().split('T')[0]}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `S2_MOCK_${acquisitionDate.toISOString().split('T')[0]}_${Math.random().toString(36).substr(2, 9)}`,
           source: 'sentinel-2',
           acquisitionDate,
           cloudCover: Math.round(cloudCover * 10) / 10,
-          resolution: 10, // 10m for RGB bands
+          resolution: 10,
           bounds: {
             west: lng - offset,
             south: lat - offset,
             east: lng + offset,
             north: lat + offset
           },
-          bands: ['B2', 'B3', 'B4', 'B8'], // Blue, Green, Red, NIR
+          bands: ['B2', 'B3', 'B4', 'B8'],
           metadata: {
-            satellite: 'Sentinel-2A',
+            satellite: 'Sentinel-2A (Mock)',
             processingLevel: 'L2A',
-            tileId: `T${Math.floor(Math.random() * 60)}TUL`
+            tileId: `T${Math.floor(Math.random() * 60)}TUL`,
+            mock: true
           }
         })
       }
     }
 
-    console.log(`✓ Found ${mockImages.length} Sentinel-2 images`)
     return mockImages
   }
 

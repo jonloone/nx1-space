@@ -1,11 +1,14 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react'
-import { ArrowUp, Loader2, Bot, User } from 'lucide-react'
+import { ArrowUp, Loader2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { ChatArtifact } from '@/lib/types/chatArtifacts'
+import NexusOneIcon from '@/components/branding/NexusOneIcon'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 export interface ChatMessage {
   id: string
@@ -67,7 +70,8 @@ const AIChatPanel = forwardRef<AIChatPanelRef, AIChatPanelProps>(function AIChat
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [processing, setProcessing] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollViewportRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Expose injectMessage method via ref
   useImperativeHandle(ref, () => ({
@@ -76,11 +80,9 @@ const AIChatPanel = forwardRef<AIChatPanelRef, AIChatPanelProps>(function AIChat
     }
   }), [])
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,7 +124,7 @@ const AIChatPanel = forwardRef<AIChatPanelRef, AIChatPanelProps>(function AIChat
   return (
     <div className="flex flex-col h-full bg-white shadow-sm">
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -132,8 +134,8 @@ const AIChatPanel = forwardRef<AIChatPanelRef, AIChatPanelProps>(function AIChat
               }`}
             >
               {message.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-mundi-500 flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0">
+                  <NexusOneIcon size={16} />
                 </div>
               )}
               <div
@@ -143,7 +145,87 @@ const AIChatPanel = forwardRef<AIChatPanelRef, AIChatPanelProps>(function AIChat
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                <div className="text-sm leading-relaxed markdown-content">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({children}) => <p className="my-1">{children}</p>,
+                      strong: ({children}) => <strong className="font-semibold">{children}</strong>,
+                      em: ({children}) => <em className="italic">{children}</em>,
+                      code: ({children}) => (
+                        <code className={`px-1.5 py-0.5 rounded text-xs font-mono ${
+                          message.role === 'user'
+                            ? 'bg-white/20 text-white'
+                            : 'bg-gray-200 text-gray-800'
+                        }`}>
+                          {children}
+                        </code>
+                      ),
+                      a: ({children, href}) => (
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`underline ${
+                            message.role === 'user'
+                              ? 'text-white hover:text-white/80'
+                              : 'text-mundi-600 hover:text-mundi-700'
+                          }`}
+                        >
+                          {children}
+                        </a>
+                      ),
+                      table: ({children}) => (
+                        <table className={`w-full border-collapse my-2 text-xs ${
+                          message.role === 'user'
+                            ? 'border-white/20'
+                            : 'border-gray-300'
+                        }`}>
+                          {children}
+                        </table>
+                      ),
+                      thead: ({children}) => (
+                        <thead className={`${
+                          message.role === 'user'
+                            ? 'bg-white/10 border-b border-white/20'
+                            : 'bg-gray-50 border-b-2 border-gray-300'
+                        }`}>
+                          {children}
+                        </thead>
+                      ),
+                      tbody: ({children}) => <tbody>{children}</tbody>,
+                      tr: ({children}) => (
+                        <tr className={`border-b ${
+                          message.role === 'user'
+                            ? 'border-white/10'
+                            : 'border-gray-200'
+                        }`}>
+                          {children}
+                        </tr>
+                      ),
+                      th: ({children}) => (
+                        <th className={`px-3 py-2 text-left font-semibold ${
+                          message.role === 'user'
+                            ? 'text-white'
+                            : 'text-gray-900'
+                        }`}>
+                          {children}
+                        </th>
+                      ),
+                      td: ({children}) => (
+                        <td className={`px-3 py-2 ${
+                          message.role === 'user'
+                            ? 'text-white/90'
+                            : 'text-gray-700'
+                        }`}>
+                          {children}
+                        </td>
+                      )
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                </div>
 
                 {message.metadata?.entitiesFiltered !== undefined && (
                   <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
@@ -160,8 +242,8 @@ const AIChatPanel = forwardRef<AIChatPanelRef, AIChatPanelProps>(function AIChat
           ))}
           {processing && (
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-mundi-500 flex items-center justify-center shrink-0">
-                <Bot className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0">
+                <NexusOneIcon size={16} />
               </div>
               <div className="bg-gray-100 rounded-2xl px-4 py-3">
                 <div className="flex items-center gap-2 text-gray-900">
@@ -171,6 +253,8 @@ const AIChatPanel = forwardRef<AIChatPanelRef, AIChatPanelProps>(function AIChat
               </div>
             </div>
           )}
+          {/* Scroll anchor */}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 

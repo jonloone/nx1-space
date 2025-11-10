@@ -68,7 +68,7 @@ NO explanations. NO reasoning. ONLY tool calls.`
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { messages, context } = body
+    const { messages, context, mode, modeToolCall } = body
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -80,6 +80,12 @@ export async function POST(req: NextRequest) {
     console.log('Processing chat request with', messages.length, 'messages')
     if (context) {
       console.log('📍 Application context:', context)
+    }
+    if (mode) {
+      console.log('🎯 Analysis mode:', mode)
+    }
+    if (modeToolCall) {
+      console.log('🔧 Mode handler provided tool call:', modeToolCall.tool)
     }
 
     // Build messages array with optional context
@@ -106,7 +112,7 @@ export async function POST(req: NextRequest) {
         'Authorization': `Bearer ${process.env.VULTR_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-instruct',
+        model: 'deepseek-r1-distill-llama-70b',
         messages: llmMessages,
         temperature: 0.1,
         max_tokens: 150
@@ -138,8 +144,16 @@ export async function POST(req: NextRequest) {
     // Initialize result variable (will be set if tool is called)
     let toolCall: any = null
 
-    // Check if LLM wants to call a tool
-    const toolCallMatch = assistantMessage.match(/TOOL_CALL:\s*(\w+)\((.*?)\)/)
+    // If mode handler provided a tool call, use it directly (eliminates pattern matching conflicts)
+    if (modeToolCall) {
+      toolCall = modeToolCall
+      assistantMessage = toolCall.pendingMessage || 'Processing your request...'
+      console.log('✅ Using tool call from mode handler:', toolCall.tool)
+    }
+
+    // Check if LLM wants to call a tool (fallback to LLM output if direct parser didn't match)
+    if (!toolCall) {
+      const toolCallMatch = assistantMessage.match(/TOOL_CALL:\s*(\w+)\((.*?)\)/)
 
     if (toolCallMatch) {
       const [, toolName, paramsStr] = toolCallMatch
@@ -166,6 +180,7 @@ export async function POST(req: NextRequest) {
         console.error('Tool parsing error:', error)
         assistantMessage = 'I encountered an error parsing that command. Please try again.'
       }
+    }
     }
 
     // Return response in OpenAI-compatible format with action data

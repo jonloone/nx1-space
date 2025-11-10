@@ -27,7 +27,8 @@ export class InvestigationCommandHandler {
                                lowerQuery.includes('satellite') ||
                                lowerQuery.includes('isochrone') ||
                                lowerQuery.includes('reachability') ||
-                               lowerQuery.includes('accessibility')
+                               lowerQuery.includes('accessibility') ||
+                               (lowerQuery.includes('route') && !lowerQuery.includes('subject'))
 
     if (!isAnalysisCommand && (
       lowerQuery.includes('alert') ||
@@ -58,17 +59,18 @@ export class InvestigationCommandHandler {
       }
     }
 
-    // Show route pattern (only for investigation-specific route commands, not general route analysis)
+    // Show route pattern (only for investigation-specific route commands with subject reference)
     if (
-      (lowerQuery.includes('show') && (lowerQuery.includes('route') || lowerQuery.includes('movement'))) ||
-      (lowerQuery.includes('display') && (lowerQuery.includes('route') || lowerQuery.includes('movement'))) ||
-      (lowerQuery.includes('subject') && (lowerQuery.includes('route') || lowerQuery.includes('movement')))
+      lowerQuery.includes('subject') && (lowerQuery.includes('route') || lowerQuery.includes('movement'))
     ) {
       return { type: 'show-route', params: {} }
     }
 
     // List subjects pattern
-    if (lowerQuery.includes('list') && lowerQuery.includes('subject')) {
+    if (
+      (lowerQuery.includes('list') || lowerQuery.includes('show')) &&
+      (lowerQuery.includes('subject') || lowerQuery.includes('all'))
+    ) {
       return { type: 'list-subjects', params: {} }
     }
 
@@ -91,11 +93,17 @@ export class InvestigationCommandHandler {
       case 'analyze-subject':
         return this.handleAnalyzeSubject(command.params.subjectId)
 
+      case 'list-subjects':
+        return this.handleListSubjects()
+
+      case 'show-route':
+        return this.handleShowRoute()
+
       default:
         return [{
           id: Date.now().toString(),
           role: 'assistant',
-          content: 'Command not yet implemented. Try: "Show me the alerts"',
+          content: 'Command not yet implemented. Try: "Show me the alerts" or "Show all subjects"',
           timestamp: new Date()
         }]
     }
@@ -503,6 +511,63 @@ Be concise, professional, and action-oriented. Do not use emojis.`
       id: Date.now().toString(),
       role: 'assistant',
       content: `🧠 Analyzing subject ${subjectId}... (Demo mode: Full implementation in production)`,
+      timestamp: new Date()
+    }]
+  }
+
+  /**
+   * Handle: List all subjects under investigation
+   */
+  private async handleListSubjects(): Promise<ChatMessage[]> {
+    try {
+      const { getCitizens360DataService } = await import('./citizens360DataService')
+      const dataService = getCitizens360DataService()
+
+      // Get all subjects from the database
+      const subjects = await dataService.getAllSubjects()
+
+      if (subjects.length === 0) {
+        return [{
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: '📋 **No Active Subjects**\n\nNo subjects are currently under investigation.',
+          timestamp: new Date()
+        }]
+      }
+
+      // Format subject list
+      const subjectList = subjects.map((subject, index) => {
+        const statusIcon = subject.status === 'active' ? '🟢' : subject.status === 'pending' ? '🟡' : '⚪'
+        return `${index + 1}. ${statusIcon} **${subject.name}** (${subject.id})\n   Risk: ${subject.riskLevel} | Status: ${subject.status}`
+      }).join('\n\n')
+
+      const content = `📋 **Active Subjects** (${subjects.length} total)\n\n${subjectList}\n\n*Use "Analyze subject [ID]" for detailed investigation*`
+
+      return [{
+        id: Date.now().toString(),
+        role: 'assistant',
+        content,
+        timestamp: new Date()
+      }]
+    } catch (error) {
+      console.error('Error listing subjects:', error)
+      return [{
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '❌ Error loading subjects. Please try again.',
+        timestamp: new Date()
+      }]
+    }
+  }
+
+  /**
+   * Handle: Show subject route/movement
+   */
+  private async handleShowRoute(): Promise<ChatMessage[]> {
+    return [{
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: '🗺️ **Subject Movement Analysis**\n\nThis feature displays subject movement patterns, frequent locations, and route analysis. (Demo mode: Full implementation in production)',
       timestamp: new Date()
     }]
   }

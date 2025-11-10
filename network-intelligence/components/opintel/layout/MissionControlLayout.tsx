@@ -28,6 +28,7 @@ import IntegratedSearchBar from '@/components/search/IntegratedSearchBar'
 import ChatContainer from '@/components/chat/ChatContainer'
 import CommandPaletteBar from '@/components/chat/CommandPaletteBar'
 import { CardDock } from '@/components/opintel/CardDock'
+import AISidebarLayout from '@/components/ai-sidebar/AISidebarLayout'
 import RightPanel from '@/components/opintel/panels/RightPanel'
 import { IntelligenceAlertArtifact } from '@/components/ai/artifacts/IntelligenceAlertArtifact'
 import { SubjectProfileCard } from '@/components/investigation/SubjectProfileCard'
@@ -41,6 +42,7 @@ import { usePanelStore } from '@/lib/stores/panelStore'
 import { useMapStore } from '@/lib/stores/mapStore'
 import { useAnalysisStore } from '@/lib/stores/analysisStore'
 import { GERSPlace } from '@/lib/services/gersDemoService'
+import BubbleTimeline from '@/components/investigation/BubbleTimeline'
 
 // Simple city center coordinates lookup for common cities
 const CITY_COORDINATES: Record<string, [number, number]> = {
@@ -114,8 +116,7 @@ export default function MissionControlLayout({
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const [chatHeight, setChatHeight] = useState(70) // Default collapsed height
-  const [mouseDownPos, setMouseDownPos] = useState<{ x: number; y: number } | null>(null)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   // Panel and map stores
   const { isOpen: isPanelOpen, currentHeight: panelHeight, rightPanelMode, rightPanelData, closeRightPanel, openRightPanel, openPanel } = usePanelStore()
@@ -172,42 +173,17 @@ export default function MissionControlLayout({
     }
   }, [isPanelOpen, panelHeight, setPadding])
 
-  // Adjust map padding based on command palette height
+  // Map padding for sidebar layout - no bottom padding needed now
   useEffect(() => {
-    if (useChatInterface && chatHeight > 0) {
-      // Add padding to bottom of map to account for command palette
-      // Add a bit extra (20px) so map content isn't right at palette edge
-      setPadding({ bottom: chatHeight + 20 })
+    if (useChatInterface && !hideSidebar) {
+      // No padding needed - sidebar is in grid column
+      setPadding({ bottom: 0 })
     }
-  }, [useChatInterface, chatHeight, setPadding])
+  }, [useChatInterface, hideSidebar, setPadding])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     onSearch?.(searchQuery)
-  }
-
-  // Track mouse down position to detect if it's a click or drag
-  const handleMapMouseDown = (e: React.MouseEvent) => {
-    setMouseDownPos({ x: e.clientX, y: e.clientY })
-    // Don't prevent default - let map handle the event too
-  }
-
-  // Only minimize command palette if this was a click (not a drag)
-  const handleMapClick = (e: React.MouseEvent) => {
-    if (!mouseDownPos || !useChatInterface || !chatRef?.current) return
-
-    // Calculate distance moved
-    const deltaX = Math.abs(e.clientX - mouseDownPos.x)
-    const deltaY = Math.abs(e.clientY - mouseDownPos.y)
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
-
-    // If mouse moved less than 5 pixels, it's a click (not a drag)
-    if (distance < 5) {
-      chatRef.current.collapse()
-    }
-
-    setMouseDownPos(null)
-    // Don't prevent default - let map handle the event too
   }
 
   // Handle progressive investigation actions
@@ -245,7 +221,7 @@ export default function MissionControlLayout({
         const subjectId = data.subjectId || data.profile?.subjectId || 'SUBJECT-2547'
         const caseNumber = 'CT-2024-8473'
 
-        console.log('📅 Opening timeline panel for subject:', subjectId)
+        console.log('📅 Loading timeline for subject:', subjectId)
 
         try {
           const timeline = await citizens360Service.loadTimeline(caseNumber, subjectId)
@@ -261,28 +237,18 @@ export default function MissionControlLayout({
 
             const subjectName = data.subjectName || subject?.name?.full || data.profile?.name?.full || 'Subject'
 
-            // Open timeline in bottom panel (instead of artifact card)
-            const panelContent = {
-              type: 'timeline' as const,
+            // Push timeline as artifact (will appear inline at bottom-right)
+            pushArtifact({
+              type: 'timeline',
               data: {
                 events: timeline,
                 subjectName,
                 period,
                 subjectId
-              },
-              title: `${subjectName} - Timeline`,
-              subtitle: `${timeline.length} events over ${Math.ceil((period.end.getTime() - period.start.getTime()) / (1000 * 60 * 60 * 24))} days`
-            }
+              }
+            })
 
-            console.log('📅 Opening panel with content:', panelContent)
-            openPanel(panelContent, 'medium')
-
-            // Verify panel state after opening
-            setTimeout(() => {
-              console.log('📅 Panel state check - isOpen:', isPanelOpen, 'detent:', usePanelStore.getState().detent)
-            }, 100)
-
-            console.log('📅 Timeline panel opened with', timeline.length, 'events')
+            console.log('📅 Timeline artifact created with', timeline.length, 'events')
           }
         } catch (error) {
           console.error('Failed to load timeline:', error)
@@ -399,20 +365,55 @@ export default function MissionControlLayout({
   }
 
   return (
-    <div className="h-screen w-full relative overflow-hidden layout-container">
-      {/* Full-Screen Map Backdrop */}
-      <div className="absolute inset-0 map-card">
-        {children}
+    <div
+      className="h-screen w-full overflow-hidden layout-container"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: useChatInterface && !hideSidebar
+          ? isRightPanelOpen
+            ? `${isSidebarCollapsed ? '60px' : '420px'} 600px 1fr`
+            : `${isSidebarCollapsed ? '60px' : '420px'} 1fr`
+          : '1fr',
+        gridTemplateRows: '1fr',
+        transition: 'grid-template-columns 0.3s ease-in-out'
+      }}
+    >
+      {/* AI Sidebar - Left Column (420px expanded, 60px collapsed) */}
+      {useChatInterface && !hideSidebar && (
+        <AISidebarLayout
+          ref={chatRef}
+          onCollapse={setIsSidebarCollapsed}
+          onAction={handleInvestigationAction}
+        />
+      )}
 
-        {/* Transparent overlay to capture clicks for closing command palette - only when expanded */}
-        {useChatInterface && chatHeight > 70 && (
-          <div
-            className="absolute inset-0 pointer-events-auto"
-            style={{ zIndex: 35 }}
-            onMouseDown={handleMapMouseDown}
-            onClick={handleMapClick}
-          />
+      {/* Right Panel - Middle Column (slides from left, pushes map) */}
+      <AnimatePresence mode="wait">
+        {isRightPanelOpen && (
+          <motion.aside
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 600, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            className="relative h-full bg-white dark:bg-gray-900 shadow-[2px_0_16px_rgba(0,0,0,0.06)] overflow-hidden z-10"
+          >
+            <div className="w-[600px] h-full">
+              {rightPanel || (
+                <RightPanel
+                  mode={rightPanelMode}
+                  data={rightPanelData}
+                  onClose={closeRightPanel}
+                  onAction={handleInvestigationAction}
+                />
+              )}
+            </div>
+          </motion.aside>
         )}
+      </AnimatePresence>
+
+      {/* Full-Screen Map Backdrop - Center Column */}
+      <div className="relative h-full w-full overflow-hidden map-card">
+        {children}
 
           {/* Top-Left Logo & Controls - Floating inside map card (hidden when chat interface is active) */}
           {!hideSidebar && !useChatInterface && (
@@ -486,22 +487,16 @@ export default function MissionControlLayout({
           )}
       </div>
 
-      {/* Command Palette Bar - Full Width Bottom */}
-      {!hideSidebar && useChatInterface && (
-        <CommandPaletteBar
-          ref={chatRef}
-          onAction={handleInvestigationAction}
-          onHeightChange={setChatHeight}
-        />
-      )}
+      {/* Command Palette - REMOVED: Chat now integrated into AI sidebar */}
 
       {/* Investigation Cards - Adaptive Masonry Grid (Max 3 Expanded) */}
       {!hideSidebar && useChatInterface && expandedArtifacts.length > 0 && (
         <motion.div
-          className="absolute left-4 right-4 z-40 pointer-events-none overflow-y-auto overflow-x-hidden"
+          className="absolute right-4 z-40 pointer-events-none overflow-y-auto overflow-x-hidden"
           animate={{
-            top: minimizedArtifacts.length > 0 ? '76px' : '16px', // 24px (top-6) + 40px (dock height) + 12px gap
-            maxHeight: `calc(100vh - ${chatHeight}px - ${minimizedArtifacts.length > 0 ? 76 : 16}px - 16px)`
+            left: (isSidebarCollapsed ? 60 : 420) + (isRightPanelOpen ? 600 : 0) + 16, // Sidebar + Panel + 16px padding
+            top: minimizedArtifacts.length > 0 ? '76px' : '16px',
+            maxHeight: `calc(100vh - ${minimizedArtifacts.length > 0 ? 76 : 16}px - 16px)`
           }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
@@ -514,7 +509,7 @@ export default function MissionControlLayout({
             }}
           >
             <AnimatePresence mode="popLayout">
-              {expandedArtifacts.map((artifact) => (
+              {expandedArtifacts.filter(a => a.type !== 'timeline').map((artifact) => (
                 <motion.div
                   key={artifact.id}
                   layout
@@ -537,15 +532,6 @@ export default function MissionControlLayout({
                       onClose={() => removeArtifact(artifact.id)}
                     />
                   )}
-                  {artifact.type === 'timeline' && (
-                    <TimelineCard
-                      events={artifact.data.events}
-                      subjectName={artifact.data.subjectName}
-                      subjectId={artifact.data.subjectId}
-                      onAction={handleInvestigationAction}
-                      onClose={() => removeArtifact(artifact.id)}
-                    />
-                  )}
                   {artifact.type === 'network-graph' && (
                     <ArtifactRenderer artifact={artifact} />
                   )}
@@ -555,6 +541,7 @@ export default function MissionControlLayout({
           </div>
         </motion.div>
       )}
+
 
       {/* Top-Right User Controls - Floating over map */}
       <div className="absolute top-6 right-6 z-50 flex items-center gap-3">
@@ -606,30 +593,9 @@ export default function MissionControlLayout({
           minimizedArtifacts={minimizedArtifacts}
           onExpand={expandArtifact}
           onRemove={removeArtifact}
+          sidebarWidth={(isSidebarCollapsed ? 60 : 420) + (isRightPanelOpen ? 600 : 0)}
         />
       )}
-
-      {/* Right Panel - Full height, wider, clean design - Above all UI elements */}
-      <AnimatePresence mode="wait">
-        {isRightPanelOpen && (
-          <motion.aside
-            initial={{ x: 600, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 600, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute top-0 right-0 bottom-0 z-[60] w-[600px] bg-white dark:bg-gray-900 shadow-2xl"
-          >
-            {rightPanel || (
-              <RightPanel
-                mode={rightPanelMode}
-                data={rightPanelData}
-                onClose={closeRightPanel}
-                onAction={handleInvestigationAction}
-              />
-            )}
-          </motion.aside>
-        )}
-      </AnimatePresence>
 
       {/* Bottom Panel */}
       <SimpleBottomPanel />
