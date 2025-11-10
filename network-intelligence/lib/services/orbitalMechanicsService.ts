@@ -9,7 +9,19 @@
  * - Visibility calculations
  */
 
-import * as satellite from 'satellite.js'
+import {
+  twoline2satrec,
+  propagate,
+  gstime,
+  eciToGeodetic,
+  eciToEcf,
+  ecfToLookAngles,
+  degreesLat,
+  degreesLong,
+  degreesToRadians,
+  type EciVec3,
+  type GeodeticLocation
+} from 'satellite.js'
 import type { TLE } from './tleDataService'
 
 export interface SatellitePosition {
@@ -89,7 +101,7 @@ export class OrbitalMechanicsService {
       }
 
       // Initialize satellite record from TLE
-      const satrec = satellite.twoline2satrec(tle.line1, tle.line2)
+      const satrec = twoline2satrec(tle.line1, tle.line2)
 
       if (satrec.error !== 0) {
         console.error(`❌ TLE initialization error for ${tle.name}: ${satrec.error}`)
@@ -97,24 +109,24 @@ export class OrbitalMechanicsService {
       }
 
       // Propagate to the specified time
-      const positionAndVelocity = satellite.propagate(satrec, date)
+      const positionAndVelocity = propagate(satrec, date)
 
       // Check if position is valid
       if (!positionAndVelocity.position || typeof positionAndVelocity.position === 'boolean') {
         return null
       }
 
-      const positionEci = positionAndVelocity.position as satellite.EciVec3<number>
-      const velocityEci = positionAndVelocity.velocity as satellite.EciVec3<number>
+      const positionEci = positionAndVelocity.position as EciVec3<number>
+      const velocityEci = positionAndVelocity.velocity as EciVec3<number>
 
       // Convert ECI to Geodetic (lat/lon/alt)
-      const gmst = satellite.gstime(date)
-      const positionGd = satellite.eciToGeodetic(positionEci, gmst)
+      const gmst = gstime(date)
+      const positionGd = eciToGeodetic(positionEci, gmst)
 
       return {
         position: {
-          latitude: satellite.degreesLat(positionGd.latitude),
-          longitude: satellite.degreesLong(positionGd.longitude),
+          latitude: degreesLat(positionGd.latitude),
+          longitude: degreesLong(positionGd.longitude),
           altitude: positionGd.height, // km
           time: date
         },
@@ -186,34 +198,34 @@ export class OrbitalMechanicsService {
   ): { azimuth: number; elevation: number; range: number } | null {
     try {
       // Initialize satellite
-      const satrec = satellite.twoline2satrec(tle.line1, tle.line2)
-      const positionAndVelocity = satellite.propagate(satrec, date)
+      const satrec = twoline2satrec(tle.line1, tle.line2)
+      const positionAndVelocity = propagate(satrec, date)
 
       if (!positionAndVelocity.position || typeof positionAndVelocity.position === 'boolean') {
         return null
       }
 
-      const positionEci = positionAndVelocity.position as satellite.EciVec3<number>
+      const positionEci = positionAndVelocity.position as EciVec3<number>
 
       // Observer location in ECF (Earth-Centered Fixed)
-      const observerGd = {
-        latitude: satellite.degreesToRadians(observer.latitude),
-        longitude: satellite.degreesToRadians(observer.longitude),
+      const observerGd: GeodeticLocation = {
+        latitude: degreesToRadians(observer.latitude),
+        longitude: degreesToRadians(observer.longitude),
         height: (observer.altitude || 0) / 1000 // Convert meters to km
       }
 
       // Calculate GMST for ECI to ECF conversion
-      const gmst = satellite.gstime(date)
+      const gmst = gstime(date)
 
       // Convert ECI position to ECF
-      const positionEcf = satellite.eciToEcf(positionEci, gmst)
+      const positionEcf = eciToEcf(positionEci, gmst)
 
       // Calculate look angles
-      const lookAngles = satellite.ecfToLookAngles(observerGd, positionEcf)
+      const lookAngles = ecfToLookAngles(observerGd, positionEcf)
 
       return {
-        azimuth: satellite.degreesLong(lookAngles.azimuth),
-        elevation: satellite.degreesLat(lookAngles.elevation),
+        azimuth: degreesLong(lookAngles.azimuth),
+        elevation: degreesLat(lookAngles.elevation),
         range: lookAngles.rangeSat // km
       }
     } catch (error) {
