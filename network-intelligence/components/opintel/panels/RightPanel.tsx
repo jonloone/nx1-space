@@ -32,17 +32,18 @@ import { cn } from '@/lib/utils'
 import type { IntelligenceAlert } from '@/lib/types/chatArtifacts'
 import { NetworkAnalysisCard } from '@/components/investigation/NetworkAnalysisCard'
 import type { Network } from 'lucide-react'
-import { DomainManagerPanel } from '@/components/opintel/panels/DomainManagerPanel'
+import type mapboxgl from 'mapbox-gl'
 
 interface RightPanelProps {
-  mode: 'feature' | 'alert' | 'layer' | 'analysis' | 'cluster' | 'network-analysis' | 'timeline-detail' | 'domain-manager' | null
+  mode: 'feature' | 'alert' | 'layer' | 'analysis' | 'cluster' | 'network-analysis' | 'timeline-detail' | null
   data?: any
   onClose: () => void
   onInjectAlert?: (alert: IntelligenceAlert) => void
   onAction?: (action: string, data: any) => void
+  map?: mapboxgl.Map | null
 }
 
-export default function RightPanel({ mode, data, onClose, onInjectAlert, onAction }: RightPanelProps) {
+export default function RightPanel({ mode, data, onClose, onInjectAlert, onAction, map }: RightPanelProps) {
   if (!mode) return null
 
   const renderHeader = () => {
@@ -78,9 +79,6 @@ export default function RightPanel({ mode, data, onClose, onInjectAlert, onActio
         icon = <Clock className="h-4 w-4" />
         title = 'Event Details'
         break
-      case 'domain-manager':
-        // Domain manager has its own header, skip default header
-        return null
     }
 
     return (
@@ -97,15 +95,6 @@ export default function RightPanel({ mode, data, onClose, onInjectAlert, onActio
         >
           <X className="h-4 w-4 text-[#525252]" />
         </Button>
-      </div>
-    )
-  }
-
-  // Domain manager uses its own layout
-  if (mode === 'domain-manager') {
-    return (
-      <div className="h-full bg-gray-900 border-l border-gray-800">
-        <DomainManagerPanel onClose={onClose} initialDomain={data?.initialDomain} initialLayers={data?.initialLayers} />
       </div>
     )
   }

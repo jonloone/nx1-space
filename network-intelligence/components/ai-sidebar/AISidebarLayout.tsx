@@ -12,7 +12,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { AIChatPanelRef } from '@/components/ai/AIChatPanel'
 import SidebarHeader from './SidebarHeader'
-import ContextActionsCard from './ContextActionsCard'
 import ChatHistoryView from './ChatHistoryView'
 
 export interface AISidebarLayoutProps {
@@ -86,15 +85,8 @@ const AISidebarLayout = forwardRef<AIChatPanelRef, AISidebarLayoutProps>(
             transition={{ duration: 0.2 }}
             className="flex-1 flex flex-col overflow-hidden"
           >
-            {/* Context & Actions Card with integrated agent indicator */}
-            <ContextActionsCard
-              isThinking={contextAgentThinking}
-              agentStatus="monitoring"
-              onAction={onAction}
-            />
-
             {/* Chat History & Input */}
-            <div className="flex-1 flex flex-col overflow-hidden border-t border-gray-100 mt-3">
+            <div className="flex-1 flex flex-col overflow-hidden border-t border-gray-100 mt-3 pb-16">
               <ChatHistoryView ref={ref} onAction={onAction} />
             </div>
           </motion.div>

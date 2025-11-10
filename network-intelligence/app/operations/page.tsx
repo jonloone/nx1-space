@@ -4,7 +4,6 @@ import React, { useRef, useEffect, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import MissionControlLayout from '@/components/opintel/layout/MissionControlLayout'
-import LeftSidebar from '@/components/opintel/panels/LeftSidebar'
 import RightPanel from '@/components/opintel/panels/RightPanel'
 import IntelligenceAlertPanel from '@/components/opintel/panels/IntelligenceAlertPanel'
 import SubjectProfileViewer from '@/components/opintel/SubjectProfileViewer'
@@ -20,12 +19,17 @@ import AddLayerDropdown from '@/components/opintel/panels/AddLayerDropdown'
 // DISABLED: Investigation mode now triggered via AI chat artifacts
 // import { InvestigationMode } from '@/components/investigation'
 import CopilotProvider from '@/components/chat/CopilotProvider'
-import CopilotSidebarWrapper from '@/components/chat/CopilotSidebarWrapper'
 import { AIChatPanelRef, ChatMessage } from '@/components/ai/AIChatPanel'
-import { CommandPaletteBarRef } from '@/components/chat/CommandPaletteBar'
 import MapboxAlertVisualization from '@/components/opintel/MapboxAlertVisualization'
-import { SatelliteTrackingIntegration } from '@/components/space/SatelliteTrackingIntegration'
+import { SpaceDomainIntegration } from '@/components/space/SpaceDomainIntegration'
+import { UnifiedDock } from '@/components/dock/UnifiedDock'
+import { DockChatPanel } from '@/components/dock/panels/DockChatPanel'
+import { DockDomainsPanel } from '@/components/dock/panels/DockDomainsPanel'
+import { DockAnalysisPanel } from '@/components/dock/panels/DockAnalysisPanel'
+import { DockLayersPanel } from '@/components/dock/panels/DockLayersPanel'
+import { ToolbarManager } from '@/components/domains/toolbars'
 import type { IntelligenceAlert } from '@/lib/types/chatArtifacts'
+import type { ICDomainId } from '@/lib/config/icDomains'
 import { useMapStore, usePanelStore } from '@/lib/stores'
 import { useAnalysisStore } from '@/lib/stores/analysisStore'
 import { GERSPlace, LOD_CONFIG } from '@/lib/services/gersDemoService'
@@ -41,11 +45,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibG9vbmV5Z2lzIiwiYSI6ImNtZTh0c201OTBqcjgya29pM
 export default function OperationsPage() {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
-  const chatRef = useRef<CommandPaletteBarRef>(null)
+  const chatRef = useRef<AIChatPanelRef>(null)
   const summarizedAlerts = useRef<Set<string>>(new Set())
 
-  // Chat sidebar state
-  const [isChatExpanded, setIsChatExpanded] = useState(false)
+  // Active domains state (for ToolbarManager)
+  const [activeDomains, setActiveDomains] = useState<ICDomainId[]>(['ground'])
 
   // Zustand stores
   const {
@@ -135,7 +139,7 @@ export default function OperationsPage() {
       map.current?.remove()
       setMap(null)
     }
-  }, [setMap, setLoaded])
+  }, [setMap, setLoaded, openRightPanel])
 
   // Initialize cache on mount
   useEffect(() => {
@@ -896,116 +900,9 @@ export default function OperationsPage() {
         isLive={true}
         activeUsers={12}
         hideSidebar={false}
-        useChatInterface={true}
-        chatRef={chatRef}
-        isChatExpanded={isChatExpanded}
-        onToggleChat={() => setIsChatExpanded(!isChatExpanded)}
-        onChatAction={handleChatAction}
+        useChatInterface={false}
         onSearch={handleSearch}
         onPlaceSelect={handleGERSPlaceSelect}
-      leftSidebar={
-        <LeftSidebar
-          dataSources={dataSources}
-          layers={activeLayers}
-          liveStreams={liveStreams}
-          onAddLayer={handleAddLayer}
-          onToggleLayer={handleToggleLayer}
-          onRemoveLayer={handleRemoveLayer}
-          onChangeOpacity={handleChangeOpacity}
-          onLayerSettings={handleLayerSettings}
-          onTogglePlaceCategory={handleTogglePlaceCategory}
-          onTogglePlaceGroup={handleTogglePlaceGroup}
-          onLoadPreset={async (presetId) => {
-            if (!map.current) return
-
-            console.log('📋 Loading preset:', presetId)
-
-            // Investigation intelligence preset - Now handled by AI chat
-            if (presetId === 'investigation-intelligence') {
-              console.log('🔍 Investigation Intelligence - Use AI chat to trigger investigation artifacts')
-              // No longer activates a separate mode
-              return
-            }
-
-            try {
-              const { getPreset } = require('@/lib/config/layerPresets')
-              const preset = getPreset(presetId)
-
-              if (!preset) {
-                console.error(`Preset ${presetId} not found`)
-                return
-              }
-
-              // Check if preset is available
-              if (preset.status === 'coming-soon') {
-                console.log('⏳ Preset not yet available:', preset.name)
-                // TODO: Show toast notification to user
-                return
-              }
-
-              console.log(`Loading preset: ${preset.name}`)
-
-              // Step 1: Remove all current layers (except basemap)
-              const layersToRemove = [...activeLayers]
-              for (const layer of layersToRemove) {
-                await handleRemoveLayer(layer.id)
-              }
-
-              // Step 2: Change basemap
-              const { getLayerById } = require('@/lib/config/layerCatalog')
-              const basemapDef = getLayerById(preset.basemap)
-              if (basemapDef?.sourceUrl) {
-                map.current.setStyle(basemapDef.sourceUrl)
-                console.log(`✅ Changed basemap to: ${basemapDef.name}`)
-
-                // Wait for style to load before adding layers
-                await new Promise((resolve) => {
-                  map.current!.once('style.load', resolve)
-                })
-
-                // Reinitialize Overture Layers Manager after style change
-                const layersManager = getOvertureLayersManager()
-                await layersManager.initialize(map.current!)
-              }
-
-              // Step 3: Load preset layers with visibility
-              for (const layerConfig of preset.layers) {
-                const layerDef = getLayerById(layerConfig.id)
-
-                // Only load available layers
-                if (layerDef?.status === 'available') {
-                  await handleAddLayer(layerConfig.id)
-
-                  // Set visibility based on preset
-                  if (!layerConfig.visible) {
-                    setTimeout(() => {
-                      setActiveLayers(prev =>
-                        prev.map(l => l.id === layerConfig.id ? { ...l, visible: false } : l)
-                      )
-
-                      // Also toggle in the manager
-                      const layerIdMap: Record<string, string> = {
-                        'infra-places': 'places',
-                        'infra-buildings-2d': 'buildings-2d',
-                        'infra-buildings-3d': 'buildings-3d'
-                      }
-                      const overtureLayerId = layerIdMap[layerConfig.id]
-                      if (overtureLayerId) {
-                        const layersManager = getOvertureLayersManager()
-                        layersManager.toggleLayer(overtureLayerId as any, false)
-                      }
-                    }, 100)
-                  }
-                }
-              }
-
-              console.log(`✅ Loaded preset: ${preset.name}`)
-            } catch (error) {
-              console.error('❌ Failed to load preset:', error)
-            }
-          }}
-        />
-      }
       rightPanel={
         rightPanelMode ? (
           rightPanelMode === 'alert' && rightPanelData?.alert ? (
@@ -1078,6 +975,7 @@ export default function OperationsPage() {
             <RightPanel
               mode={rightPanelMode}
               data={rightPanelData}
+              map={map.current}
               onClose={() => {
                 // Clear highlight when closing panel
                 const highlightService = getFeatureHighlightService()
@@ -1126,15 +1024,28 @@ export default function OperationsPage() {
         />
       )}
 
-      {/* Satellite Tracking - Real-time orbital mechanics */}
+      {/* Satellite Imagery - Time-series analysis with timeline */}
       {map.current && isLoaded && (
-        <SatelliteTrackingIntegration
+        <SpaceDomainIntegration
           map={map.current}
           isActive={true}
-          showOrbits={true}
-          showLabels={true}
         />
       )}
+
+      {/* Domain Toolbars - Floating toolbars for domain-specific operations */}
+      {map.current && isLoaded && (
+        <ToolbarManager map={map.current} activeDomains={activeDomains} />
+      )}
+
+      {/* Unified Dock - Bottom command bar with Chat, Domains, Analysis, Layers */}
+      <UnifiedDock
+        map={map.current}
+        onAction={handleChatAction}
+        chatPanel={<DockChatPanel ref={chatRef} onAction={handleChatAction} />}
+        domainsPanel={<DockDomainsPanel onDomainsChange={setActiveDomains} />}
+        analysisPanel={<DockAnalysisPanel />}
+        layersPanel={<DockLayersPanel />}
+      />
 
       {/* Investigation Mode - DISABLED: Now triggered via AI chat artifacts */}
       {/* Investigation components will be dynamically created as artifacts */}

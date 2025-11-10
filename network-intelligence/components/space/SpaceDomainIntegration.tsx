@@ -20,39 +20,21 @@ import { Satellite, X } from 'lucide-react'
 interface SpaceDomainIntegrationProps {
   map: mapboxgl.Map | null
   isActive: boolean
-  initialLocation?: [number, number] // [lng, lat]
-  initialLocationName?: string
 }
 
 export function SpaceDomainIntegration({
   map,
-  isActive,
-  initialLocation,
-  initialLocationName
+  isActive
 }: SpaceDomainIntegrationProps) {
   const {
     selectedImage,
     images,
     isLoading,
     imageOpacity,
-    currentLocation,
-    loadTimeSeries,
-    setImageOpacity
+    currentLocation
   } = useSpaceStore()
 
   const [isExpanded, setIsExpanded] = useState(true)
-  const hasInitialized = useRef(false)
-
-  // Load initial imagery when activated
-  useEffect(() => {
-    if (!isActive || !initialLocation || hasInitialized.current) {
-      return
-    }
-
-    console.log('🛰️ Initializing Space domain imagery for:', initialLocationName)
-    loadTimeSeries(initialLocation, initialLocationName)
-    hasInitialized.current = true
-  }, [isActive, initialLocation, initialLocationName, loadTimeSeries])
 
   // Update map overlay when selected image changes
   useEffect(() => {
@@ -100,16 +82,7 @@ export function SpaceDomainIntegration({
 
   // Don't render if no location loaded
   if (!currentLocation && !isLoading) {
-    return (
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
-        <div className="bg-gray-900/95 backdrop-blur border border-gray-800 rounded-lg px-4 py-3 flex items-center gap-3">
-          <Satellite className="w-5 h-5 text-blue-500" />
-          <span className="text-sm text-gray-300">
-            Click a location on the map to load satellite imagery
-          </span>
-        </div>
-      </div>
-    )
+    return null // Control panel will handle instructions
   }
 
   // Collapsed state

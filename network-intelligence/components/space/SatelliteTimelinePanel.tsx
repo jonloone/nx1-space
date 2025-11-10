@@ -5,8 +5,8 @@
  * Bottom panel for browsing satellite imagery time-series
  */
 
-import React, { useRef, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Calendar, Loader2, GitCompare, Sliders } from 'lucide-react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
+import { ChevronLeft, ChevronRight, Calendar, Loader2, GitCompare, Sliders, Play, Pause } from 'lucide-react'
 import { ImageryThumbnail } from './ImageryThumbnail'
 import { useSpaceStore } from '@/lib/stores/spaceStore'
 
@@ -30,8 +30,13 @@ export function SatelliteTimelinePanel({ className = '' }: SatelliteTimelinePane
   } = useSpaceStore()
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [showDatePicker, setShowDatePicker] = React.useState(false)
-  const [compareSelectionStep, setCompareSelectionStep] = React.useState<0 | 1 | 2>(0) // 0 = off, 1 = selecting before, 2 = selecting after
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [compareSelectionStep, setCompareSelectionStep] = useState<0 | 1 | 2>(0) // 0 = off, 1 = selecting before, 2 = selecting after
+
+  // Playback state
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 5>(1) // 1x, 2x, 5x
+  const playbackIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Auto-scroll to selected image
   useEffect(() => {
@@ -86,6 +91,57 @@ export function SatelliteTimelinePanel({ className = '' }: SatelliteTimelinePane
     disableCompareMode()
   }
 
+  // Playback logic - advance to next image
+  const advanceToNextImage = useCallback(() => {
+    if (!selectedImage || images.length === 0) return
+
+    const currentIndex = images.findIndex(img => img.id === selectedImage.id)
+    if (currentIndex === -1) return
+
+    // Loop back to start if at the end
+    const nextIndex = (currentIndex + 1) % images.length
+    setSelectedImage(images[nextIndex])
+  }, [selectedImage, images, setSelectedImage])
+
+  // Playback control
+  const togglePlayback = () => {
+    setIsPlaying(!isPlaying)
+  }
+
+  const cyclePlaybackSpeed = () => {
+    setPlaybackSpeed(current => {
+      if (current === 1) return 2
+      if (current === 2) return 5
+      return 1
+    })
+  }
+
+  // Playback effect - auto-advance through timeline
+  useEffect(() => {
+    if (!isPlaying || images.length === 0) {
+      if (playbackIntervalRef.current) {
+        clearInterval(playbackIntervalRef.current)
+        playbackIntervalRef.current = null
+      }
+      return
+    }
+
+    // Calculate interval based on speed (base: 2000ms at 1x)
+    const baseInterval = 2000
+    const interval = baseInterval / playbackSpeed
+
+    playbackIntervalRef.current = setInterval(() => {
+      advanceToNextImage()
+    }, interval)
+
+    return () => {
+      if (playbackIntervalRef.current) {
+        clearInterval(playbackIntervalRef.current)
+        playbackIntervalRef.current = null
+      }
+    }
+  }, [isPlaying, playbackSpeed, advanceToNextImage, images.length])
+
   if (isLoading) {
     return (
       <div className={`h-40 bg-gray-900/95 backdrop-blur border-t border-gray-800 ${className}`}>
@@ -122,6 +178,30 @@ export function SatelliteTimelinePanel({ className = '' }: SatelliteTimelinePane
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Playback Controls */}
+          <button
+            onClick={togglePlayback}
+            className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded transition-colors flex items-center gap-2"
+            title={isPlaying ? 'Pause playback' : 'Play timeline'}
+          >
+            {isPlaying ? (
+              <Pause className="w-4 h-4" />
+            ) : (
+              <Play className="w-4 h-4" />
+            )}
+          </button>
+
+          {/* Speed Control */}
+          <button
+            onClick={cyclePlaybackSpeed}
+            className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm rounded transition-colors"
+            title="Playback speed"
+          >
+            {playbackSpeed}x
+          </button>
+
+          <div className="w-px h-6 bg-gray-700" /> {/* Divider */}
+
           {/* Opacity Control */}
           <div className="flex items-center gap-2 px-3 py-1 bg-gray-800 rounded">
             <Sliders className="w-3.5 h-3.5 text-gray-400" />

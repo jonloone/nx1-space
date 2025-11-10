@@ -23,7 +23,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Bot, MapPin, Database, ChevronUp, ChevronDown, Maximize2, Minimize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import CopilotSidebarWrapper from './CopilotSidebarWrapper'
-import QuickActions from './QuickActions'
 import { AIChatPanelRef } from '@/components/ai/AIChatPanel'
 import { cn } from '@/lib/utils'
 
@@ -144,9 +143,6 @@ const PersistentChatPanel = forwardRef<AIChatPanelRef, PersistentChatPanelProps>
                       </div>
                     )}
                   </div>
-
-                  {/* Quick Actions */}
-                  <QuickActions onAction={(actionId) => onAction?.('quick-action', { actionId })} />
                 </div>
               </motion.div>
             )}

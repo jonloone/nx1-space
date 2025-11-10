@@ -1,14 +1,13 @@
 'use client'
 
 import React, { useState, forwardRef, useEffect } from 'react'
-import { Sparkles, Layers, Settings } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import styles from './copilot-custom.module.css'
 import AIChatPanel, { ChatMessage, AIChatPanelRef } from '@/components/ai/AIChatPanel'
 import { useAnalysisStore } from '@/lib/stores/analysisStore'
 import { useMapStore } from '@/lib/stores/mapStore'
 import { usePanelStore } from '@/lib/stores/panelStore'
 import { getAIContext, formatContextForAI } from '@/lib/services/aiContextService'
-import { AnalysisModeSwitcher } from '@/components/chat/AnalysisModeSwitcher'
 import { getAvailableICDomains, type ICDomain } from '@/lib/config/icDomains'
 import { type ICLayerId } from '@/lib/config/icLayers'
 import { ICAnalysisHandler } from '@/lib/services/icAnalysisHandler'
@@ -272,39 +271,8 @@ const CopilotSidebarWrapper = forwardRef<AIChatPanelRef, CopilotSidebarWrapperPr
     console.log(`🎯 Domain changed to: ${domain.name} | Layers:`, layers)
   }
 
-  const handleOpenDomainManager = () => {
-    panelStore.openRightPanel('domain-manager', {
-      initialDomain: currentDomain?.id,
-      initialLayers: currentLayers
-    })
-  }
-
   return (
-    <div className={`${styles.copilotSidebar} ${className} flex flex-col`}>
-      {/* Domain Configuration Button */}
-      <div className="p-3 border-b border-gray-700">
-        <button
-          onClick={handleOpenDomainManager}
-          className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-gray-800 hover:bg-gray-750 rounded-lg transition-colors group"
-        >
-          <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-blue-400" />
-            <div className="text-left">
-              <div className="text-sm font-medium text-gray-200">
-                {currentDomain?.name || 'Configure Domains'}
-              </div>
-              <div className="text-xs text-gray-500">
-                {currentLayers.length > 0
-                  ? `${currentLayers.length} layer(s) active`
-                  : 'Select analysis layers'
-                }
-              </div>
-            </div>
-          </div>
-          <Settings className="w-4 h-4 text-gray-500 group-hover:text-gray-300 transition-colors" />
-        </button>
-      </div>
-
+    <div className={`${styles.copilotSidebar} ${className} flex flex-col pb-20`}>
       {/* Chat Panel */}
       <div className="flex-1 overflow-hidden">
         <AIChatPanel

@@ -19,7 +19,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Bot, MapPin, Database, ChevronUp, Sparkles, Command } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import CopilotSidebarWrapper from './CopilotSidebarWrapper'
-import QuickActions from './QuickActions'
 import { AIChatPanelRef } from '@/components/ai/AIChatPanel'
 import { cn } from '@/lib/utils'
 
@@ -243,15 +242,6 @@ const CommandPaletteBar = forwardRef<CommandPaletteBarRef, CommandPaletteBarProp
                   </Button>
                 </div>
               </div>
-
-              {/* Quick Actions */}
-              {dataContext?.loadedDatasets && dataContext.loadedDatasets.length > 0 && (
-                <div className="shrink-0 px-6 py-3 bg-[#F9FAFB] border-b border-gray-100">
-                  <QuickActions
-                    onAction={(actionId) => onAction?.('quick-action', { actionId })}
-                  />
-                </div>
-              )}
 
               {/* Chat Content */}
               <div className="flex-1 overflow-hidden">

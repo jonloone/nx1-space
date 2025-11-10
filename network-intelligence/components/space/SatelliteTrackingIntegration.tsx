@@ -16,6 +16,7 @@ import {
   removeSatelliteOrbitLayers
 } from '@/lib/layers/satelliteOrbitLayer'
 import { SatelliteTrackingPanel } from './SatelliteTrackingPanel'
+import { SpaceImageryControlPanel } from './SpaceImageryControlPanel'
 
 interface SatelliteTrackingIntegrationProps {
   map: mapboxgl.Map | null
@@ -111,6 +112,10 @@ export function SatelliteTrackingIntegration({
   return (
     <>
       <SatelliteTrackingPanel />
+      {/* Imagery Control Panel - added below satellite tracking */}
+      <div className="mt-4">
+        <SpaceImageryControlPanel map={map} />
+      </div>
     </>
   )
 }
