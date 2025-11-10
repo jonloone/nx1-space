@@ -25,6 +25,178 @@ export interface DomainSwitchResult {
  */
 export class DomainLayerService {
   private currentDomain: ICDomainId | null = null
+  private currentDomains: ICDomainId[] = []
+
+  /**
+   * Switch to multiple IC operational domains (multi-domain fusion)
+   * Merges layer configurations and intelligently selects basemap
+   */
+  switchMultipleDomains(
+    domainIds: ICDomainId[],
+    map: mapboxgl.Map | null,
+    options?: {
+      animateViewport?: boolean
+      preserveUserLayers?: boolean
+    }
+  ): DomainSwitchResult {
+    const { animateViewport = true, preserveUserLayers = false } = options || {}
+
+    console.log(`[DomainLayerService] Switching to multi-domain: [${domainIds.join(', ')}]`)
+
+    if (domainIds.length === 0) {
+      console.warn('[DomainLayerService] No domains provided, defaulting to ground')
+      return this.switchDomain('ground', map, options)
+    }
+
+    if (domainIds.length === 1) {
+      // Single domain - use standard switch
+      return this.switchDomain(domainIds[0], map, options)
+    }
+
+    // Multi-domain fusion logic
+    // Step 1: Merge layers from all domains
+    const mergedLayers = this.mergeDomainLayers(domainIds)
+    console.log(`[DomainLayerService] Merged ${mergedLayers.length} layers from ${domainIds.length} domains`)
+
+    // Step 2: Select optimal basemap for domain combination
+    const basemap = this.selectOptimalBasemap(domainIds)
+    const basemapUrl = basemapToMapboxStyle(basemap)
+    console.log(`[DomainLayerService] Selected basemap: ${basemap}`)
+
+    // Step 3: Apply layer configuration
+    const layerStore = useLayerStore.getState()
+
+    if (!preserveUserLayers) {
+      mergedLayers.forEach(layerConfig => {
+        const layer = layerStore.getLayer(layerConfig.id)
+
+        if (layer) {
+          layerStore.updateLayer(layerConfig.id, {
+            enabled: layerConfig.enabled,
+            visible: layerConfig.enabled,
+            opacity: layerConfig.opacity,
+            zIndex: layerConfig.zIndex
+          })
+        } else {
+          console.log(`[DomainLayerService] Layer ${layerConfig.id} not found in store (may be added later)`)
+        }
+      })
+    }
+
+    // Step 4: Apply basemap and domain-specific features
+    if (map) {
+      const currentStyle = map.getStyle()
+      const currentStyleUrl = (currentStyle as any)?.sprite || ''
+
+      if (!currentStyleUrl.includes(basemap)) {
+        console.log(`[DomainLayerService] Changing basemap to ${basemap} (${basemapUrl})`)
+        map.setStyle(basemapUrl)
+
+        map.once('style.load', () => {
+          setTimeout(() => {
+            this.applyMultiDomainFeatures(domainIds, map)
+          }, 100)
+        })
+      } else {
+        setTimeout(() => {
+          this.applyMultiDomainFeatures(domainIds, map)
+        }, 100)
+      }
+    }
+
+    // Store current domains
+    this.currentDomains = domainIds
+    this.currentDomain = domainIds[0] // Primary domain for backwards compatibility
+
+    return {
+      layersChanged: mergedLayers,
+      basemapChanged: basemapUrl,
+      viewportChanged: { pitch: 0, bearing: 0, zoom: 12 }
+    }
+  }
+
+  /**
+   * Merge layer configurations from multiple domains
+   * Handles conflicts by prioritizing layers with higher priority (lower number)
+   */
+  private mergeDomainLayers(domainIds: ICDomainId[]): LayerConfig[] {
+    const layerMap = new Map<string, LayerConfig>()
+
+    // Collect all layers from all domains
+    domainIds.forEach(domainId => {
+      const layers = getDomainDefaultLayers(domainId)
+
+      layers.forEach(layer => {
+        const existing = layerMap.get(layer.id)
+
+        if (!existing) {
+          // New layer - add it
+          layerMap.set(layer.id, { ...layer })
+        } else {
+          // Layer exists in multiple domains - merge intelligently
+          // Use the configuration with highest priority (lowest number)
+          if (layer.priority < existing.priority) {
+            layerMap.set(layer.id, { ...layer })
+          } else if (layer.priority === existing.priority) {
+            // Same priority - enable if ANY domain wants it enabled
+            layerMap.set(layer.id, {
+              ...existing,
+              enabled: existing.enabled || layer.enabled,
+              // Average opacity for balanced visibility
+              opacity: (existing.opacity + layer.opacity) / 2,
+              // Keep higher zIndex for proper layering
+              zIndex: Math.max(existing.zIndex, layer.zIndex)
+            })
+          }
+        }
+      })
+    })
+
+    // Convert to array and sort by priority
+    return Array.from(layerMap.values()).sort((a, b) => a.priority - b.priority)
+  }
+
+  /**
+   * Select optimal basemap for domain combination
+   * Uses intelligent heuristics based on domain mix
+   */
+  private selectOptimalBasemap(domainIds: ICDomainId[]): BasemapStyle {
+    // Priority rules for basemap selection:
+    // 1. If Surface domain is present, use satellite-streets (for 3D buildings)
+    // 2. If Space domain is present, use dark (for contrast)
+    // 3. If Maritime domain is present, prefer satellite
+    // 4. Default to light for Ground/Air
+
+    if (domainIds.includes('surface')) {
+      return 'satellite-streets' // Best for 3D terrain + buildings
+    }
+
+    if (domainIds.includes('space')) {
+      return 'dark' // Best for orbital/imagery visualization
+    }
+
+    if (domainIds.includes('maritime')) {
+      return 'satellite' // Best for ocean/vessel tracking
+    }
+
+    // Default for Ground, Air, Subsurface combinations
+    return 'light'
+  }
+
+  /**
+   * Apply features for multi-domain combinations
+   */
+  private applyMultiDomainFeatures(domainIds: ICDomainId[], map: mapboxgl.Map) {
+    // Enable 3D terrain if Surface domain is included
+    if (domainIds.includes('surface')) {
+      this.enable3DTerrain(map)
+    } else {
+      this.disable3DTerrain(map)
+    }
+
+    // Additional multi-domain feature logic can go here
+    // e.g., special overlays for Ground + Space (ground station coverage)
+  }
 
   /**
    * Switch to a new IC operational domain
@@ -229,6 +401,13 @@ export class DomainLayerService {
    */
   getCurrentDomain(): ICDomainId | null {
     return this.currentDomain
+  }
+
+  /**
+   * Get all current active domains (for multi-domain mode)
+   */
+  getCurrentDomains(): ICDomainId[] {
+    return this.currentDomains.length > 0 ? this.currentDomains : (this.currentDomain ? [this.currentDomain] : [])
   }
 
   /**

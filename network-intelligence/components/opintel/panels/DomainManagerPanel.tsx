@@ -110,16 +110,16 @@ export function DomainManagerPanel({
   }
 
   const handleApply = () => {
-    // Apply configuration to map
+    // Apply multi-domain configuration to map
     const domainLayerService = getDomainLayerService()
 
-    // For now, apply primary domain (first selected)
-    // TODO: Implement true multi-domain support
     if (selectedDomains.length > 0 && mapStore.map) {
-      domainLayerService.switchDomain(selectedDomains[0], mapStore.map, {
+      // Use new multi-domain fusion support
+      domainLayerService.switchMultipleDomains(selectedDomains, mapStore.map, {
         animateViewport: false,
         preserveUserLayers: false
       })
+      console.log(`[DomainManager] Applied ${selectedDomains.length} domain(s): [${selectedDomains.join(', ')}]`)
     }
 
     onApply?.(selectedDomains, selectedLayers)
