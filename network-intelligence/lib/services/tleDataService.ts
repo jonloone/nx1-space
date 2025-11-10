@@ -40,28 +40,6 @@ export interface TLEQueryOptions {
   forceRefresh?: boolean
 }
 
-interface CelesTrakGPRecord {
-  OBJECT_NAME: string
-  OBJECT_ID: string
-  EPOCH: string
-  MEAN_MOTION: number
-  ECCENTRICITY: number
-  INCLINATION: number
-  RA_OF_ASC_NODE: number
-  ARG_OF_PERICENTER: number
-  MEAN_ANOMALY: number
-  EPHEMERIS_TYPE: number
-  CLASSIFICATION_TYPE: string
-  NORAD_CAT_ID: number
-  ELEMENT_SET_NO: number
-  REV_AT_EPOCH: number
-  BSTAR: number
-  MEAN_MOTION_DOT: number
-  MEAN_MOTION_DDOT: number
-  TLE_LINE1: string
-  TLE_LINE2: string
-}
-
 interface TLECacheEntry {
   data: TLE[]
   timestamp: Date
@@ -69,7 +47,8 @@ interface TLECacheEntry {
 }
 
 export class TLEDataService {
-  private baseUrl = 'https://celestrak.org/NORAD/elements/gp.php'
+  private baseUrlJson = 'https://celestrak.org/NORAD/elements/gp.php'
+  private baseUrlTle = 'https://celestrak.org/NORAD/elements/gp.php'
   private cache: Map<string, TLECacheEntry> = new Map()
   private defaultTTL = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
@@ -136,30 +115,18 @@ export class TLEDataService {
     try {
       console.log(`🛰️ Fetching TLE data: ${queryType}=${value}`)
 
-      const url = `${this.baseUrl}?${queryType}=${encodeURIComponent(value)}&FORMAT=JSON`
+      // Use TLE format instead of JSON to get actual TLE lines
+      const url = `${this.baseUrlTle}?${queryType}=${encodeURIComponent(value)}&FORMAT=TLE`
       const response = await fetch(url)
 
       if (!response.ok) {
         throw new Error(`CelesTrak API error: ${response.status} ${response.statusText}`)
       }
 
-      const data: CelesTrakGPRecord[] = await response.json()
+      const tleText = await response.text()
 
-      if (!Array.isArray(data)) {
-        throw new Error('Invalid response format from CelesTrak API')
-      }
-
-      // Transform to our TLE format (filter out invalid records)
-      const tles = data
-        .map(record => {
-          try {
-            return this.transformCelesTrakRecord(record)
-          } catch (error) {
-            console.warn(`⚠️ Skipping satellite ${record.OBJECT_NAME}:`, error instanceof Error ? error.message : error)
-            return null
-          }
-        })
-        .filter((tle): tle is TLE => tle !== null)
+      // Parse TLE format (3-line format: name, line1, line2)
+      const tles = this.parseTLEText(tleText)
 
       // Cache the results
       this.cache.set(cacheKey, {
@@ -186,30 +153,71 @@ export class TLEDataService {
   }
 
   /**
-   * Transform CelesTrak GP record to our TLE format
+   * Parse TLE text format (3-line format: name, line1, line2)
    */
-  private transformCelesTrakRecord(record: CelesTrakGPRecord): TLE {
-    // Validate TLE lines exist
-    if (!record.TLE_LINE1 || !record.TLE_LINE2) {
-      throw new Error(
-        `Invalid TLE data for ${record.OBJECT_NAME}: Missing TLE lines. ` +
-        `This satellite may not be available in CelesTrak's JSON format.`
-      )
+  private parseTLEText(tleText: string): TLE[] {
+    const lines = tleText.trim().split('\n').map(line => line.trim()).filter(line => line.length > 0)
+    const tles: TLE[] = []
+
+    // Process in groups of 3 lines (name, line1, line2)
+    for (let i = 0; i < lines.length; i += 3) {
+      if (i + 2 >= lines.length) break
+
+      const name = lines[i]
+      const line1 = lines[i + 1]
+      const line2 = lines[i + 2]
+
+      // Validate TLE lines (must start with "1 " and "2 ")
+      if (!line1.startsWith('1 ') || !line2.startsWith('2 ')) {
+        console.warn(`⚠️ Invalid TLE format for ${name}, skipping`)
+        continue
+      }
+
+      try {
+        // Extract catalog number from line 1 (columns 3-7)
+        const catalogNumber = line1.substring(2, 7).trim()
+
+        // Extract orbital elements from TLE lines
+        // Line 1: inclination is at columns 9-16 of line 2
+        // Line 2: Mean motion at columns 53-63
+        const inclination = parseFloat(line2.substring(8, 16).trim())
+        const rightAscension = parseFloat(line2.substring(17, 25).trim())
+        const eccentricity = parseFloat('0.' + line2.substring(26, 33).trim())
+        const argumentOfPerigee = parseFloat(line2.substring(34, 42).trim())
+        const meanAnomaly = parseFloat(line2.substring(43, 51).trim())
+        const meanMotion = parseFloat(line2.substring(52, 63).trim())
+
+        // Extract epoch from line 1 (columns 19-32)
+        const epochYear = parseInt(line1.substring(18, 20))
+        const epochDay = parseFloat(line1.substring(20, 32))
+
+        // Convert 2-digit year to 4-digit (00-56 = 2000-2056, 57-99 = 1957-1999)
+        const fullYear = epochYear < 57 ? 2000 + epochYear : 1900 + epochYear
+
+        // Convert day of year to Date
+        const epoch = new Date(fullYear, 0, 1)
+        epoch.setDate(epochDay)
+
+        tles.push({
+          name: name.trim(),
+          catalogNumber,
+          line1,
+          line2,
+          epoch,
+          meanMotion,
+          eccentricity,
+          inclination,
+          rightAscension,
+          argumentOfPerigee,
+          meanAnomaly
+        })
+      } catch (error) {
+        console.warn(`⚠️ Failed to parse TLE for ${name}:`, error)
+        continue
+      }
     }
 
-    return {
-      name: record.OBJECT_NAME.trim(),
-      catalogNumber: record.NORAD_CAT_ID.toString(),
-      line1: record.TLE_LINE1,
-      line2: record.TLE_LINE2,
-      epoch: new Date(record.EPOCH),
-      meanMotion: record.MEAN_MOTION,
-      eccentricity: record.ECCENTRICITY,
-      inclination: record.INCLINATION,
-      rightAscension: record.RA_OF_ASC_NODE,
-      argumentOfPerigee: record.ARG_OF_PERICENTER,
-      meanAnomaly: record.MEAN_ANOMALY
-    }
+    return tles
   }
 
   /**
