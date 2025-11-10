@@ -15,7 +15,12 @@ import {
   Copy,
   Download,
   Share2,
-  Navigation
+  Navigation,
+  Phone,
+  Users,
+  DollarSign,
+  Wifi,
+  Activity
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,9 +32,10 @@ import { cn } from '@/lib/utils'
 import type { IntelligenceAlert } from '@/lib/types/chatArtifacts'
 import { NetworkAnalysisCard } from '@/components/investigation/NetworkAnalysisCard'
 import type { Network } from 'lucide-react'
+import { DomainManagerPanel } from '@/components/opintel/panels/DomainManagerPanel'
 
 interface RightPanelProps {
-  mode: 'feature' | 'alert' | 'layer' | 'analysis' | 'cluster' | 'network-analysis' | null
+  mode: 'feature' | 'alert' | 'layer' | 'analysis' | 'cluster' | 'network-analysis' | 'timeline-detail' | 'domain-manager' | null
   data?: any
   onClose: () => void
   onInjectAlert?: (alert: IntelligenceAlert) => void
@@ -68,6 +74,13 @@ export default function RightPanel({ mode, data, onClose, onInjectAlert, onActio
         icon = <Navigation className="h-4 w-4" />
         title = 'Network Analysis'
         break
+      case 'timeline-detail':
+        icon = <Clock className="h-4 w-4" />
+        title = 'Event Details'
+        break
+      case 'domain-manager':
+        // Domain manager has its own header, skip default header
+        return null
     }
 
     return (
@@ -84,6 +97,15 @@ export default function RightPanel({ mode, data, onClose, onInjectAlert, onActio
         >
           <X className="h-4 w-4 text-[#525252]" />
         </Button>
+      </div>
+    )
+  }
+
+  // Domain manager uses its own layout
+  if (mode === 'domain-manager') {
+    return (
+      <div className="h-full bg-gray-900 border-l border-gray-800">
+        <DomainManagerPanel onClose={onClose} initialDomain={data?.initialDomain} initialLayers={data?.initialLayers} />
       </div>
     )
   }
@@ -106,6 +128,7 @@ export default function RightPanel({ mode, data, onClose, onInjectAlert, onActio
               onAction={onAction}
             />
           )}
+          {mode === 'timeline-detail' && <TimelineDetailPanel data={data} onAction={onAction} />}
         </div>
       </ScrollArea>
     </div>
@@ -609,6 +632,209 @@ function ClusterAlertsPanel({ data, onInjectAlert }: { data: any; onInjectAlert?
             </Card>
           ))}
         </div>
+      </div>
+    </div>
+  )
+}
+
+// Timeline Event Detail Panel
+function TimelineDetailPanel({ data, onAction }: { data: any; onAction?: (action: string, data: any) => void }) {
+  if (!data) return <div className="p-4 text-sm text-gray-500">No event data available</div>
+
+  const event = data
+
+  // Event type to icon mapping
+  const EVENT_ICONS_MAP: { [key: string]: typeof MapPin } = {
+    movement: Navigation,
+    communication: Phone,
+    meeting: Users,
+    financial: DollarSign,
+    digital: Wifi,
+    location: MapPin,
+    status: Activity
+  }
+
+  // Significance colors
+  const SIGNIFICANCE_COLORS_MAP: { [key: string]: string } = {
+    critical: '#EF4444',     // red
+    anomaly: '#F97316',      // orange
+    suspicious: '#F59E0B',   // amber
+    routine: '#6B7280'       // gray
+  }
+
+  // Event type colors
+  const EVENT_COLORS_MAP: { [key: string]: string } = {
+    movement: '#3B82F6',
+    communication: '#10B981',
+    meeting: '#8B5CF6',
+    financial: '#059669',
+    digital: '#06B6D4',
+    location: '#EF4444',
+    status: '#6B7280'
+  }
+
+  const Icon = EVENT_ICONS_MAP[event.type]
+  const significanceColor = SIGNIFICANCE_COLORS_MAP[event.significance]
+  const typeColor = EVENT_COLORS_MAP[event.type]
+
+  return (
+    <div className="space-y-4">
+      {/* Event Header */}
+      <div className="space-y-2">
+        {/* Event type badge */}
+        <div className="flex items-center gap-2">
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: typeColor }}
+          >
+            {Icon && <Icon className="w-4 h-4 text-white" />}
+          </div>
+          <div>
+            <Badge variant="outline" className="text-xs capitalize border-[#E5E5E5] text-[#525252]">
+              {event.type}
+            </Badge>
+          </div>
+        </div>
+
+        {/* Event title */}
+        <h4 className="text-lg font-bold text-[#171717] leading-tight">{event.title}</h4>
+
+        {/* Significance & confidence badges */}
+        <div className="flex gap-2">
+          <Badge
+            className="text-xs font-bold text-white uppercase"
+            style={{ backgroundColor: significanceColor }}
+          >
+            {event.significance}
+          </Badge>
+          <Badge variant="outline" className="text-xs capitalize border-[#E5E5E5] text-[#525252]">
+            {event.confidence.replace('-', ' ')}
+          </Badge>
+        </div>
+
+        {/* Timestamp */}
+        <div className="flex items-center gap-2 text-xs text-[#737373]">
+          <Clock className="w-3.5 h-3.5" />
+          {new Date(event.timestamp).toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
+        </div>
+      </div>
+
+      <Separator className="bg-[#E5E5E5]" />
+
+      {/* Description */}
+      {event.description && (
+        <div>
+          <h5 className="text-xs font-semibold text-[#525252] mb-2">Description</h5>
+          <p className="text-xs text-[#737373] leading-relaxed">{event.description}</p>
+        </div>
+      )}
+
+      {/* Location */}
+      {event.location && (
+        <div>
+          <h5 className="text-xs font-semibold text-[#525252] mb-2">Location</h5>
+          <div className="bg-[#F5F5F5] rounded-md p-3 space-y-1">
+            <div className="flex items-start gap-2">
+              <MapPin className="w-3.5 h-3.5 text-[#525252] mt-0.5" />
+              <div>
+                <div className="text-xs font-medium text-[#171717]">{event.location.name}</div>
+                {event.location.address && (
+                  <div className="text-[10px] text-[#737373] mt-0.5">{event.location.address}</div>
+                )}
+                {event.location.coordinates && (
+                  <div className="text-[10px] font-mono text-[#A3A3A3] mt-1">
+                    {event.location.coordinates[1].toFixed(4)}, {event.location.coordinates[0].toFixed(4)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Participants */}
+      {event.participants && event.participants.length > 0 && (
+        <div>
+          <h5 className="text-xs font-semibold text-[#525252] mb-2">
+            Participants ({event.participants.length})
+          </h5>
+          <div className="space-y-1.5">
+            {event.participants.map((participant: string, i: number) => (
+              <div key={i} className="flex items-center gap-2 text-xs">
+                <User className="w-3.5 h-3.5 text-[#A3A3A3]" />
+                <span className="text-[#171717]">{participant}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <Separator className="bg-[#E5E5E5]" />
+
+      {/* Metadata */}
+      <div>
+        <h5 className="text-xs font-semibold text-[#525252] mb-2">Metadata</h5>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center py-1">
+            <span className="text-xs text-[#737373]">Source</span>
+            <span className="text-xs text-[#171717] font-medium">{event.source}</span>
+          </div>
+          {event.mediaAttached && (
+            <div className="flex justify-between items-center py-1">
+              <span className="text-xs text-[#737373]">Media</span>
+              <Badge variant="outline" className="text-xs border-[#E5E5E5] text-[#525252]">
+                Attached
+              </Badge>
+            </div>
+          )}
+          {event.relatedEvents && event.relatedEvents.length > 0 && (
+            <div className="flex justify-between items-center py-1">
+              <span className="text-xs text-[#737373]">Related Events</span>
+              <span className="text-xs text-[#171717] font-medium">{event.relatedEvents.length}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Separator className="bg-[#E5E5E5]" />
+
+      {/* Actions */}
+      <div className="space-y-2">
+        {event.location && (
+          <Button
+            onClick={() => onAction?.('show-on-map', event)}
+            className="w-full bg-[#176BF8] hover:bg-[#0D4DB8] text-white"
+            size="sm"
+          >
+            <MapPin className="h-3 w-3 mr-2" />
+            Show on Map
+          </Button>
+        )}
+        {event.relatedEvents && event.relatedEvents.length > 0 && (
+          <Button
+            onClick={() => onAction?.('show-network', event)}
+            variant="outline"
+            className="w-full border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]"
+            size="sm"
+          >
+            <Navigation className="h-3 w-3 mr-2" />
+            View Network
+          </Button>
+        )}
+        <Button
+          onClick={() => onAction?.('view-timeline', event)}
+          variant="outline"
+          className="w-full border-[#E5E5E5] text-[#525252] hover:bg-[#F5F5F5]"
+          size="sm"
+        >
+          <Clock className="h-3 w-3 mr-2" />
+          View Timeline Context
+        </Button>
       </div>
     </div>
   )
