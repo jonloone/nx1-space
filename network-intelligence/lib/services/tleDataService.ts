@@ -149,8 +149,17 @@ export class TLEDataService {
         throw new Error('Invalid response format from CelesTrak API')
       }
 
-      // Transform to our TLE format
-      const tles = data.map(record => this.transformCelesTrakRecord(record))
+      // Transform to our TLE format (filter out invalid records)
+      const tles = data
+        .map(record => {
+          try {
+            return this.transformCelesTrakRecord(record)
+          } catch (error) {
+            console.warn(`⚠️ Skipping satellite ${record.OBJECT_NAME}:`, error instanceof Error ? error.message : error)
+            return null
+          }
+        })
+        .filter((tle): tle is TLE => tle !== null)
 
       // Cache the results
       this.cache.set(cacheKey, {
@@ -180,6 +189,14 @@ export class TLEDataService {
    * Transform CelesTrak GP record to our TLE format
    */
   private transformCelesTrakRecord(record: CelesTrakGPRecord): TLE {
+    // Validate TLE lines exist
+    if (!record.TLE_LINE1 || !record.TLE_LINE2) {
+      throw new Error(
+        `Invalid TLE data for ${record.OBJECT_NAME}: Missing TLE lines. ` +
+        `This satellite may not be available in CelesTrak's JSON format.`
+      )
+    }
+
     return {
       name: record.OBJECT_NAME.trim(),
       catalogNumber: record.NORAD_CAT_ID.toString(),

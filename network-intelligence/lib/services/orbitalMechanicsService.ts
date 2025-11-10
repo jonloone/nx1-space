@@ -77,11 +77,22 @@ export class OrbitalMechanicsService {
    */
   getSatellitePosition(tle: TLE, date: Date = new Date()): SatelliteState | null {
     try {
+      // Validate TLE data
+      if (!tle.line1 || !tle.line2) {
+        console.error(`❌ Invalid TLE data for ${tle.name}: Missing line1 or line2`)
+        return null
+      }
+
+      if (typeof tle.line1 !== 'string' || typeof tle.line2 !== 'string') {
+        console.error(`❌ Invalid TLE data for ${tle.name}: line1 and line2 must be strings`)
+        return null
+      }
+
       // Initialize satellite record from TLE
       const satrec = satellite.twoline2satrec(tle.line1, tle.line2)
 
       if (satrec.error !== 0) {
-        console.error(`❌ TLE initialization error: ${satrec.error}`)
+        console.error(`❌ TLE initialization error for ${tle.name}: ${satrec.error}`)
         return null
       }
 
