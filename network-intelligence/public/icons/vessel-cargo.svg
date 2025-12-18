@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Cargo/Container Ship - Rectangular with containers -->
+  <path d="M16 2 L28 10 L28 24 L16 30 L4 24 L4 10 Z" fill="currentColor"/>
+  <rect x="8" y="12" width="4" height="4" fill="currentColor" opacity="0.6"/>
+  <rect x="14" y="12" width="4" height="4" fill="currentColor" opacity="0.6"/>
+  <rect x="20" y="12" width="4" height="4" fill="currentColor" opacity="0.6"/>
+</svg>

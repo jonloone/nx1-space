@@ -11,6 +11,20 @@ export type PanelContentType =
   | 'document'
   | 'help'
 
+// Document panel modes (right of chat)
+export type DocumentPanelMode =
+  | 'entity-details'       // Vessel info, port details, etc.
+  | 'analysis-report'      // AI analysis summaries
+  | 'compact-table'        // Tables with 5-15 rows
+  | 'document-viewer'      // Rich document display
+  | null
+
+// Response display mode for routing
+export type ResponseDisplayMode =
+  | 'inline'               // Show in chat
+  | 'document-panel'       // Show in right document panel
+  | 'bottom-panel'         // Show in bottom detailed table
+
 export interface PanelContent {
   type: PanelContentType
   data: any
@@ -64,6 +78,16 @@ interface PanelState {
   setRightPanelData: (data: any) => void
   openRightPanel: (mode: RightPanelMode, data?: any) => void
   closeRightPanel: () => void
+
+  // Document panel state (right of chat, left of map)
+  documentPanelMode: DocumentPanelMode
+  documentPanelData: any
+  documentPanelWidth: number  // Default 400px
+
+  // Document panel actions
+  openDocumentPanel: (mode: DocumentPanelMode, data: any) => void
+  closeDocumentPanel: () => void
+  setDocumentPanelWidth: (width: number) => void
 }
 
 export const usePanelStore = create<PanelState>()(
@@ -143,6 +167,26 @@ export const usePanelStore = create<PanelState>()(
 
       closeRightPanel: () => {
         loggedSet({ rightPanelMode: null, rightPanelData: null })
+      },
+
+      // Document panel state (right of chat)
+      documentPanelMode: null,
+      documentPanelData: null,
+      documentPanelWidth: 400,
+
+      // Document panel actions
+      openDocumentPanel: (mode, data) => {
+        console.log('📄 openDocumentPanel called with:', { mode, data })
+        loggedSet({ documentPanelMode: mode, documentPanelData: data })
+      },
+
+      closeDocumentPanel: () => {
+        console.log('📄 closeDocumentPanel called')
+        loggedSet({ documentPanelMode: null, documentPanelData: null })
+      },
+
+      setDocumentPanelWidth: (width) => {
+        loggedSet({ documentPanelWidth: width })
       }
     }},
     { name: 'PanelStore' }

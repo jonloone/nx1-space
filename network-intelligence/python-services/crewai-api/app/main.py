@@ -2,8 +2,11 @@
 FastAPI Server for CrewAI Multi-Agent Intelligence Orchestration
 
 This service provides multi-agent orchestration using CrewAI for complex
-intelligence analysis workflows including route analysis, site assessment,
-and comprehensive multi-INT investigations.
+intelligence analysis workflows across multiple domains:
+- Ground: Buildings, infrastructure, POIs
+- Maritime: Ports, vessels, shipping
+- Space: Satellites, orbits, ground stations
+- Route: Navigation and path analysis
 """
 import os
 import time
@@ -14,6 +17,10 @@ from dotenv import load_dotenv
 
 from app.models import CrewRequest, CrewResponse, HealthResponse, TaskResult
 from app.crews.route_intelligence import RouteIntelligenceCrew
+from app.crews.ground_intelligence import GroundIntelligenceCrew
+from app.crews.maritime_intelligence import MaritimeIntelligenceCrew
+from app.crews.space_intelligence import SpaceIntelligenceCrew
+from app.crews.domain_router import get_domain_router, IntelDomain
 
 # Load environment variables
 load_dotenv()
@@ -21,8 +28,8 @@ load_dotenv()
 # Initialize FastAPI
 app = FastAPI(
     title="CrewAI Intelligence API",
-    description="Multi-agent orchestration for intelligence analysis",
-    version="1.0.0"
+    description="Multi-agent orchestration for intelligence analysis across Ground, Maritime, and Space domains",
+    version="2.0.0"
 )
 
 # Configure CORS - Allow Next.js frontend
@@ -31,6 +38,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://137.220.61.218:3000",
         "https://app.mundi.ai",
         os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
     ],
@@ -45,8 +53,9 @@ async def root():
     """Root endpoint"""
     return {
         "service": "CrewAI Intelligence API",
-        "version": "1.0.0",
-        "status": "operational"
+        "version": "2.0.0",
+        "status": "operational",
+        "domains": ["ground", "maritime", "space", "route", "all"]
     }
 
 
@@ -55,8 +64,8 @@ async def health() -> HealthResponse:
     """Health check endpoint"""
     return HealthResponse(
         status="healthy",
-        version="1.0.0",
-        crews_available=["route", "site", "investigation", "auto"]
+        version="2.0.0",
+        crews_available=["route", "ground", "maritime", "space", "auto"]
     )
 
 
@@ -66,76 +75,67 @@ async def execute_crew(request: CrewRequest) -> CrewResponse:
     Execute a CrewAI workflow based on user query and context
 
     This endpoint:
-    1. Analyzes the query and context to determine the appropriate crew
-    2. Executes the crew with specialized agents
+    1. Routes the query to the appropriate domain crew using DomainRouter
+    2. Executes the crew with specialized agents and data access tools
     3. Returns synthesized intelligence with artifacts and map actions
+
+    Supported crew types:
+    - route: Navigation and path analysis
+    - ground: Buildings, infrastructure, POIs
+    - maritime: Ports, vessels, shipping
+    - space: Satellites, orbits, ground stations
+    - auto: Automatic detection based on query content
 
     Example Request:
     {
-        "query": "Analyze route from Times Square to Central Park",
+        "query": "Analyze major seaports in California",
         "context": {
-            "map_center": {"lat": 40.7580, "lng": -73.9855},
-            "map_zoom": 13,
-            "selected_location": "Times Square, NYC"
+            "map_center": {"lat": 34.0522, "lng": -118.2437},
+            "map_zoom": 8,
+            "domain": "maritime"
         },
-        "crew_type": "route",
+        "crew_type": "maritime",
         "verbose": true
     }
     """
     start_time = time.time()
 
     try:
+        # Get domain router
+        router = get_domain_router()
+
         # Determine which crew to use
         crew_type = request.crew_type or "auto"
+        context = request.context or {}
 
-        if crew_type == "auto":
-            # Auto-detect crew based on query
-            crew_type = detect_crew_type(request.query)
+        # Extract explicit domain from context if provided
+        explicit_domain = context.get("domain", crew_type if crew_type != "auto" else None)
 
-        print(f"🎯 Executing {crew_type} crew for query: {request.query}")
+        print(f"🎯 Routing query: {request.query}")
+        print(f"   Crew type: {crew_type}, Explicit domain: {explicit_domain}")
 
-        # Route to appropriate crew
-        if crew_type == "route":
-            crew = RouteIntelligenceCrew(
-                query=request.query,
-                context=request.context or {},
-                verbose=request.verbose
-            )
-            result = await crew.execute()
+        # Use domain router for intelligent routing
+        domain, result = await router.route_query(
+            query=request.query,
+            context=context,
+            explicit_domain=explicit_domain,
+            verbose=request.verbose
+        )
 
-            # Convert CrewAI result to API response format
-            response = CrewResponse(
-                success=result.get("success", True),
-                output=result.get("output", ""),
-                task_results=result.get("task_results", []),
-                artifacts=result.get("artifacts", []),
-                actions=result.get("actions", []),
-                total_duration_ms=int((time.time() - start_time) * 1000),
-                total_tokens=result.get("total_tokens"),
-                error=result.get("error")
-            )
+        # Convert result to API response format
+        response = CrewResponse(
+            success=result.get("success", True),
+            output=result.get("output", ""),
+            task_results=result.get("task_results", []),
+            artifacts=result.get("artifacts", []),
+            actions=result.get("actions", []),
+            total_duration_ms=int((time.time() - start_time) * 1000),
+            total_tokens=result.get("total_tokens"),
+            error=result.get("error")
+        )
 
-            return response
-
-        elif crew_type == "site":
-            # TODO: Implement Site Intelligence Crew
-            raise HTTPException(
-                status_code=501,
-                detail="Site Intelligence crew not yet implemented"
-            )
-
-        elif crew_type == "investigation":
-            # TODO: Implement Full Investigation Crew
-            raise HTTPException(
-                status_code=501,
-                detail="Investigation crew not yet implemented"
-            )
-
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Unknown crew type: {crew_type}"
-            )
+        print(f"✅ Completed {domain.value} analysis in {response.total_duration_ms}ms")
+        return response
 
     except Exception as e:
         print(f"❌ Crew execution error: {str(e)}")
@@ -148,6 +148,36 @@ async def execute_crew(request: CrewRequest) -> CrewResponse:
             total_duration_ms=int((time.time() - start_time) * 1000),
             error=str(e)
         )
+
+
+@app.post("/api/crew/ground")
+async def execute_ground_crew(request: CrewRequest) -> CrewResponse:
+    """Execute Ground Intelligence Crew directly"""
+    request.crew_type = "ground"
+    if request.context is None:
+        request.context = {}
+    request.context["domain"] = "ground"
+    return await execute_crew(request)
+
+
+@app.post("/api/crew/maritime")
+async def execute_maritime_crew(request: CrewRequest) -> CrewResponse:
+    """Execute Maritime Intelligence Crew directly"""
+    request.crew_type = "maritime"
+    if request.context is None:
+        request.context = {}
+    request.context["domain"] = "maritime"
+    return await execute_crew(request)
+
+
+@app.post("/api/crew/space")
+async def execute_space_crew(request: CrewRequest) -> CrewResponse:
+    """Execute Space Intelligence Crew directly"""
+    request.crew_type = "space"
+    if request.context is None:
+        request.context = {}
+    request.context["domain"] = "space"
+    return await execute_crew(request)
 
 
 def detect_crew_type(query: str) -> str:

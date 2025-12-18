@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Tanker - Rounded hull shape -->
+  <ellipse cx="16" cy="16" rx="12" ry="6" fill="currentColor"/>
+  <path d="M16 4 L20 10 L12 10 Z" fill="currentColor"/>
+  <circle cx="16" cy="16" r="3" fill="currentColor" opacity="0.6"/>
+</svg>

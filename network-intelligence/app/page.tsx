@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 
 /**
- * Root page - redirects to Operations Intelligence (Mundi OpIntel Platform)
+ * Root page - redirects to Ask Data interface
  */
 export default function HomePage() {
-  redirect('/operations')
+  redirect('/ask-data')
 }
