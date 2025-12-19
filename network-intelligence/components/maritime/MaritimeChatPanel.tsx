@@ -237,7 +237,9 @@ export default function MaritimeChatPanel({
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <div className="text-sm prose prose-invert prose-sm max-w-none prose-p:my-1 prose-strong:text-white">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      </div>
                     )}
                   </div>
 
